@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/Portalum/Portalum.Payment.Zvt/main/doc/logo.png" width="200">
+
 # Portalum.Payment.Zvt
 ZVT standard cash register interface
 
