@@ -1,0 +1,48 @@
+﻿<Window x:Class="Portalum.Payment.Zvt.TestUi.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Portalum.Payment.Zvt.TestUi"
+        mc:Ignorable="d"
+        Title="Portalum Payment Zvt TestUi (ECR)" Height="450" Width="800" Closing="Window_Closing">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Common">
+                <Grid Background="#FFE5E5E5">
+                    <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="10.15.0.130" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" Margin="8,20,0,0"/>
+                    <Label Content="IpAddress:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,-2,0,0"/>
+                    <Button x:Name="ButtonConnect" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="57" Margin="100,19,0,0"/>
+                    <Button x:Name="ButtonDisconnect" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonDisconnect_Click" Width="69" Margin="162,19,0,0"/>
+                    <Button x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="7,48,0,0"/>
+                    <Button x:Name="ButtonEndOfDay" Content="EndOfDay" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonEndOfDay_Click" Width="90" Height="29" Margin="102,82,0,0"/>
+                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,154,0,0" Height="50
+                            " VerticalAlignment="Top" HorizontalAlignment="Left" Width="289">
+                        <Grid>
+                            <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,0,0,0" Text="20.4" TextWrapping="Wrap" VerticalAlignment="Center" Width="111" TextAlignment="Right" FontSize="20"/>
+                            <Button x:Name="ButtonPay" Content="Pay" HorizontalAlignment="Left" Margin="126,0,0,0" VerticalAlignment="Center" Click="ButtonPay_Click" Height="29" Width="60"/>
+                        </Grid>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,211,0,0" Height="59" VerticalAlignment="Top" HorizontalAlignment="Left" Width="289">
+                        <Grid>
+                            <TextBox x:Name="TextBoxReceiptNumber" HorizontalAlignment="Left" Text="0000" TextWrapping="Wrap" VerticalAlignment="Top" Width="112" TextAlignment="Right" FontSize="20" Margin="10,19,0,0"/>
+                            <Button x:Name="ButtonReversal" Content="Reversal" HorizontalAlignment="Left" Margin="127,19,0,0" VerticalAlignment="Top" Width="60" Height="29" Click="ButtonReversal_Click"/>
+                            <Label Content="ReceiptNumber" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,-1,0,0" FontSize="10" Width="83"/>
+                        </Grid>
+                    </Border>
+                    <TextBox x:Name="TextBoxOutput" Margin="301,0,0,0" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" FontSize="10" />
+                    <Button x:Name="ButtonRepeatReceipt" Content="RepeatReceipt" HorizontalAlignment="Left" Margin="197,82,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
+                    <Button x:Name="ButtonLogOff" Content="LogOff" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="102,48,0,0" Click="ButtonLogOff_Click"/>
+                    <Button x:Name="ButtonRefund" Content="Refund" HorizontalAlignment="Left" Margin="7,82,0,0" VerticalAlignment="Top" Click="ButtonRefund_Click" Width="90" Height="29"/>
+                    <Button x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="197,48,0,0" Click="ButtonDiagnosis_Click"/>
+                    <Label x:Name="LabelStatus" Content="Status" HorizontalAlignment="Left" Margin="7,116,0,0" VerticalAlignment="Top" Background="#FFFFE599" Width="289" Height="33"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Communication">
+                <Grid Background="#FFE5E5E5" Margin="0">
+                    <local:CommunicationUserControl x:Name="CommunicationUserControl" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

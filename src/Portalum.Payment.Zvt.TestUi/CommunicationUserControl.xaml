@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="Portalum.Payment.Zvt.TestUi.CommunicationUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Portalum.Payment.Zvt.TestUi"
+             mc:Ignorable="d" HorizontalContentAlignment="Stretch"  VerticalContentAlignment="Stretch" >
+    <Grid>
+
+        <DataGrid AutoGenerateColumns="False" x:Name="DataGridCommunication" Grid.Column="0" CanUserAddRows="False" RenderTransformOrigin="1.007,0.503" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Timestamp" IsReadOnly="True" Binding="{Binding Timestamp, StringFormat=\{0:HH:mm:ss.fff\}}" Width="100"/>
+                <DataGridTextColumn Header="Category" IsReadOnly="True" Binding="{Binding Category}" Width="100"/>
+                <DataGridTextColumn Header="HexData" IsReadOnly="True" Binding="{Binding HexData}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>
