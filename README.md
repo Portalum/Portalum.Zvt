@@ -18,6 +18,12 @@ It is also possible to easily integrate the whole thing into a web service using
 - Repeat Receipt
 - Diagnosis
 
+## How can I use it?
+The package is available via [nuget](https://www.nuget.org/packages/Portalum.Payment.Zvt)
+```
+PM> install-package Portalum.Payment.Zvt
+```
+
 ## ZVT Documentation
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
 - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
