@@ -16,6 +16,7 @@ It is also possible to easily integrate the whole thing into a web service using
 - End-of-Day
 - Send Turnover Totals
 - Repeat Receipt
+- Diagnosis
 
 ## ZVT Documentation
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
