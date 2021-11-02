@@ -67,5 +67,21 @@ namespace Portalum.Payment.Zvt.UnitTest
             Assert.IsTrue(receiptInfo.Content.StartsWith("  Leihstellung von hobex"));
             Assert.IsTrue(receiptInfo.Content.Contains("HÄNDLERBELEG"));
         }
+
+        [TestMethod]
+        public void Parse_AdministrationReceipt_Successful()
+        {
+            var hexData = "06-D3-AC-06-81-A9-1F-07-01-03-25-81-A2-07-1B-30-32-2E-31-31-2E-32-30-32-31-20-20-20-20-20-20-20-20-20-31-37-3A-30-35-3A-30-32-07-0C-54-49-44-3A-41-48-30-30-30-30-30-36-07-14-41-62-73-63-68-6C-75-73-73-20-2D-20-6B-65-69-6E-65-20-54-58-07-19-20-41-56-3A-20-2B-30-34-2E-30-37-20-28-4A-75-6E-20-31-31-20-32-30-32-31-29-07-1B-54-49-3A-20-45-20-44-54-3A-20-30-2F-30-2F-20-4F-46-3A-20-30-2F-30-2F-20-43-47-3A-07-0F-20-20-20-20-20-20-20-20-20-20-20-31-2F-30-2F-07-01-20-07-01-20-07-01-20-07-01-20-07-01-20-07-01-20-07-01-20-09-01-81";
+            var byteData = ByteHelper.HexToByteArray(hexData);
+            var apduInfo = this.GetReceiveHandler().GetApduInfo(byteData);
+            var data = byteData.AsSpan().Slice(apduInfo.DataStartIndex);
+
+            var parser = this.GetPrintTextBlockParser();
+            var receiptInfo = parser.Parse(data);
+
+            Assert.IsTrue(receiptInfo.CompletelyProcessed);
+            Assert.AreEqual(ReceiptType.Administration, receiptInfo.ReceiptType);
+            Assert.IsTrue(receiptInfo.Content.Contains("Abschluss - keine TX"));
+        }
     }
 }
