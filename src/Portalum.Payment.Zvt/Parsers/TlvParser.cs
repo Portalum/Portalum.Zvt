@@ -229,6 +229,17 @@ namespace Portalum.Payment.Zvt.Parsers
                 return new TlvLengthInfo { Successful = false };
             }
 
+            if (bits.Bit0 && !bits.Bit1 && !bits.Bit2 && !bits.Bit3 && !bits.Bit4 && !bits.Bit5 && !bits.Bit6 && bits.Bit7)
+            {
+                if (data.Length < 2)
+                {
+                    this._logger.LogWarning($"{nameof(GetLength)} - Not enough bytes available");
+                    return new TlvLengthInfo { Successful = false };
+                }
+
+                return new TlvLengthInfo { Successful = true, Length = data[1], NumberOfBytesThatCanBeSkipped = 2 };
+            }
+
             if (!bits.Bit0 && bits.Bit1 && !bits.Bit2 && !bits.Bit3 && !bits.Bit4 && !bits.Bit5 && !bits.Bit6 && bits.Bit7)
             {
                 if (data.Length < 3)
