@@ -24,7 +24,7 @@ namespace Portalum.Payment.Zvt
         private readonly byte[] _passwordData;
 
         private readonly ZvtCommunication _zvtCommunication;
-        private readonly ReceiveHandler _receiveHandler;
+        private readonly IReceiveHandler _receiveHandler;
 
         public event Action<StatusInformation> StatusInformationReceived;
         public event Action<string> IntermediateStatusInformationReceived;
@@ -37,10 +37,12 @@ namespace Portalum.Payment.Zvt
         /// <param name="deviceCommunication"></param>
         /// <param name="logger"></param>
         /// <param name="password">The password of the PT device</param>
+        /// <param name="receiveHandler">The password of the PT device</param>
         public ZvtClient(
             IDeviceCommunication deviceCommunication,
             ILogger<ZvtClient> logger = default,
-            int password = 000000)
+            int password = 000000,
+            IReceiveHandler receiveHandler = default)
         {
             if (logger == null)
             {
@@ -53,7 +55,15 @@ namespace Portalum.Payment.Zvt
 
             IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
 
-            this._receiveHandler = new ReceiveHandler(logger, errorMessageRepository);
+            if (receiveHandler == default)
+            {
+                this._receiveHandler = new ReceiveHandler(logger, errorMessageRepository);
+            }
+            else
+            {
+                this._receiveHandler = receiveHandler;
+            }
+            
             this._receiveHandler.IntermediateStatusInformationReceived += this.ProcessIntermediateStatusInformationReceived;
             this._receiveHandler.StatusInformationReceived += this.ProcessStatusInformationReceived;
             this._receiveHandler.LineReceived += this.ProcessLineReceived;

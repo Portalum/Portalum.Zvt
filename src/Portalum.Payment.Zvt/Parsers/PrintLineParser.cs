@@ -9,7 +9,7 @@ namespace Portalum.Payment.Zvt.Parsers
     /// <summary>
     /// PrintLineParser
     /// </summary>
-    public class PrintLineParser
+    public class PrintLineParser : IPrintLineParser
     {
         private readonly ILogger _logger;
 
@@ -23,11 +23,7 @@ namespace Portalum.Payment.Zvt.Parsers
             this._logger = logger;
         }
 
-        /// <summary>
-        /// Parse
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public PrintLineInfo Parse(Span<byte> data)
         {
             /*

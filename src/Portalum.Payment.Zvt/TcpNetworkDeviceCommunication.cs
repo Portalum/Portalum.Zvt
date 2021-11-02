@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Portalum.Payment.Zvt
 {
+    /// <summary>
+    /// TcpNetwork DeviceCommunication
+    /// </summary>
     public class TcpNetworkDeviceCommunication : IDeviceCommunication, IDisposable
     {
         private readonly SimpleTcpClient _simpleTcpClient;
@@ -20,6 +23,12 @@ namespace Portalum.Payment.Zvt
         /// <inheritdoc />
         public event Action ConnectionStateChanged;
 
+        /// <summary>
+        /// TcpNetwork DeviceCommunication
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <param name="logger"></param>
         public TcpNetworkDeviceCommunication(
             string ipAddress,
             int port = 20007,

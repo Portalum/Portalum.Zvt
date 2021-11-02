@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Portalum.Payment.Zvt
 {
+    /// <summary>
+    /// SerialPort DeviceCommunication
+    /// </summary>
     public class SerialPortDeviceCommunication : IDeviceCommunication, IDisposable
     {
         private readonly ILogger<SerialPortDeviceCommunication> _logger;
@@ -23,6 +26,11 @@ namespace Portalum.Payment.Zvt
 
         public const byte DLE = 0x10;
 
+        /// <summary>
+        /// SerialPort DeviceCommunication
+        /// </summary>
+        /// <param name="comPort"></param>
+        /// <param name="logger"></param>
         public SerialPortDeviceCommunication(
             string comPort,
             ILogger<SerialPortDeviceCommunication> logger = default)

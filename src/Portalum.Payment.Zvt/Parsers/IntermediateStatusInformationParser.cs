@@ -7,7 +7,7 @@ namespace Portalum.Payment.Zvt.Parsers
     /// <summary>
     /// IntermediateStatusInformationParser
     /// </summary>
-    public class IntermediateStatusInformationParser
+    public class IntermediateStatusInformationParser : IIntermediateStatusInformationParser
     {
         private readonly ILogger _logger;
         private readonly Dictionary<byte, string> _statusMessages;
@@ -110,11 +110,7 @@ namespace Portalum.Payment.Zvt.Parsers
             };
         }
 
-        /// <summary>
-        /// GetMessage
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public string GetMessage(Span<byte> data)
         {
             if (data.Length <= 3)

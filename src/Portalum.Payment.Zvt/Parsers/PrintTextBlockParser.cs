@@ -3,7 +3,6 @@ using Portalum.Payment.Zvt.Models;
 using Portalum.Payment.Zvt.Repositories;
 using Portalum.Payment.Zvt.Responses;
 using System;
-using System.Diagnostics;
 using System.Text;
 
 namespace Portalum.Payment.Zvt.Parsers
@@ -11,7 +10,7 @@ namespace Portalum.Payment.Zvt.Parsers
     /// <summary>
     /// PrintTextBlockParser
     /// </summary>
-    public class PrintTextBlockParser
+    public class PrintTextBlockParser : IPrintTextBlockParser
     {
         private readonly ILogger _logger;
         private readonly BmpParser _bmpParser;
@@ -47,11 +46,7 @@ namespace Portalum.Payment.Zvt.Parsers
             this._receiptContent = new StringBuilder();
         }
 
-        /// <summary>
-        /// Parse
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public ReceiptInfo Parse(Span<byte> data)
         {
             this._completelyProcessed = false;

@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Portalum.Payment.Zvt.Repositories;
+using Portalum.Payment.Zvt.Helpers;
 using System;
 using System.Linq;
 
@@ -8,21 +8,12 @@ namespace Portalum.Payment.Zvt.UnitTest
     [TestClass]
     public class ReceiveHandlerTest
     {
-        private ReceiveHandler GetReceiveHandler()
-        {
-            IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
-
-            var logger = LoggerHelper.GetLogger();
-            return new ReceiveHandler(logger.Object, errorMessageRepository);
-        }
-
         [TestMethod]
         public void GetApduInfo_CorruptData1_Successful()
         {
             var data = new byte[] { 0x04, 0x0F };
 
-            var receiveHandler = this.GetReceiveHandler();
-            var apduInfo = receiveHandler.GetApduInfo(data);
+            var apduInfo = ApduHelper.GetApduInfo(data);
             Assert.IsNull(apduInfo.ControlField);
             Assert.AreEqual(0, apduInfo.DataLength);
             Assert.AreEqual(0, apduInfo.DataStartIndex);
@@ -33,8 +24,7 @@ namespace Portalum.Payment.Zvt.UnitTest
         {
             var data = new byte[0];
 
-            var receiveHandler = this.GetReceiveHandler();
-            var apduInfo = receiveHandler.GetApduInfo(data);
+            var apduInfo = ApduHelper.GetApduInfo(data);
             Assert.IsNull(apduInfo.ControlField);
             Assert.AreEqual(0, apduInfo.DataLength);
             Assert.AreEqual(0, apduInfo.DataStartIndex);
@@ -45,8 +35,7 @@ namespace Portalum.Payment.Zvt.UnitTest
         {
             var data = new byte[] { 0x04, 0x0F, 0x01, 0x6C };
 
-            var receiveHandler = this.GetReceiveHandler();
-            var apduInfo = receiveHandler.GetApduInfo(data);
+            var apduInfo = ApduHelper.GetApduInfo(data);
             Assert.IsTrue(apduInfo.ControlField.SequenceEqual(new byte[] { 0x04, 0x0F }));
             Assert.AreEqual(1, apduInfo.DataLength);
 
@@ -59,8 +48,7 @@ namespace Portalum.Payment.Zvt.UnitTest
         {
             var data = new byte[] { 0x04, 0x0F, 0xFF, 0x01, 0x00, 0x6C };
 
-            var receiveHandler = this.GetReceiveHandler();
-            var apduInfo = receiveHandler.GetApduInfo(data);
+            var apduInfo = ApduHelper.GetApduInfo(data);
             Assert.IsTrue(apduInfo.ControlField.SequenceEqual(new byte[] { 0x04, 0x0F }));
             Assert.AreEqual(1, apduInfo.DataLength);
 
@@ -73,8 +61,7 @@ namespace Portalum.Payment.Zvt.UnitTest
         {
             var data = new byte[] { 0x04, 0x0F, 0xFF, 0x00, 0x01, 0x6C };
 
-            var receiveHandler = this.GetReceiveHandler();
-            var apduInfo = receiveHandler.GetApduInfo(data);
+            var apduInfo = ApduHelper.GetApduInfo(data);
             Assert.IsTrue(apduInfo.ControlField.SequenceEqual(new byte[] { 0x04, 0x0F }));
             Assert.AreEqual(256, apduInfo.DataLength);
 
@@ -87,8 +74,7 @@ namespace Portalum.Payment.Zvt.UnitTest
         {
             var data = new byte[] { 0x04, 0x0F, 0x06, 0x00, 0x01, 0x02, 0x03 };
 
-            var receiveHandler = this.GetReceiveHandler();
-            var apduInfo = receiveHandler.GetApduInfo(data);
+            var apduInfo = ApduHelper.GetApduInfo(data);
             Assert.IsTrue(apduInfo.ControlField.SequenceEqual(new byte[] { 0x04, 0x0F }));
             Assert.AreEqual(6, apduInfo.DataLength);
         }

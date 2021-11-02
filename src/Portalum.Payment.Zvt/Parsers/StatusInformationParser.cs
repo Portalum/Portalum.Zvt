@@ -9,7 +9,7 @@ namespace Portalum.Payment.Zvt.Parsers
     /// <summary>
     /// StatusInformationParser
     /// </summary>
-    public class StatusInformationParser
+    public class StatusInformationParser : IStatusInformationParser
     {
         private readonly ILogger _logger;
         private readonly BmpParser _bmpParser;
@@ -25,9 +25,13 @@ namespace Portalum.Payment.Zvt.Parsers
         {
             this._logger = logger;
 
+            //tag:24 (display-texts)
+            //tag:07 (text-lines)
             //tag:60 (application)
             //tag:43 (application-ID)
             //tag:44 (application preferred name)
+            //tag:46 (EMV-print-data (customer-receipt))
+            //tag:47 (EMV-print-data (merchant-receipt))
             //tag:1F2B (Trace number (long format))
 
             var tlvInfos = new TlvInfo[]
@@ -42,11 +46,7 @@ namespace Portalum.Payment.Zvt.Parsers
             this._bmpParser = bmpParser;
         }
 
-        /// <summary>
-        /// Parse
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public StatusInformation Parse(Span<byte> data)
         {
             var statusInformation = new StatusInformation();

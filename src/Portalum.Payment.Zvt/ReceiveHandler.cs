@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Portalum.Payment.Zvt.Helpers;
 using Portalum.Payment.Zvt.Models;
 using Portalum.Payment.Zvt.Parsers;
 using Portalum.Payment.Zvt.Repositories;
@@ -6,82 +7,81 @@ using System;
 
 namespace Portalum.Payment.Zvt
 {
-    public class ReceiveHandler
+    /// <summary>
+    /// ReceiveHandler
+    /// </summary>
+    public class ReceiveHandler : IReceiveHandler
     {
         private readonly ILogger _logger;
         private readonly IErrorMessageRepository _errorMessageRepository;
-        private readonly int _controlFieldLength = 2;
-        private readonly byte _extendedLengthFieldIndicator = 0xFF;
-        private readonly byte _extendedLengthFieldByteCount = 2;
 
-        private readonly PrintLineParser _printLineParser;
-        private readonly PrintTextBlockParser _printTextBlockParser;
-        private readonly StatusInformationParser _statusInformationParser;
-        private readonly IntermediateStatusInformationParser _intermediateStatusInformationParser;
+        private readonly IPrintLineParser _printLineParser;
+        private readonly IPrintTextBlockParser _printTextBlockParser;
+        private readonly IStatusInformationParser _statusInformationParser;
+        private readonly IIntermediateStatusInformationParser _intermediateStatusInformationParser;
 
+        /// <inheritdoc />
         public event Action<PrintLineInfo> LineReceived;
+
+        /// <inheritdoc />
         public event Action<ReceiptInfo> ReceiptReceived;
+
+        /// <inheritdoc />
         public event Action<StatusInformation> StatusInformationReceived;
+
+        /// <inheritdoc />
         public event Action<string> IntermediateStatusInformationReceived;
 
+        /// <inheritdoc />
         public event Action CompletionReceived;
+
+        /// <inheritdoc />
         public event Action<string> AbortReceived;
+
+        /// <inheritdoc />
         public event Action NotSupportedReceived;
 
+        /// <summary>
+        /// ReceiveHandler
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="errorMessageRepository"></param>
+        /// <param name="printLineParser"></param>
+        /// <param name="printTextBlockParser"></param>
+        /// <param name="statusInformationParser"></param>
+        /// <param name="intermediateStatusInformationParser"></param>
         public ReceiveHandler(
             ILogger logger,
-            IErrorMessageRepository errorMessageRepository)
+            IErrorMessageRepository errorMessageRepository,
+            IPrintLineParser printLineParser = default,
+            IPrintTextBlockParser printTextBlockParser = default,
+            IStatusInformationParser statusInformationParser = default,
+            IIntermediateStatusInformationParser intermediateStatusInformationParser = default)
         {
             this._logger = logger;
             this._errorMessageRepository = errorMessageRepository;
 
-            this._printLineParser = new PrintLineParser(logger);
-            this._printTextBlockParser = new PrintTextBlockParser(logger, errorMessageRepository);
-            this._statusInformationParser = new StatusInformationParser(logger, errorMessageRepository);
-            this._intermediateStatusInformationParser = new IntermediateStatusInformationParser(logger);
+            this._printLineParser = printLineParser == default
+                ? new PrintLineParser(logger)
+                : printLineParser;
+
+            this._printTextBlockParser = printTextBlockParser == default
+                ? new PrintTextBlockParser(logger, errorMessageRepository)
+                : printTextBlockParser;
+
+            this._statusInformationParser = statusInformationParser == default
+                ? new StatusInformationParser(logger, errorMessageRepository)
+                : statusInformationParser;
+
+            this._intermediateStatusInformationParser = intermediateStatusInformationParser == default
+                ? new IntermediateStatusInformationParser(logger)
+                : intermediateStatusInformationParser;
         }
 
-        public ApduResponseInfo GetApduInfo(Span<byte> data)
-        {
-            if (data.Length < 3)
-            {
-                // More than 2 bytes required
-                //
-                // 00-00-00
-                // |  |  |  
-                // │  │  └─ Length
-                // │  └─ Control field INSTR
-                // └─ Control field CLASS
-
-                this._logger.LogError($"{nameof(GetApduInfo)} - Receive data packet that is too short");
-                return new ApduResponseInfo();
-            }
-
-            var apduDefaultLengthByteCount = 1;
-
-            var item = new ApduResponseInfo();
-            item.ControlField = data.Slice(0, this._controlFieldLength).ToArray();
-
-            var packageData = data.Slice(this._controlFieldLength, 1);
-            var startIndex = this._controlFieldLength + apduDefaultLengthByteCount;
-
-            if (packageData[0] != this._extendedLengthFieldIndicator)
-            {
-                item.DataLength = packageData[0];
-                item.DataStartIndex = startIndex;
-            }
-            else
-            {
-                item.DataLength = BitConverter.ToInt16(data.Slice(startIndex, this._extendedLengthFieldByteCount));
-                item.DataStartIndex = startIndex + this._extendedLengthFieldByteCount;
-            }
-
-            return item;
-        }
-
+        /// <inheritdoc />
         public bool ProcessData(Span<byte> data)
         {
-            var apduInfo = this.GetApduInfo(data);
+            var apduInfo = ApduHelper.GetApduInfo(data);
             if (apduInfo.ControlField == null)
             {
                 return false;
