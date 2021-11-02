@@ -24,6 +24,17 @@ The package is available via [nuget](https://www.nuget.org/packages/Portalum.Pay
 PM> install-package Portalum.Payment.Zvt
 ```
 
+## Examples
+
+### Start payment prcocess
+```cs
+var deviceCommunication = new TcpNetworkDeviceCommunication("1.2.3.4", port: 20007);
+await deviceCommunication.ConnectAsync();
+
+using var zvtClient = new ZvtClient(deviceCommunication);
+await zvtClient.PaymentAsync(10.5M);
+```
+
 ## ZVT Documentation
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
 - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
