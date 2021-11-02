@@ -17,6 +17,7 @@ namespace Portalum.Payment.Zvt
     /// </summary>
     public class ZvtClient : IDisposable
     {
+        //Documentation
         //https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
         //https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
 
@@ -299,10 +300,12 @@ namespace Portalum.Payment.Zvt
         /// This command starts a Refund on the PT. The result of the Refund is reported to the ECR after completion of the booking-process.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> RefundAsync()
+        public async Task<bool> RefundAsync(decimal amount)
         {
             var package = new List<byte>();
             package.AddRange(this._passwordData);
+            package.Add(0x04); //Amount prefix
+            package.AddRange(NumberHelper.DecimalToBcd(amount));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x31 }, package);
             return await this.SendCommandAsync(fullPackage);

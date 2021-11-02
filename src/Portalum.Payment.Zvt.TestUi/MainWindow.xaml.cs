@@ -241,12 +241,18 @@ namespace Portalum.Payment.Zvt.TestUi
 
         private async void ButtonRefund_Click(object sender, RoutedEventArgs e)
         {
+            if (!decimal.TryParse(this.TextBoxAmount.Text, NumberStyles.Currency, CultureInfo.InvariantCulture, out var amount))
+            {
+                MessageBox.Show("Cannot parse amount");
+                return;
+            }
+
             if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
             {
                 return;
             }
 
-            await this._zvtClient?.RefundAsync();
+            await this._zvtClient?.RefundAsync(amount);
         }
 
         private async  void ButtonReversal_Click(object sender, RoutedEventArgs e)
