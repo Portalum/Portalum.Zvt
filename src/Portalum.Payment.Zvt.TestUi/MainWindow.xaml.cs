@@ -73,8 +73,15 @@ namespace Portalum.Payment.Zvt.TestUi
 
         private void ReceiptReceived(ReceiptInfo receipt)
         {
+            if (receipt == null)
+            {
+                return;
+            }
+
             this.TextBoxOutput.Dispatcher.Invoke(() =>
             {
+                this.TextBoxOutput.Text += $"{receipt.ReceiptType}\r\n";
+                this.TextBoxOutput.Text += "-----------------------\r\n";
                 this.TextBoxOutput.Text += $"{receipt.Content}\r\n";
                 this.TextBoxOutput.ScrollToEnd();
             });

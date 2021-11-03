@@ -237,8 +237,18 @@ namespace Portalum.Payment.Zvt
             package.Add(0x00); //Service byte data
 
             //Add empty TLV Container
+            //package.Add(0x06); //TLV
+            //package.Add(0x00); //TLV-Length
+
+            //Add TLV Container permit 06D3 (Card complete)
             package.Add(0x06); //TLV
-            package.Add(0x00); //TLV-Length
+            package.Add(0x06); //tlv legnth
+            package.Add(0x26); //list of permitted ZVT-Commands
+            package.Add(0x04); //length
+            package.Add(0x0A); //ZVT-command
+            package.Add(0x02); //length
+            package.Add(0x06); //06 first hex of print text block
+            package.Add(0xD3); //D3 second hex of print text block
 
             //TLV TAG
             //10 - Number of columns and number of lines of the merchant-display
