@@ -77,5 +77,15 @@ namespace Portalum.Payment.Zvt.UnitTest
             var result = NumberHelper.IntToBcd(number, 3);
             Assert.IsTrue(result.SequenceEqual(expected));
         }
+
+        [TestMethod]
+        public void IntToBcd_EuroCurrencyNumericCode_Successful()
+        {
+            var number = 978;
+            var expected = new byte[] { 0x09, 0x78 };
+
+            var result = NumberHelper.IntToBcd(number, 2);
+            Assert.IsTrue(result.SequenceEqual(expected));
+        }
     }
 }

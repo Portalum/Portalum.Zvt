@@ -175,37 +175,6 @@ namespace Portalum.Payment.Zvt
             return successful;
         }
 
-        private byte GetConfigByte(RegistrationConfig registrationConfig)
-        {
-            _ = registrationConfig ?? throw new ArgumentNullException(nameof(registrationConfig));
-
-            var configByte = new byte();
-            if (!registrationConfig.ReceiptPrintoutForPaymentFunctionsViaPaymentTerminal)
-            {
-                configByte = BitHelper.SetBit(configByte, 1);
-            }
-            if (!registrationConfig.ReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal)
-            {
-                configByte = BitHelper.SetBit(configByte, 2);
-            }
-            if (registrationConfig.SendIntermediateStatusInformation)
-            {
-                configByte = BitHelper.SetBit(configByte, 3);
-            }
-            if (!registrationConfig.AllowStartPaymentViaPaymentTerminal)
-            {
-                configByte = BitHelper.SetBit(configByte, 4);
-            }
-            if (!registrationConfig.AllowAdministrationViaPaymentTerminal)
-            {
-                configByte = BitHelper.SetBit(configByte, 5);
-            }
-
-            configByte = BitHelper.SetBit(configByte, 7); //ECR print-type
-
-            return configByte;
-        }
-
         private byte[] CreatePackage(byte[] controlField, IEnumerable<byte> packageData)
         {
             var package = new List<byte>();
@@ -223,18 +192,23 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<bool> RegistrationAsync(RegistrationConfig registrationConfig)
         {
-            var configByte = this.GetConfigByte(registrationConfig);
+            _ = registrationConfig ?? throw new ArgumentNullException(nameof(registrationConfig));
+
+            var configByte = registrationConfig.GetConfigByte();
+            var serviceByte = registrationConfig.GetServiceByte();
 
             var package = new List<byte>();
             package.AddRange(this._passwordData);
             package.Add(configByte);
 
             //Currency Code (CC)
-            package.AddRange(new byte[] { 0x09, 0x78 }); //Set curreny to Euro
+            //ISO4217 (https://en.wikipedia.org/wiki/ISO_4217)
+            var currencyNumericCodeData = NumberHelper.IntToBcd(978, 2); //978 = Euro
+            package.AddRange(currencyNumericCodeData);
 
             //Service byte
             package.Add(0x03); //Service byte indicator
-            package.Add(0x00); //Service byte data
+            package.Add(serviceByte);
 
             //Add empty TLV Container
             //package.Add(0x06); //TLV
