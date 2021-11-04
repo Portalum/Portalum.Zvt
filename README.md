@@ -9,14 +9,29 @@ It is also possible to easily integrate the whole thing into a web service using
 
 ## Supported features
 
+### Commands to Payment Terminal
+
 - Registration
 - Log-Off
 - Authorization
 - Reversal
+- Refund
 - End-of-Day
 - Send Turnover Totals
 - Repeat Receipt
 - Diagnosis
+
+### Commands from Payment Terminal
+
+- Status-Information
+- Intermediate StatusInformation
+- Print Line
+- Print Text-Block
+
+### Generic
+
+- BMP Processing
+- TLV Processing
 
 ## How can I use it?
 The package is available via [nuget](https://www.nuget.org/packages/Portalum.Payment.Zvt)
