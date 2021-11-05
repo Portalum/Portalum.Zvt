@@ -135,10 +135,12 @@ namespace Portalum.Payment.Zvt.TestUi
                 return;
             }
 
-            var inlines = new List<Inline>();
-            inlines.Add(new Bold(new Run($"Receipt {receipt.ReceiptType}")));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run(receipt.Content));
+            var inlines = new List<Inline>
+            {
+                new Bold(new Run($"Receipt {receipt.ReceiptType}")),
+                new LineBreak(),
+                new Run(receipt.Content)
+            };
 
             this.AddOutputElement(inlines.ToArray(), Brushes.White);
         }
@@ -149,10 +151,12 @@ namespace Portalum.Payment.Zvt.TestUi
 
             if (printLineInfo.IsLastLine)
             {
-                var inlines = new List<Inline>();
-                inlines.Add(new Bold(new Run("Lines")));
-                inlines.Add(new LineBreak());
-                inlines.Add(new Run(this._printLineCache.ToString()));
+                var inlines = new List<Inline>
+                {
+                    new Bold(new Run("Lines")),
+                    new LineBreak(),
+                    new Run(this._printLineCache.ToString())
+                };
 
                 this.AddOutputElement(inlines.ToArray(), Brushes.White);
 
@@ -165,24 +169,26 @@ namespace Portalum.Payment.Zvt.TestUi
         {
             this.IntermediateStatusInformationReceived(string.Empty);
 
-            var inlines = new List<Inline>();
-            inlines.Add(new Bold(new Run("StatusInformation")));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"AdditionalText: {statusInformation.AdditionalText}"));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"Amount: {statusInformation.Amount}"));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"CardholderAuthentication: {statusInformation.CardholderAuthentication}"));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"CardName: {statusInformation.CardName}"));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"CardTechnology: {statusInformation.CardTechnology}"));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"TerminalIdentifier: {statusInformation.TerminalIdentifier}"));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"TraceNumber: {statusInformation.TraceNumber}"));
-            inlines.Add(new LineBreak());
-            inlines.Add(new Run($"ErrorMessage: {statusInformation.ErrorMessage}"));
+            var inlines = new List<Inline>
+            {
+                new Bold(new Run("StatusInformation")),
+                new LineBreak(),
+                new Run($"AdditionalText: {statusInformation.AdditionalText}"),
+                new LineBreak(),
+                new Run($"Amount: {statusInformation.Amount}"),
+                new LineBreak(),
+                new Run($"CardholderAuthentication: {statusInformation.CardholderAuthentication}"),
+                new LineBreak(),
+                new Run($"CardName: {statusInformation.CardName}"),
+                new LineBreak(),
+                new Run($"CardTechnology: {statusInformation.CardTechnology}"),
+                new LineBreak(),
+                new Run($"TerminalIdentifier: {statusInformation.TerminalIdentifier}"),
+                new LineBreak(),
+                new Run($"TraceNumber: {statusInformation.TraceNumber}"),
+                new LineBreak(),
+                new Run($"ErrorMessage: {statusInformation.ErrorMessage}")
+            };
 
             this.AddOutputElement(inlines.ToArray(), Brushes.LightGoldenrodYellow);
         }
