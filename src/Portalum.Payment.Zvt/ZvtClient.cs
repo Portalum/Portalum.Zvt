@@ -39,11 +39,13 @@ namespace Portalum.Payment.Zvt
         /// <param name="logger"></param>
         /// <param name="password">The password of the PT device</param>
         /// <param name="receiveHandler">The password of the PT device</param>
+        /// <param name="language"></param>
         public ZvtClient(
             IDeviceCommunication deviceCommunication,
             ILogger<ZvtClient> logger = default,
             int password = 000000,
-            IReceiveHandler receiveHandler = default)
+            IReceiveHandler receiveHandler = default,
+            Language language = Language.English)
         {
             if (logger == null)
             {
@@ -54,11 +56,28 @@ namespace Portalum.Payment.Zvt
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             this._passwordData = NumberHelper.IntToBcd(password);
 
-            IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
+            #region Language
+
+            IErrorMessageRepository errorMessageRepository;
+            IIntermediateStatusRepository intermediateStatusRepository;
+            if (language == Language.German)
+            {
+                errorMessageRepository = new EnglishErrorMessageRepository(); //No Germman translation available
+                intermediateStatusRepository = new GermanIntermediateStatusRepository();
+            }
+            else
+            {
+                errorMessageRepository = new EnglishErrorMessageRepository();
+                intermediateStatusRepository = new EnglishIntermediateStatusRepository();
+            }
+
+            #endregion
+
+            #region ReceiveHandler
 
             if (receiveHandler == default)
             {
-                this._receiveHandler = new ReceiveHandler(logger, errorMessageRepository);
+                this._receiveHandler = new ReceiveHandler(logger, errorMessageRepository, intermediateStatusRepository);
             }
             else
             {
@@ -70,8 +89,11 @@ namespace Portalum.Payment.Zvt
             this._receiveHandler.LineReceived += this.ProcessLineReceived;
             this._receiveHandler.ReceiptReceived += this.ProcessReceiptReceived;
 
+            #endregion
+
             this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
             this._zvtCommunication.DataReceived += this.DataReceived;
+
         }
 
         /// <summary>

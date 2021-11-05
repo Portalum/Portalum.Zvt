@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Portalum.Payment.Zvt.Parsers;
+using Portalum.Payment.Zvt.Repositories;
 
 namespace Portalum.Payment.Zvt.UnitTest
 {
@@ -9,7 +10,9 @@ namespace Portalum.Payment.Zvt.UnitTest
         private IntermediateStatusInformationParser GetIntermediateStatusInformationParser()
         {
             var logger = LoggerHelper.GetLogger();
-            return new IntermediateStatusInformationParser(logger.Object);
+            IIntermediateStatusRepository intermediateStatusRepository = new EnglishIntermediateStatusRepository();
+
+            return new IntermediateStatusInformationParser(logger.Object, intermediateStatusRepository);
         }
 
         [TestMethod]

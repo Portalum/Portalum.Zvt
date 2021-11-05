@@ -46,6 +46,7 @@ namespace Portalum.Payment.Zvt
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="errorMessageRepository"></param>
+        /// <param name="intermediateStatusRepository"></param>
         /// <param name="printLineParser"></param>
         /// <param name="printTextBlockParser"></param>
         /// <param name="statusInformationParser"></param>
@@ -53,6 +54,7 @@ namespace Portalum.Payment.Zvt
         public ReceiveHandler(
             ILogger logger,
             IErrorMessageRepository errorMessageRepository,
+            IIntermediateStatusRepository intermediateStatusRepository,
             IPrintLineParser printLineParser = default,
             IPrintTextBlockParser printTextBlockParser = default,
             IStatusInformationParser statusInformationParser = default,
@@ -74,7 +76,7 @@ namespace Portalum.Payment.Zvt
                 : statusInformationParser;
 
             this._intermediateStatusInformationParser = intermediateStatusInformationParser == default
-                ? new IntermediateStatusInformationParser(logger)
+                ? new IntermediateStatusInformationParser(logger, intermediateStatusRepository)
                 : intermediateStatusInformationParser;
         }
 

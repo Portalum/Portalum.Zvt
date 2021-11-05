@@ -64,7 +64,7 @@ namespace Portalum.Payment.Zvt.TestUi
             this.ButtonDisconnect.IsEnabled = true;
             this.ButtonConnect.IsEnabled = false;
 
-            this._zvtClient = new ZvtClient(this._deviceCommunication, logger: loggerZvtClient);
+            this._zvtClient = new ZvtClient(this._deviceCommunication, logger: loggerZvtClient, language: Zvt.Language.German);
             this._zvtClient.LineReceived += this.LineReceived;
             this._zvtClient.ReceiptReceived += this.ReceiptReceived;
             this._zvtClient.StatusInformationReceived += this.StatusInformationReceived;

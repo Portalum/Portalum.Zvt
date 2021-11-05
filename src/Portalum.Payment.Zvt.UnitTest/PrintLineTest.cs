@@ -11,9 +11,10 @@ namespace Portalum.Payment.Zvt.UnitTest
         private ReceiveHandler GetReceiveHandler()
         {
             IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
+            IIntermediateStatusRepository intermediateStatusRepository = new EnglishIntermediateStatusRepository();
 
             var logger = LoggerHelper.GetLogger();
-            return new ReceiveHandler(logger.Object, errorMessageRepository);
+            return new ReceiveHandler(logger.Object, errorMessageRepository, intermediateStatusRepository);
         }
 
         [TestMethod]

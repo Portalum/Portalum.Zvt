@@ -3,13 +3,15 @@
 namespace Portalum.Payment.Zvt.Repositories
 {
     /// <summary>
-    /// EnglishErrorMessageRepository
+    /// English ErrorMessageRepository
     /// </summary>
     public class EnglishErrorMessageRepository : IErrorMessageRepository
     {
         private readonly Dictionary<byte, string> _errorCodes;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// English ErrorMessageRepository
+        /// </summary>
         public EnglishErrorMessageRepository()
         {
             this._errorCodes = new Dictionary<byte, string>
