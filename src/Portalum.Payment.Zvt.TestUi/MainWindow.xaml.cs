@@ -145,6 +145,8 @@ namespace Portalum.Payment.Zvt.TestUi
 
         private void LineReceived(PrintLineInfo printLineInfo)
         {
+            this._printLineCache.AppendLine(printLineInfo.Text);
+
             if (printLineInfo.IsLastLine)
             {
                 var inlines = new List<Inline>();
@@ -157,8 +159,6 @@ namespace Portalum.Payment.Zvt.TestUi
                 this._printLineCache.Clear();
                 return;
             }
-
-            this._printLineCache.AppendLine(printLineInfo.Text);
         }
 
         private void StatusInformationReceived(StatusInformation statusInformation)
