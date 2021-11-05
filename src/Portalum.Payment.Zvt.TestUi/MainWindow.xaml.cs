@@ -1,11 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portalum.Payment.Zvt.Models;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 
 namespace Portalum.Payment.Zvt.TestUi
 {
@@ -17,6 +22,8 @@ namespace Portalum.Payment.Zvt.TestUi
         private readonly ILoggerFactory _loggerFactory;
         private IDeviceCommunication _deviceCommunication;
         private ZvtClient _zvtClient;
+        private int _outputRowNumber = 0;
+        private StringBuilder _printLineCache;
 
         public MainWindow()
         {
@@ -26,6 +33,7 @@ namespace Portalum.Payment.Zvt.TestUi
             this.InitializeComponent();
             this.LabelStatus.Content = string.Empty;
 
+            this._printLineCache = new StringBuilder();
             this.TextBoxIpAddress.Background = Brushes.White;
             this.ButtonDisconnect.IsEnabled = false;
         }
@@ -71,6 +79,55 @@ namespace Portalum.Payment.Zvt.TestUi
             this._zvtClient.IntermediateStatusInformationReceived += this.IntermediateStatusInformationReceived;
         }
 
+        private void AddOutputElement(Inline[] inlines, Brush backgroundColor)
+        {
+            this.Output.Dispatcher.Invoke(() =>
+            {
+                var textBlock = new TextBlock
+                {
+                    Padding = new Thickness(10),
+                    TextWrapping = TextWrapping.Wrap,
+                    Width = 200
+                };
+
+                textBlock.Inlines.Add(new Run($"{DateTime.Now}") { Foreground = Brushes.DarkGray, FontSize = 9 });
+                textBlock.Inlines.Add(new LineBreak());
+                textBlock.Inlines.AddRange(inlines);
+                textBlock.Measure(new Size(50, 1000));
+
+                var canvas = new Canvas
+                {
+                    Background = backgroundColor,
+                    Height = textBlock.DesiredSize.Height,
+                    Margin = new Thickness(10),
+                    Effect = new DropShadowEffect()
+                    {
+                        Color = Colors.DimGray,
+                        BlurRadius = 10,
+                        Direction = 0,
+                        ShadowDepth = 0.5,
+                        Opacity = 0.2
+                    }
+                };
+
+                canvas.Children.Add(textBlock);
+                Grid.SetRow(canvas, this._outputRowNumber++);
+
+                var rowDefinition = new RowDefinition
+                {
+                    Height = new GridLength(0, GridUnitType.Star)
+                };
+
+                this.Output.RowDefinitions.Add(rowDefinition);
+                this.Output.Children.Add(canvas);
+            });
+
+            this.OutputScrollViewer.Dispatcher.Invoke(() =>
+            {
+                this.OutputScrollViewer.ScrollToEnd();
+            });
+        }
+
         private void ReceiptReceived(ReceiptInfo receipt)
         {
             if (receipt == null)
@@ -78,35 +135,56 @@ namespace Portalum.Payment.Zvt.TestUi
                 return;
             }
 
-            this.TextBoxOutput.Dispatcher.Invoke(() =>
-            {
-                this.TextBoxOutput.Text += $"{receipt.ReceiptType}\r\n";
-                this.TextBoxOutput.Text += "-----------------------\r\n";
-                this.TextBoxOutput.Text += $"{receipt.Content}\r\n";
-                this.TextBoxOutput.ScrollToEnd();
-            });
+            var inlines = new List<Inline>();
+            inlines.Add(new Bold(new Run($"Receipt {receipt.ReceiptType}")));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run(receipt.Content));
+
+            this.AddOutputElement(inlines.ToArray(), Brushes.White);
         }
 
         private void LineReceived(PrintLineInfo printLineInfo)
         {
-            this.TextBoxOutput.Dispatcher.Invoke(() =>
+            if (printLineInfo.IsLastLine)
             {
-                this.TextBoxOutput.Text += $"{printLineInfo.Text}\r\n";
-                this.TextBoxOutput.ScrollToEnd();
-            });
+                var inlines = new List<Inline>();
+                inlines.Add(new Bold(new Run("Lines")));
+                inlines.Add(new LineBreak());
+                inlines.Add(new Run(this._printLineCache.ToString()));
+
+                this.AddOutputElement(inlines.ToArray(), Brushes.White);
+
+                this._printLineCache.Clear();
+                return;
+            }
+
+            this._printLineCache.AppendLine(printLineInfo.Text);
         }
 
         private void StatusInformationReceived(StatusInformation statusInformation)
         {
             this.IntermediateStatusInformationReceived(string.Empty);
 
-            this.TextBoxOutput.Dispatcher.Invoke(() =>
-            {
-                var json = JsonSerializer.Serialize(statusInformation);
+            var inlines = new List<Inline>();
+            inlines.Add(new Bold(new Run("StatusInformation")));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"AdditionalText: {statusInformation.AdditionalText}"));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"Amount: {statusInformation.Amount}"));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"CardholderAuthentication: {statusInformation.CardholderAuthentication}"));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"CardName: {statusInformation.CardName}"));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"CardTechnology: {statusInformation.CardTechnology}"));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"TerminalIdentifier: {statusInformation.TerminalIdentifier}"));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"TraceNumber: {statusInformation.TraceNumber}"));
+            inlines.Add(new LineBreak());
+            inlines.Add(new Run($"ErrorMessage: {statusInformation.ErrorMessage}"));
 
-                this.TextBoxOutput.Text += $"SI: {json}\r\n";
-                this.TextBoxOutput.ScrollToEnd();
-            });
+            this.AddOutputElement(inlines.ToArray(), Brushes.LightGoldenrodYellow);
         }
 
         private void IntermediateStatusInformationReceived(string message)
