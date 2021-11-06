@@ -3,6 +3,9 @@ using System;
 
 namespace Portalum.Payment.Zvt.Helpers
 {
+    /// <summary>
+    /// BitHelper
+    /// </summary>
     public static class BitHelper
     {
         /// <summary>

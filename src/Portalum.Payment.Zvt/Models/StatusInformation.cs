@@ -1,4 +1,5 @@
 ﻿using Portalum.Payment.Zvt.Responses;
+using System;
 
 namespace Portalum.Payment.Zvt.Models
 {
@@ -10,7 +11,9 @@ namespace Portalum.Payment.Zvt.Models
         IResponseAmount,
         IResponseCardName,
         IResponseCardholderAuthentication,
-        IResponseCardTechnology
+        IResponseCardTechnology,
+        IResponseTime,
+        IResponseCurrencyCode
     {
         public string ErrorMessage { get; set; }
         public string TraceNumber { get; set; }
@@ -20,5 +23,7 @@ namespace Portalum.Payment.Zvt.Models
         public decimal Amount { get; set; }
         public string CardholderAuthentication { get; set; }
         public string CardTechnology { get; set; }
+        public TimeSpan Time { get; set; }
+        public int CurrencyCode { get; set; }
     }
 }

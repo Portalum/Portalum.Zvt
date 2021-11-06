@@ -3,8 +3,16 @@ using System.Linq;
 
 namespace Portalum.Payment.Zvt.Helpers
 {
+    /// <summary>
+    /// NumberHelper
+    /// </summary>
     public static class NumberHelper
     {
+        /// <summary>
+        /// Get number of digits
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static int GetNumberOfDigits(decimal value)
         {
             var abs = Math.Abs(value);
@@ -12,6 +20,12 @@ namespace Portalum.Payment.Zvt.Helpers
             return abs < 1 ? 0 : (int)(Math.Log10(decimal.ToDouble(abs)) + 1);
         }
 
+        /// <summary>
+        /// Convert decimal to Binary Coded Decimal
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static byte[] DecimalToBcd(decimal value, int length = 6)
         {
             var x = decimal.Round(value, 2, MidpointRounding.AwayFromZero);
@@ -36,6 +50,12 @@ namespace Portalum.Payment.Zvt.Helpers
             return data.Reverse().ToArray();
         }
 
+        /// <summary>
+        /// Convert int to Binary Coded Decimal
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static byte[] IntToBcd(int value, int length = 3)
         {
             var data = new byte[length];
@@ -50,6 +70,22 @@ namespace Portalum.Payment.Zvt.Helpers
             }
 
             return data.Reverse().ToArray();
+        }
+
+        /// <summary>
+        /// Convert Binary Coded Decimal to int
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static int BcdToInt(Span<byte> data)
+        {
+            var tempNumber = ByteHelper.ByteArrayToHex(data);
+            if (int.TryParse(tempNumber, out var number))
+            {
+                return number;
+            }
+
+            return 0;
         }
 
         public static short ToInt16LittleEndian(Span<byte> data)

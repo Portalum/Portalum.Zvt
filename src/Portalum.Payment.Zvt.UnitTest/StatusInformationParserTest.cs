@@ -62,6 +62,9 @@ namespace Portalum.Payment.Zvt.UnitTest
 
             Assert.AreEqual("GEN.NR.:611804", statusInformation.AdditionalText);
             Assert.AreEqual("Debit Mastercard", statusInformation.CardName);
+            Assert.AreEqual(20.4M, statusInformation.Amount);
+            Assert.AreEqual(978, statusInformation.CurrencyCode);
+            Assert.AreEqual(new TimeSpan(22, 39, 53), statusInformation.Time);
             Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
         }
 
@@ -78,6 +81,7 @@ namespace Portalum.Payment.Zvt.UnitTest
 
             Assert.AreEqual("GEN.NR.:978539", statusInformation.AdditionalText);
             Assert.AreEqual("Debit Mastercard", statusInformation.CardName);
+            Assert.AreEqual(20.4M, statusInformation.Amount);
             Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
         }
 

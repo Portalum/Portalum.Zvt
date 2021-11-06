@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using Portalum.Payment.Zvt.Helpers;
 using Portalum.Payment.Zvt.Models;
 using Portalum.Payment.Zvt.Repositories;
 using Portalum.Payment.Zvt.Responses;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Portalum.Payment.Zvt.Parsers
@@ -35,8 +37,8 @@ namespace Portalum.Payment.Zvt.Parsers
                 new BmpInfo { Id = 0x04, DataLength = 6, Description = "Amount in minor currency units", TryParse = ParseAmount },
                 new BmpInfo { Id = 0x05, DataLength = 1, Description = "Pump number, range 00 - FF", TryParse = null },
                 new BmpInfo { Id = 0x06, DataLength = 0, Description = "TLV-container; length according to TLV-encoding (not LLL-Var !)", TryParse = tlvParser.Parse },
-                new BmpInfo { Id = 0x0B, DataLength = 3, Description = "Trace number", TryParse = null },
-                new BmpInfo { Id = 0x0C, DataLength = 3, Description = "Time, format HHMMSS", TryParse = null },
+                new BmpInfo { Id = 0x0B, DataLength = 3, Description = "Trace number", TryParse = this.ParseTraceNumber },
+                new BmpInfo { Id = 0x0C, DataLength = 3, Description = "Time, format HHMMSS", TryParse = this.ParseTime },
                 new BmpInfo { Id = 0x0D, DataLength = 2, Description = "Date, format MMDD (see also AA)", TryParse = null },
                 new BmpInfo { Id = 0x0E, DataLength = 2, Description = "Expiry-date, format YYMM", TryParse = null },
                 new BmpInfo { Id = 0x17, DataLength = 2, Description = "Card sequence-number", TryParse = null },
@@ -54,7 +56,7 @@ namespace Portalum.Payment.Zvt.Parsers
                 new BmpInfo { Id = 0x3B, DataLength = 8, Description = "AID authorisation-attribute", TryParse = null },
                 new BmpInfo { Id = 0x3C, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Additional-data/additional-text", TryParse = this.ParseAdditionalText },
                 new BmpInfo { Id = 0x3D, DataLength = 3, Description = "Password", TryParse = null },
-                new BmpInfo { Id = 0x49, DataLength = 2, Description = "Currency code", TryParse = null },
+                new BmpInfo { Id = 0x49, DataLength = 2, Description = "Currency code", TryParse = this.ParseCurrencyCode },
                 new BmpInfo { Id = 0x60, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Individual totals", TryParse = null },
                 new BmpInfo { Id = 0x70, DataLength = 4, Description = "Uniquely identifies Display Image request. In case image data is transmitted by more than one Display Image message (image data is chunked) then each of them has to have the same request-id set.", TryParse = null },
                 new BmpInfo { Id = 0x71, DataLength = 4, Description = "Total size of the image that will be displayed. Image-size is 4 bytes long. This field is used when image data is chunked and pays control role to ensure receiver that sum of all received image data chunks is correct.", TryParse = null },
@@ -261,13 +263,53 @@ namespace Portalum.Payment.Zvt.Parsers
             return false;
         }
 
+        private bool ParseTime(byte[] data, IResponse response)
+        {
+            if (response is IResponseTime typedResponse)
+            {
+                if (data.Length != 3)
+                {
+                    return false;
+                }
+
+                var timeInHex = ByteHelper.ByteArrayToHex(data);
+                if (!TimeSpan.TryParseExact(timeInHex, "hhmmss", CultureInfo.InvariantCulture, out var time))
+                {
+                    return false;
+                }
+
+                typedResponse.Time = time;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseCurrencyCode(byte[] data, IResponse response)
+        {
+            if (response is IResponseCurrencyCode typedResponse)
+            {
+                var currencyCode = NumberHelper.BcdToInt(data);
+                typedResponse.CurrencyCode = currencyCode;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseTraceNumber(byte[] data, IResponse response)
+        {
+            return false;
+        }
+
         private bool ParseAdditionalText(byte[] data, IResponse response)
         {
-            var text = Encoding.UTF7.GetString(data);
-
             if (response is IResponseAdditionalText typedResponse)
             {
+                var text = Encoding.UTF7.GetString(data);
                 typedResponse.AdditionalText = text;
+
                 return true;
             }
 
@@ -276,12 +318,13 @@ namespace Portalum.Payment.Zvt.Parsers
 
         private bool ParseTerminalIdentifier(byte[] data, IResponse response)
         {
-            Array.Reverse(data);
-            var terminalIdentifier = BitConverter.ToInt32(data, 0);
-
             if (response is IResponseTerminalIdentifier typedResponse)
             {
+                Array.Reverse(data);
+                var terminalIdentifier = BitConverter.ToInt32(data, 0);
+
                 typedResponse.TerminalIdentifier = terminalIdentifier;
+
                 return true;
             }
 
@@ -290,11 +333,11 @@ namespace Portalum.Payment.Zvt.Parsers
 
         private bool ParseCardName(byte[] data, IResponse response)
         {
-            var cardName = Encoding.UTF7.GetString(data);
-
             if (response is IResponseCardName typedResponse)
             {
+                var cardName = Encoding.UTF7.GetString(data);
                 typedResponse.CardName = cardName.TrimEnd('\0');
+
                 return true;
             }
 
@@ -303,53 +346,12 @@ namespace Portalum.Payment.Zvt.Parsers
 
         private bool ParseAmount(byte[] data, IResponse response)
         {
-            var firstByteHex = data[0].ToString("X2");
-            var secondByteHex = data[1].ToString("X2");
-            var thirdByteHex = data[2].ToString("X2");
-            var fourthByteHex = data[3].ToString("X2");
-            var fifthByteHex = data[4].ToString("X2");
-            var sixthByteHex = data[5].ToString("X2");
-
-            if (!int.TryParse(firstByteHex, out var n1))
-            {
-                return false;
-            }
-
-            if (!int.TryParse(secondByteHex, out var n2))
-            {
-                return false;
-            }
-
-            if (!int.TryParse(thirdByteHex, out var n3))
-            {
-                return false;
-            }
-
-            if (!int.TryParse(fourthByteHex, out var n4))
-            {
-                return false;
-            }
-
-            if (!int.TryParse(fifthByteHex, out var n5))
-            {
-                return false;
-            }
-
-            if (!int.TryParse(sixthByteHex, out var n6))
-            {
-                return false;
-            }
-
-            decimal amount = n1 * 10_000;
-            amount += n2 * 1_000;
-            amount += n3 * 100;
-            amount += n4 * 10;
-            amount += n5;
-            amount += n6 / 100M;
-
             if (response is IResponseAmount typedResponse)
             {
+                var number = NumberHelper.BcdToInt(data);
+                var amount = number / 100.0M;
                 typedResponse.Amount = amount;
+
                 return true;
             }
 
