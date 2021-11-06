@@ -16,7 +16,7 @@
                     <Button x:Name="ButtonDisconnect" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonDisconnect_Click" Width="69" Margin="162,19,0,0"/>
                     <Button x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="7,48,0,0"/>
                     <Button x:Name="ButtonEndOfDay" Content="End of Day" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonEndOfDay_Click" Width="90" Height="29" Margin="7,82,0,0"/>
-                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,154,0,0" Height="50
+                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,174,0,0" Height="50
                             " VerticalAlignment="Top" HorizontalAlignment="Left" Width="289">
                         <Grid>
                             <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,0,0,0" Text="20.4" TextWrapping="Wrap" VerticalAlignment="Center" Width="111" TextAlignment="Right" FontSize="20"/>
@@ -24,7 +24,7 @@
                             <Button x:Name="ButtonRefund" Content="Refund" HorizontalAlignment="Left" Margin="191,0,0,0" VerticalAlignment="Center" Click="ButtonRefund_Click" Width="60" Height="29"/>
                         </Grid>
                     </Border>
-                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,211,0,0" Height="59" VerticalAlignment="Top" HorizontalAlignment="Left" Width="289">
+                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,231,0,0" Height="59" VerticalAlignment="Top" HorizontalAlignment="Left" Width="289">
                         <Grid>
                             <TextBox x:Name="TextBoxReceiptNumber" HorizontalAlignment="Left" Text="0000" TextWrapping="Wrap" VerticalAlignment="Top" Width="112" TextAlignment="Right" FontSize="20" Margin="10,19,0,0"/>
                             <Button x:Name="ButtonReversal" Content="Reversal" HorizontalAlignment="Left" Margin="127,19,0,0" VerticalAlignment="Top" Width="60" Height="29" Click="ButtonReversal_Click"/>
@@ -34,8 +34,8 @@
                     <Button x:Name="ButtonRepeatReceipt" Content="Repeat Receipt" HorizontalAlignment="Left" Margin="102,82,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
                     <Button x:Name="ButtonLogOff" Content="Log Off" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="102,48,0,0" Click="ButtonLogOff_Click"/>
                     <Button x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="197,48,0,0" Click="ButtonDiagnosis_Click"/>
-                    <Label x:Name="LabelStatus" Content="Status" HorizontalAlignment="Left" Margin="7,116,0,0" VerticalAlignment="Top" Background="#FFFFE599" Width="289" Height="33"/>
-                    <ScrollViewer x:Name="OutputScrollViewer" Margin="360,0,0,0" Background="#FFF9F9F9">
+                    <Label x:Name="LabelStatus" Content="Status" HorizontalAlignment="Left" Margin="7,116,0,0" VerticalAlignment="Top" Background="#FFFFE599" Width="289" Height="53"/>
+                    <ScrollViewer x:Name="OutputScrollViewer" Margin="307,0,0,0" Background="#FFF9F9F9">
                         <Grid x:Name="Output"></Grid>
                     </ScrollViewer>
                 </Grid>

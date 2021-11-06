@@ -4,14 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
-using System.Windows.Threading;
 
 namespace Portalum.Payment.Zvt.TestUi
 {
@@ -102,7 +100,7 @@ namespace Portalum.Payment.Zvt.TestUi
                     Width = 200
                 };
 
-                textBlock.Inlines.Add(new Run($"{DateTime.Now}") { Foreground = Brushes.DarkGray, FontSize = 9 });
+                textBlock.Inlines.Add(new Run($"{DateTime.Now:HH:mm:ss.fff}") { Foreground = Brushes.DarkGray, FontSize = 9 });
                 textBlock.Inlines.Add(new LineBreak());
                 textBlock.Inlines.AddRange(inlines);
                 textBlock.Measure(new Size(50, 1000));
