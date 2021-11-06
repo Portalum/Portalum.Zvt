@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Windows.Threading;
 
 namespace Portalum.Payment.Zvt.TestUi
 {
@@ -79,10 +80,21 @@ namespace Portalum.Payment.Zvt.TestUi
             this._zvtClient.IntermediateStatusInformationReceived += this.IntermediateStatusInformationReceived;
         }
 
-        private void AddOutputElement(Inline[] inlines, Brush backgroundColor)
+        private void AddOutputElement(OutputInfo outputInfo, Brush backgroundColor)
         {
             this.Output.Dispatcher.Invoke(() =>
             {
+                var inlines = new List<Inline>
+                {
+                    new Bold(new Run(outputInfo.Title)),
+                };
+
+                foreach (var line in outputInfo.Lines)
+                {
+                    inlines.Add(new LineBreak());
+                    inlines.Add(new Run(line.TrimEnd()));
+                }
+
                 var textBlock = new TextBlock
                 {
                     Padding = new Thickness(10),
@@ -100,7 +112,7 @@ namespace Portalum.Payment.Zvt.TestUi
                     Background = backgroundColor,
                     Height = textBlock.DesiredSize.Height,
                     Margin = new Thickness(10),
-                    Effect = new DropShadowEffect()
+                    Effect = new DropShadowEffect
                     {
                         Color = Colors.DimGray,
                         BlurRadius = 10,
@@ -128,21 +140,30 @@ namespace Portalum.Payment.Zvt.TestUi
             });
         }
 
-        private void ReceiptReceived(ReceiptInfo receipt)
+        private void ReceiptReceived(ReceiptInfo receiptInfo)
         {
-            if (receipt == null)
+            if (receiptInfo == null)
             {
                 return;
             }
 
-            var inlines = new List<Inline>
+            var outputInfo = new OutputInfo
             {
-                new Bold(new Run($"Receipt {receipt.ReceiptType}")),
-                new LineBreak(),
-                new Run(receipt.Content)
+                Title = $"Receipt {receiptInfo.ReceiptType}",
+                Lines = new string[]
+                {
+                    receiptInfo.Content
+                }
             };
 
-            this.AddOutputElement(inlines.ToArray(), Brushes.White);
+            try
+            {
+                this.AddOutputElement(outputInfo, Brushes.White);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.ToString());
+            }
         }
 
         private void LineReceived(PrintLineInfo printLineInfo)
@@ -151,14 +172,16 @@ namespace Portalum.Payment.Zvt.TestUi
 
             if (printLineInfo.IsLastLine)
             {
-                var inlines = new List<Inline>
+                var outputInfo = new OutputInfo
                 {
-                    new Bold(new Run("Lines")),
-                    new LineBreak(),
-                    new Run(this._printLineCache.ToString())
+                    Title = "Lines",
+                    Lines = new string[]
+                    {
+                        this._printLineCache.ToString()
+                    }
                 };
 
-                this.AddOutputElement(inlines.ToArray(), Brushes.White);
+                this.AddOutputElement(outputInfo, Brushes.White);
 
                 this._printLineCache.Clear();
                 return;
@@ -169,28 +192,23 @@ namespace Portalum.Payment.Zvt.TestUi
         {
             this.IntermediateStatusInformationReceived(string.Empty);
 
-            var inlines = new List<Inline>
+            var outputInfo = new OutputInfo
             {
-                new Bold(new Run("StatusInformation")),
-                new LineBreak(),
-                new Run($"AdditionalText: {statusInformation.AdditionalText}"),
-                new LineBreak(),
-                new Run($"Amount: {statusInformation.Amount}"),
-                new LineBreak(),
-                new Run($"CardholderAuthentication: {statusInformation.CardholderAuthentication}"),
-                new LineBreak(),
-                new Run($"CardName: {statusInformation.CardName}"),
-                new LineBreak(),
-                new Run($"CardTechnology: {statusInformation.CardTechnology}"),
-                new LineBreak(),
-                new Run($"TerminalIdentifier: {statusInformation.TerminalIdentifier}"),
-                new LineBreak(),
-                new Run($"TraceNumber: {statusInformation.TraceNumber}"),
-                new LineBreak(),
-                new Run($"ErrorMessage: {statusInformation.ErrorMessage}")
+                Title = "StatusInformation",
+                Lines = new string[]
+                {
+                    $"AdditionalText: {statusInformation.AdditionalText}",
+                    $"Amount: {statusInformation.Amount}",
+                    $"CardholderAuthentication: {statusInformation.CardholderAuthentication}",
+                    $"CardName: {statusInformation.CardName}",
+                    $"CardTechnology: {statusInformation.CardTechnology}",
+                    $"TerminalIdentifier: {statusInformation.TerminalIdentifier}",
+                    $"TraceNumber: {statusInformation.TraceNumber}",
+                    $"ErrorMessage: {statusInformation.ErrorMessage}"
+                }
             };
 
-            this.AddOutputElement(inlines.ToArray(), Brushes.LightGoldenrodYellow);
+            this.AddOutputElement(outputInfo, Brushes.LightGoldenrodYellow);
         }
 
         private void IntermediateStatusInformationReceived(string message)
