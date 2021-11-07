@@ -50,6 +50,11 @@ namespace Portalum.Payment.Zvt
         /// </summary>
         public bool TextAtDisplayInCapitalLettersAtThePaymentTerminal = false;
 
+        /// <summary>
+        /// Activate TLV Support
+        /// </summary>
+        public bool ActivateTlvSupport = true;
+
         #endregion
 
         /// <summary>

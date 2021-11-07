@@ -23,6 +23,7 @@ namespace Portalum.Payment.Zvt.TestUi
                 ReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal = this.CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal.IsChecked.Value,
                 ReceiptPrintoutForPaymentFunctionsViaPaymentTerminal = this.CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal.IsChecked.Value,
                 SendIntermediateStatusInformation = this.CheckBoxSendIntermediateStatusInformation.IsChecked.Value,
+                ActivateTlvSupport = this.CheckBoxActivateTlvSupport.IsChecked.Value
             };
 
             this.Close();

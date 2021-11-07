@@ -232,34 +232,37 @@ namespace Portalum.Payment.Zvt
             package.Add(0x03); //Service byte indicator
             package.Add(serviceByte);
 
-            //Add empty TLV Container
-            //package.Add(0x06); //TLV
-            //package.Add(0x00); //TLV-Length
+            if (registrationConfig.ActivateTlvSupport)
+            {
+                //Add empty TLV Container
+                //package.Add(0x06); //TLV
+                //package.Add(0x00); //TLV-Length
 
-            //Add TLV Container permit 06D3 (Card complete)
-            package.Add(0x06); //TLV
-            package.Add(0x06); //tlv legnth
-            package.Add(0x26); //list of permitted ZVT-Commands
-            package.Add(0x04); //length
-            package.Add(0x0A); //ZVT-command
-            package.Add(0x02); //length
-            package.Add(0x06); //06 first hex of print text block
-            package.Add(0xD3); //D3 second hex of print text block
+                //Add TLV Container permit 06D3 (Card complete)
+                package.Add(0x06); //TLV
+                package.Add(0x06); //tlv legnth
+                package.Add(0x26); //list of permitted ZVT-Commands
+                package.Add(0x04); //length
+                package.Add(0x0A); //ZVT-command
+                package.Add(0x02); //length
+                package.Add(0x06); //06 first hex of print text block
+                package.Add(0xD3); //D3 second hex of print text block
 
-            //TLV TAG
-            //10 - Number of columns and number of lines of the merchant-display
-            //11 - Number of columns and number of lines of the customer-display
-            //12 - Number of characters per line of the printer
-            //14 - ISO-Character set
-            //1A - Max length the APDU
-            //26 - List of permitted ZVT commands
-            //27 - List of supported character-sets
-            //28 - List of supported languages
-            //29 - List of menus which should be displayed over the ECR or on a second customer-display
-            //2A - List of menus which the ECR will not display and therefore must be displayed on the PT
-            //40 - EMV-configuration-parameter
-            //1F04 - Receipt parameter
-            //1F05 - Transaction parameter
+                //TLV TAG
+                //10 - Number of columns and number of lines of the merchant-display
+                //11 - Number of columns and number of lines of the customer-display
+                //12 - Number of characters per line of the printer
+                //14 - ISO-Character set
+                //1A - Max length the APDU
+                //26 - List of permitted ZVT commands
+                //27 - List of supported character-sets
+                //28 - List of supported languages
+                //29 - List of menus which should be displayed over the ECR or on a second customer-display
+                //2A - List of menus which the ECR will not display and therefore must be displayed on the PT
+                //40 - EMV-configuration-parameter
+                //1F04 - Receipt parameter
+                //1F05 - Transaction parameter
+            }
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x00 }, package);
             return await this.SendCommandAsync(fullPackage);
