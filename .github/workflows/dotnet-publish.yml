@@ -1,0 +1,31 @@
+name: .NET TestUi
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET 5.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      working-directory: ./src
+      run: dotnet restore
+    - name: Build
+      working-directory: ./src
+      run: dotnet build --configuration Release --no-restore /p:NoWarn=1591
+    - name: Test
+      working-directory: ./src
+      run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
+    - name: Build project and generate NuGet package
+      run: |
+        dotnet publish --configuration Release --self-contained -r win-x64 -p:PublishSingleFile=true src/Portalum.Payment.Zvt.TestUi/Portalum.Payment.Zvt.TestUi.csproj
