@@ -48,12 +48,12 @@ namespace Portalum.Payment.Zvt.Parsers
                 new BmpInfo { Id = 0x24, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Track 3 data, without start and end markers; 'E' used to indicate a masked numeric digit", TryParse = null },
                 new BmpInfo { Id = 0x27, DataLength = 1, Description = "Result-Code as defined in chapter Error-Messages", TryParse = this.ParseErrorCode },
                 new BmpInfo { Id = 0x29, DataLength = 4, Description = "Terminal identifier", TryParse = this.ParseTerminalIdentifier },
-                new BmpInfo { Id = 0x2A, DataLength = 15, Description = "VU-number", TryParse = null },
+                new BmpInfo { Id = 0x2A, DataLength = 15, Description = "VU-number", TryParse = this.ParseVuNumber },
                 new BmpInfo { Id = 0x2D, DataLength = 2, Description = "Track 1 data, without start and end markers", TryParse = null },
                 new BmpInfo { Id = 0x2E, DataLength = 3, CalculateDataLength = this.GetDataLengthLL, Description = "Synchronous chip data", TryParse = null },
                 new BmpInfo { Id = 0x37, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Trace-number of the original transaction for reversal", TryParse = null },
                 new BmpInfo { Id = 0x3A, DataLength = 2, Description = "CVV/CVC value, right padded with ‘F’ if less than 4 digits", TryParse = null },
-                new BmpInfo { Id = 0x3B, DataLength = 8, Description = "AID authorisation-attribute", TryParse = null },
+                new BmpInfo { Id = 0x3B, DataLength = 8, Description = "AID authorisation-attribute", TryParse = this.ParseAuthorisationAttribute },
                 new BmpInfo { Id = 0x3C, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Additional-data/additional-text", TryParse = this.ParseAdditionalText },
                 new BmpInfo { Id = 0x3D, DataLength = 3, Description = "Password", TryParse = null },
                 new BmpInfo { Id = 0x49, DataLength = 2, Description = "Currency code", TryParse = this.ParseCurrencyCode },
@@ -64,7 +64,7 @@ namespace Portalum.Payment.Zvt.Parsers
                 new BmpInfo { Id = 0x73, DataLength = 1, Description = "Image encoding type.", TryParse = null },
                 new BmpInfo { Id = 0x74, DataLength = 1, Description = "Total number of chunks of the image to display.", TryParse = null },
                 new BmpInfo { Id = 0x75, DataLength = 1, Description = "Index of the chunk of the image data.", TryParse = null },
-                new BmpInfo { Id = 0x87, DataLength = 2, Description = "Receipt-number", TryParse = null },
+                new BmpInfo { Id = 0x87, DataLength = 2, Description = "Receipt-number", TryParse = this.ParseReceiptNumber },
                 new BmpInfo { Id = 0x88, DataLength = 3, Description = "Turnover record number", TryParse = null },
                 new BmpInfo { Id = 0x8A, DataLength = 1, Description = "Card-type (card-number according to ZVT-protocol; see also 8C)", TryParse = null },
                 new BmpInfo { Id = 0x8B, DataLength = 2, CalculateDataLength = this.GetDataLengthLL, Description = "Card-name", TryParse = this.ParseCardName },
@@ -300,6 +300,53 @@ namespace Portalum.Payment.Zvt.Parsers
 
         private bool ParseTraceNumber(byte[] data, IResponse response)
         {
+            if (response is IResponseTraceNumber typedResponse)
+            {
+                var number = NumberHelper.BcdToInt(data);
+                typedResponse.TraceNumber = number;
+
+                return true;
+            }
+
+            return false;
+        }
+        
+        private bool ParseVuNumber(byte[] data, IResponse response)
+        {
+            if (response is IResponseVuNumber typedResponse)
+            {
+                var number = Encoding.ASCII.GetString(data).TrimEnd();
+                typedResponse.VuNumber = number;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseAuthorisationAttribute(byte[] data, IResponse response)
+        {
+            if (response is IResponseAidAuthorisationAttribute typedResponse)
+            {
+                var number = Encoding.ASCII.GetString(data).TrimEnd('\0');
+                typedResponse.AidAuthorisationAttribute = number;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseReceiptNumber(byte[] data, IResponse response)
+        {
+            if (response is IResponseReceiptNumber typedResponse)
+            {
+                var number = NumberHelper.BcdToInt(data);
+                typedResponse.ReceiptNumber = number;
+
+                return true;
+            }
+
             return false;
         }
 

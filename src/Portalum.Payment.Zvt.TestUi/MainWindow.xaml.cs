@@ -97,13 +97,13 @@ namespace Portalum.Payment.Zvt.TestUi
                 {
                     Padding = new Thickness(10),
                     TextWrapping = TextWrapping.Wrap,
-                    Width = 200
+                    Width = this.Output.ActualWidth
                 };
 
                 textBlock.Inlines.Add(new Run($"{DateTime.Now:HH:mm:ss.fff}") { Foreground = Brushes.DarkGray, FontSize = 9 });
                 textBlock.Inlines.Add(new LineBreak());
                 textBlock.Inlines.AddRange(inlines);
-                textBlock.Measure(new Size(50, 1000));
+                textBlock.Measure(new Size(textBlock.Width, 1000));
 
                 var canvas = new Canvas
                 {
@@ -190,20 +190,56 @@ namespace Portalum.Payment.Zvt.TestUi
         {
             this.IntermediateStatusInformationReceived(string.Empty);
 
+            var lines = new List<string>();
+            if (statusInformation.TerminalIdentifier > 0)
+            {
+                lines.Add($"TerminalIdentifier: {statusInformation.TerminalIdentifier}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.AdditionalText))
+            {
+                lines.Add($"AdditionalText: {statusInformation.AdditionalText}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.ErrorMessage))
+            {
+                lines.Add($"ErrorMessage: {statusInformation.ErrorMessage}");
+            }
+            if (statusInformation.Amount > 0)
+            {
+                lines.Add($"Amount: {statusInformation.Amount}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.CardTechnology))
+            {
+                lines.Add($"CardTechnology: {statusInformation.CardTechnology}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.CardName))
+            {
+                lines.Add($"CardName: {statusInformation.CardName}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.CardholderAuthentication))
+            {
+                lines.Add($"CardholderAuthentication: {statusInformation.CardholderAuthentication}");
+            }
+            if (statusInformation.TraceNumber > 0)
+            {
+                lines.Add($"TraceNumber: {statusInformation.TraceNumber}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.VuNumber))
+            {
+                lines.Add($"VU-Nr.: {statusInformation.VuNumber}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.AidAuthorisationAttribute))
+            {
+                lines.Add($"AidAuthorisationAttribute: {statusInformation.AidAuthorisationAttribute}");
+            }
+            if (statusInformation.CurrencyCode > 0)
+            {
+                lines.Add($"CurrencyCode: {statusInformation.CurrencyCode}");
+            }
+
             var outputInfo = new OutputInfo
             {
                 Title = "StatusInformation",
-                Lines = new string[]
-                {
-                    $"AdditionalText: {statusInformation.AdditionalText}",
-                    $"Amount: {statusInformation.Amount}",
-                    $"CardholderAuthentication: {statusInformation.CardholderAuthentication}",
-                    $"CardName: {statusInformation.CardName}",
-                    $"CardTechnology: {statusInformation.CardTechnology}",
-                    $"TerminalIdentifier: {statusInformation.TerminalIdentifier}",
-                    $"TraceNumber: {statusInformation.TraceNumber}",
-                    $"ErrorMessage: {statusInformation.ErrorMessage}"
-                }
+                Lines = lines.ToArray()
             };
 
             this.AddOutputElement(outputInfo, Brushes.LightGoldenrodYellow);

@@ -13,10 +13,13 @@ namespace Portalum.Payment.Zvt.Models
         IResponseCardholderAuthentication,
         IResponseCardTechnology,
         IResponseTime,
-        IResponseCurrencyCode
+        IResponseCurrencyCode,
+        IResponseReceiptNumber,
+        IResponseTraceNumber,
+        IResponseVuNumber,
+        IResponseAidAuthorisationAttribute
     {
         public string ErrorMessage { get; set; }
-        public string TraceNumber { get; set; }
         public int TerminalIdentifier { get; set; }
         public string AdditionalText { get; set; }
         public string CardName { get; set; }
@@ -25,5 +28,9 @@ namespace Portalum.Payment.Zvt.Models
         public string CardTechnology { get; set; }
         public TimeSpan Time { get; set; }
         public int CurrencyCode { get; set; }
+        public int ReceiptNumber { get; set; }
+        public int TraceNumber { get; set; }
+        public string VuNumber { get; set; }
+        public string AidAuthorisationAttribute { get; set; }
     }
 }

@@ -86,6 +86,7 @@ namespace Portalum.Payment.Zvt.Parsers
 
         private bool AddTextLine(byte[] data, IResponse response)
         {
+            //var textBlock1 = Encoding.UTF7.GetString(data);
             var textBlock = Encoding.GetEncoding(437).GetString(data);
             this._receiptContent.AppendLine(textBlock);
 
