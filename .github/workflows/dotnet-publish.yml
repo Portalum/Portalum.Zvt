@@ -2,9 +2,8 @@ name: .NET TestUi
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build-windows:
@@ -33,11 +32,14 @@ jobs:
       with:
         files: ./publish/temp
         dest: ./publish/Portalum.Payment.Zvt.TestUi.zip
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_name: Portalum/Portalum.Payment.Zvt
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./publish/Portalum.Payment.Zvt.TestUi.zip
-        tag: ${{ github.ref }}-${{ github.run_id }}
+        tag: ${{ steps.vars.outputs.tag }}
         overwrite: true
