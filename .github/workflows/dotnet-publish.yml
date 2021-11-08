@@ -28,4 +28,13 @@ jobs:
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
     - name: Build project and generate NuGet package
       run: |
-        dotnet publish --configuration Release --self-contained -r win-x64 -p:PublishSingleFile=true src/Portalum.Payment.Zvt.TestUi/Portalum.Payment.Zvt.TestUi.csproj
+        dotnet publish ./src/Portalum.Payment.Zvt.TestUi/Portalum.Payment.Zvt.TestUi.csproj --configuration Release --self-contained --runtime win-x64 -p:PublishSingleFile=true --output ./publish 
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_name: Portalum/Portalum.Payment.Zvt
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./publish/*
+        tag: ${{ github.ref }}-${{ github.run_id }}
+        overwrite: true
+        file_glob: true
