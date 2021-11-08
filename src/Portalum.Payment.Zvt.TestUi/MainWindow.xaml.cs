@@ -351,8 +351,11 @@ namespace Portalum.Payment.Zvt.TestUi
 
         private async void ButtonRegistration_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new RegistrationConfigurationDialog();
-            dialog.Owner = this;
+            var dialog = new RegistrationConfigurationDialog
+            {
+                Owner = this
+            };
+
             var dialogResult = dialog.ShowDialog();
             if (!dialogResult.HasValue || !dialogResult.Value)
             {

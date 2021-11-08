@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Portalum.Payment.Zvt.TestUi"
         mc:Ignorable="d"
-        Title="Registration Configuration" Height="214" Width="425" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Registration Configuration" Height="223" Width="425" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <CheckBox x:Name="CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal" Content="Receipt printout for payment functions via Payment Terminal" HorizontalAlignment="Left" Margin="26,24,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal" Content="Receipt printout for administration functions via Payment Terminal" HorizontalAlignment="Left" Margin="26,44,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="CheckBoxSendIntermediateStatusInformation" IsChecked="True"  Content="Send Intermediate Status information" HorizontalAlignment="Left" Margin="26,65,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="CheckBoxAllowStartPaymentViaPaymentTerminal" Content="Allow start payment via Payment Terminal" HorizontalAlignment="Left" Margin="26,85,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="CheckBoxAllowAdministrationViaPaymentTerminal" Content="Allow administration via Payment Terminal" HorizontalAlignment="Left" Margin="26,105,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="ButtonSave" Content="Save" Margin="10,144,10,0" VerticalAlignment="Top" Click="ButtonSave_Click"/>
+        <Button x:Name="ButtonSave" Content="Save" Margin="10,155,10,0" VerticalAlignment="Top" Click="ButtonSave_Click"/>
         <CheckBox x:Name="CheckBoxActivateTlvSupport" Content="Activate TLV Support" HorizontalAlignment="Left" Margin="26,124,0,0" VerticalAlignment="Top" IsChecked="True"/>
 
     </Grid>

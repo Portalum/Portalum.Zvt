@@ -26,6 +26,7 @@ namespace Portalum.Payment.Zvt.TestUi
                 ActivateTlvSupport = this.CheckBoxActivateTlvSupport.IsChecked.Value
             };
 
+            this.DialogResult = true;
             this.Close();
         }
     }
