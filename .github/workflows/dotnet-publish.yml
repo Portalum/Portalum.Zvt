@@ -31,7 +31,7 @@ jobs:
         dotnet publish ./src/Portalum.Payment.Zvt.TestUi/Portalum.Payment.Zvt.TestUi.csproj --configuration Release --self-contained false --runtime win-x64 -p:PublishSingleFile=true --output ./publish 
     - uses: papeloto/action-zip@v1
       with:
-        files: .publish/
+        files: ./publish
         dest: TestUi.zip
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
