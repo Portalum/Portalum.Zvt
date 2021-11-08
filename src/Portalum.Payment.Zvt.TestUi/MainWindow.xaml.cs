@@ -231,6 +231,10 @@ namespace Portalum.Payment.Zvt.TestUi
             {
                 lines.Add($"AidAuthorisationAttribute: {statusInformation.AidAuthorisationAttribute}");
             }
+            if (statusInformation.ReceiptNumber > 0)
+            {
+                lines.Add($"ReceiptNumber: {statusInformation.ReceiptNumber}");
+            }
             if (statusInformation.CurrencyCode > 0)
             {
                 lines.Add($"CurrencyCode: {statusInformation.CurrencyCode}");
@@ -349,10 +353,13 @@ namespace Portalum.Payment.Zvt.TestUi
         {
             var dialog = new RegistrationConfigurationDialog();
             dialog.Owner = this;
-            dialog.ShowDialog();
+            var dialogResult = dialog.ShowDialog();
+            if (!dialogResult.HasValue || !dialogResult.Value)
+            {
+                return;
+            }
 
             var registrationConfig = dialog.RegistrationConfig;
-
             await this.RegistrationAsync(registrationConfig);
         }
 
