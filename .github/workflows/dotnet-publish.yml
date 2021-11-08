@@ -38,6 +38,6 @@ jobs:
       with:
         repo_name: Portalum/Portalum.Payment.Zvt
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./publish/TestUi.zip
+        file: ./TestUi.zip
         tag: ${{ github.ref }}-${{ github.run_id }}
         overwrite: true
