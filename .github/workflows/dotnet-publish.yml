@@ -42,5 +42,5 @@ jobs:
         repo_name: Portalum/Portalum.Payment.Zvt
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./publish/Portalum.Payment.Zvt.TestUi.zip
-        tag: ${{ steps.vars.outputs.tag }}
+        tag: ${{ steps.get_version.outputs.tag }}
         overwrite: true
