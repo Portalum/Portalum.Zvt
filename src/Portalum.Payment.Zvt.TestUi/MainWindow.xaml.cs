@@ -312,9 +312,10 @@ namespace Portalum.Payment.Zvt.TestUi
             }
 
             this.ButtonRegistration.IsEnabled = false;
-            if (!await this._zvtClient?.RegistrationAsync(registrationConfig))
+            var commandResponse = await this._zvtClient?.RegistrationAsync(registrationConfig);
+            if (commandResponse.State != CommandResponseState.Successful)
             {
-                MessageBox.Show("Failure");
+                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
             }
             this.ButtonRegistration.IsEnabled = true;
         }
@@ -327,9 +328,10 @@ namespace Portalum.Payment.Zvt.TestUi
             }
 
             this.ButtonPay.IsEnabled = false;
-            if (!await this._zvtClient?.PaymentAsync(amount))
+            var commandResponse = await this._zvtClient?.PaymentAsync(amount);
+            if (commandResponse.State != CommandResponseState.Successful)
             {
-                MessageBox.Show("Failure");
+                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
             }
             this.ButtonPay.IsEnabled = true;
         }
@@ -342,11 +344,28 @@ namespace Portalum.Payment.Zvt.TestUi
             }
 
             this.ButtonEndOfDay.IsEnabled = false;
-            if (!await this._zvtClient?.EndOfDayAsync())
+            var commandResponse = await this._zvtClient?.EndOfDayAsync();
+            if (commandResponse.State != CommandResponseState.Successful)
             {
-                MessageBox.Show("Failure");
+                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
             }
             this.ButtonEndOfDay.IsEnabled = true;
+        }
+
+        private async Task RepeatLastReceiptAsync()
+        {
+            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            {
+                return;
+            }
+
+            this.ButtonRepeatReceipt.IsEnabled = false;
+            var commandResponse = await this._zvtClient?.RepeatLastReceiptAsync();
+            if (commandResponse.State != CommandResponseState.Successful)
+            {
+                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
+            }
+            this.ButtonRepeatReceipt.IsEnabled = true;
         }
 
         private async void ButtonRegistration_Click(object sender, RoutedEventArgs e)
@@ -373,12 +392,7 @@ namespace Portalum.Payment.Zvt.TestUi
 
         private async void ButtonRepeatReceipt_Click(object sender, RoutedEventArgs e)
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
-            {
-                return;
-            }
-
-            await this._zvtClient?.RepeatLastReceiptAsync();
+            await this.RepeatLastReceiptAsync();
         }
 
         private async void ButtonPay_Click(object sender, RoutedEventArgs e)

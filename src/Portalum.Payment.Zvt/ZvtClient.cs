@@ -151,19 +151,26 @@ namespace Portalum.Payment.Zvt
             }
         }
 
-        private async Task<bool> SendCommandAsync(byte[] commandData, int commandResultTimeout = 90000)
+        private async Task<CommandResponseState> SendCommandAsync(byte[] commandData, int commandResultTimeout = 90000)
         {
             using var cancellationTokenSource = new CancellationTokenSource();
-            var successful = false;
+            var commandResult = CommandResponseState.Unknown;
 
             void completionReceived()
             {
-                successful = true;
+                commandResult = CommandResponseState.Successful;
                 cancellationTokenSource.Cancel();
             }
 
             void abortReceived(string errorMessage)
             {
+                commandResult = CommandResponseState.Abort;
+                cancellationTokenSource.Cancel();
+            }
+
+            void notSupportedReceived()
+            {
+                commandResult = CommandResponseState.NotSupported;
                 cancellationTokenSource.Cancel();
             }
 
@@ -171,30 +178,33 @@ namespace Portalum.Payment.Zvt
             {
                 this._receiveHandler.CompletionReceived += completionReceived;
                 this._receiveHandler.AbortReceived += abortReceived;
+                this._receiveHandler.NotSupportedReceived += notSupportedReceived;
 
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
                 if (!await this._zvtCommunication.SendCommandAsync(commandData))
                 {
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command");
-                    return false;
+                    return CommandResponseState.Error;
                 }
 
                 await Task.Delay(commandResultTimeout, cancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (task.Status == TaskStatus.RanToCompletion)
                     {
+                        commandResult = CommandResponseState.Timeout;
                         this._logger.LogError($"{nameof(SendCommandAsync)} - No result received in the specified timeout {commandResultTimeout}ms");
                     }
                 });
             }
             finally
             {
+                this._receiveHandler.NotSupportedReceived -= notSupportedReceived;
                 this._receiveHandler.AbortReceived -= abortReceived;
                 this._receiveHandler.CompletionReceived -= completionReceived;
             }
 
-            return successful;
+            return commandResult;
         }
 
         private byte[] CreatePackage(byte[] controlField, IEnumerable<byte> packageData)
@@ -212,7 +222,7 @@ namespace Portalum.Payment.Zvt
         /// </summary>
         /// <param name="registrationConfig"></param>
         /// <returns></returns>
-        public async Task<bool> RegistrationAsync(RegistrationConfig registrationConfig)
+        public async Task<CommandResponse> RegistrationAsync(RegistrationConfig registrationConfig)
         {
             _ = registrationConfig ?? throw new ArgumentNullException(nameof(registrationConfig));
 
@@ -265,7 +275,12 @@ namespace Portalum.Payment.Zvt
             }
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x00 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
@@ -274,7 +289,7 @@ namespace Portalum.Payment.Zvt
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public async Task<bool> PaymentAsync(decimal amount)
+        public async Task<CommandResponse> PaymentAsync(decimal amount)
         {
             this._logger.LogInformation($"{nameof(PaymentAsync)} - Start payment process, with amount of:{amount}");
 
@@ -283,7 +298,12 @@ namespace Portalum.Payment.Zvt
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x01 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
@@ -293,7 +313,7 @@ namespace Portalum.Payment.Zvt
         /// </summary>
         /// <param name="receiptNumber">four-digit number</param>
         /// <returns></returns>
-        public async Task<bool> ReversalAsync(int receiptNumber)
+        public async Task<CommandResponse> ReversalAsync(int receiptNumber)
         {
             var package = new List<byte>();
             package.AddRange(this._passwordData);
@@ -301,7 +321,12 @@ namespace Portalum.Payment.Zvt
             package.AddRange(NumberHelper.IntToBcd(receiptNumber, 2));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x30 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
@@ -309,7 +334,7 @@ namespace Portalum.Payment.Zvt
         /// This command starts a Refund on the PT. The result of the Refund is reported to the ECR after completion of the booking-process.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> RefundAsync(decimal amount)
+        public async Task<CommandResponse> RefundAsync(decimal amount)
         {
             var package = new List<byte>();
             package.AddRange(this._passwordData);
@@ -317,7 +342,12 @@ namespace Portalum.Payment.Zvt
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x31 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
@@ -325,13 +355,18 @@ namespace Portalum.Payment.Zvt
         /// ECR induces the PT to transfer the stored turnover to the host.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> EndOfDayAsync()
+        public async Task<CommandResponse> EndOfDayAsync()
         {
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x50 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
@@ -339,13 +374,18 @@ namespace Portalum.Payment.Zvt
         /// With this command the ECR causes the PT to send an overview about the stored transactions.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> SendTurnoverTotalsAsync()
+        public async Task<CommandResponse> SendTurnoverTotalsAsync()
         {
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x10 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
@@ -353,37 +393,52 @@ namespace Portalum.Payment.Zvt
         /// This command serves to repeat printing of the last stored payment-receipts or End-of-Day-receipt.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> RepeatLastReceiptAsync()
+        public async Task<CommandResponse> RepeatLastReceiptAsync()
         {
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x20 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
         /// Log-Off (06 02)
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> LogOffAsync()
+        public async Task<CommandResponse> LogOffAsync()
         {
             var package = new List<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x02 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
 
         /// <summary>
         /// Diagnosis (06 70)
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> DiagnosisAsync()
+        public async Task<CommandResponse> DiagnosisAsync()
         {
             var package = new List<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x70 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            var responseStatus = await this.SendCommandAsync(fullPackage);
+
+            return new CommandResponse
+            {
+                State = responseStatus
+            };
         }
     }
 }
