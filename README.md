@@ -59,6 +59,10 @@ using var zvtClient = new ZvtClient(deviceCommunication);
 await zvtClient.EndOfDayAsync();
 ```
 
+## TestUi
+With the TestUi you can run through different test cases.
+![TestUi](/doc/TestUi.png)
+
 ## ZVT Documentation
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
 - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
