@@ -76,7 +76,7 @@ namespace Portalum.Payment.Zvt
                 : statusInformationParser;
 
             this._intermediateStatusInformationParser = intermediateStatusInformationParser == default
-                ? new IntermediateStatusInformationParser(logger, intermediateStatusRepository)
+                ? new IntermediateStatusInformationParser(logger, intermediateStatusRepository, errorMessageRepository)
                 : intermediateStatusInformationParser;
         }
 

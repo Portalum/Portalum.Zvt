@@ -30,7 +30,7 @@ namespace Portalum.Payment.Zvt.TestUi
                 builder.AddFile("default.log", LogLevel.Debug, outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} {SourceContext} {Message:lj}{NewLine}{Exception}").SetMinimumLevel(LogLevel.Debug));
 
             this.InitializeComponent();
-            this.LabelStatus.Content = string.Empty;
+            this.TextBlockStatus.Text = string.Empty;
 
             this._printLineCache = new StringBuilder();
             this.TextBoxIpAddress.Background = Brushes.White;
@@ -251,9 +251,9 @@ namespace Portalum.Payment.Zvt.TestUi
 
         private void IntermediateStatusInformationReceived(string message)
         {
-            this.LabelStatus.Dispatcher.Invoke(() =>
+            this.TextBlockStatus.Dispatcher.Invoke(() =>
             {
-                this.LabelStatus.Content = message;
+                this.TextBlockStatus.Text = message;
             });
         }
 

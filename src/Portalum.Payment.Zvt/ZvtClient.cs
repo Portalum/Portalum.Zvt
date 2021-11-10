@@ -224,6 +224,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> RegistrationAsync(RegistrationConfig registrationConfig)
         {
+            this._logger.LogInformation($"{nameof(RegistrationAsync)} - Execute");
+
             _ = registrationConfig ?? throw new ArgumentNullException(nameof(registrationConfig));
 
             var configByte = registrationConfig.GetConfigByte();
@@ -291,7 +293,7 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> PaymentAsync(decimal amount)
         {
-            this._logger.LogInformation($"{nameof(PaymentAsync)} - Start payment process, with amount of:{amount}");
+            this._logger.LogInformation($"{nameof(PaymentAsync)} - Execute with amount of:{amount}");
 
             var package = new List<byte>();
             package.Add(0x04); //Amount prefix
@@ -315,6 +317,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> ReversalAsync(int receiptNumber)
         {
+            this._logger.LogInformation($"{nameof(ReversalAsync)} - Execute");
+
             var package = new List<byte>();
             package.AddRange(this._passwordData);
             package.Add(0x87); //Password prefix
@@ -336,6 +340,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> RefundAsync(decimal amount)
         {
+            this._logger.LogInformation($"{nameof(RefundAsync)} - Execute");
+
             var package = new List<byte>();
             package.AddRange(this._passwordData);
             package.Add(0x04); //Amount prefix
@@ -357,6 +363,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> EndOfDayAsync()
         {
+            this._logger.LogInformation($"{nameof(EndOfDayAsync)} - Execute");
+
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
@@ -376,6 +384,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> SendTurnoverTotalsAsync()
         {
+            this._logger.LogInformation($"{nameof(SendTurnoverTotalsAsync)} - Execute");
+
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
@@ -395,6 +405,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> RepeatLastReceiptAsync()
         {
+            this._logger.LogInformation($"{nameof(RepeatLastReceiptAsync)} - Execute");
+
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
@@ -413,6 +425,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> LogOffAsync()
         {
+            this._logger.LogInformation($"{nameof(LogOffAsync)} - Execute");
+
             var package = new List<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x02 }, package);
@@ -430,6 +444,8 @@ namespace Portalum.Payment.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> DiagnosisAsync()
         {
+            this._logger.LogInformation($"{nameof(DiagnosisAsync)} - Execute");
+
             var package = new List<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x70 }, package);

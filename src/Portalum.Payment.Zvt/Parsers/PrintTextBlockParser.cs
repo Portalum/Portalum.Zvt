@@ -33,10 +33,10 @@ namespace Portalum.Payment.Zvt.Parsers
 
             var tlvInfos = new TlvInfo[]
             {
-                new TlvInfo { Tag = "1F07", Description = "ReceiptType", TryProcess = SetReceiptType },
-                new TlvInfo { Tag = "25", Description = "Print-Texts", TryProcess = CleanupReceiptBuffer },
-                new TlvInfo { Tag = "07", Description = "Text-Lines", TryProcess = AddTextLine },
-                new TlvInfo { Tag = "09", Description = "EndOfReceipt", TryProcess = EndOfReceipt }
+                new TlvInfo { Tag = "1F07", Description = "ReceiptType", TryProcess = this.SetReceiptType },
+                new TlvInfo { Tag = "25", Description = "Print-Texts", TryProcess = this.CleanupReceiptBuffer },
+                new TlvInfo { Tag = "07", Description = "Text-Lines", TryProcess = this.AddTextLine },
+                new TlvInfo { Tag = "09", Description = "EndOfReceipt", TryProcess = this.EndOfReceipt }
             };
 
             this._tlvParser = new TlvParser(logger, tlvInfos);
