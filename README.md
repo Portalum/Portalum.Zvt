@@ -66,6 +66,24 @@ The [.NET Desktop Runtime 5.x](https://dotnet.microsoft.com/download/dotnet/5.0)
 
 ![Portalum.Payment.TestUi](/doc/TestUi.png)
 
+## Tested Providers and Terminals
+
+Provider | Terminal | 
+--- | --- |
+CardComplete | |
+Hobex | |
+Wordline (SIX) | yomani touch family |
+
+### Known deviations from the standard ZVT protocol
+
+#### CardComplete
+- Encoding is fixed to `UTF-8` instead of default character set `CP437`. There is no way to configure this
+- `Print Line` contains TLV data at the end of the package, after `TLV-activation`. According to official documentation, there should be no TLV data here
+
+#### Hobex
+- No `Print Line` support
+- Sends TLV data even without `TLV-activation`
+
 ## ZVT Documentation
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
 - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
