@@ -34,6 +34,7 @@ It is also possible to easily integrate the whole thing into a web service using
 - TLV Processing
 
 ## How can I use it?
+
 The package is available via [nuget](https://www.nuget.org/packages/Portalum.Payment.Zvt)
 ```
 PM> install-package Portalum.Payment.Zvt
@@ -60,8 +61,10 @@ await zvtClient.EndOfDayAsync();
 ```
 
 ## TestUi
-With the TestUi you can run through different test cases.
-![TestUi](/doc/TestUi.png)
+With the Portalum.Payment.TestUi you can test the different ZVT functions. [download here](https://github.com/Portalum/Portalum.Payment.Zvt/releases/latest/download/Portalum.Payment.Zvt.TestUi.zip)
+The [.NET Desktop Runtime 5.x](https://dotnet.microsoft.com/download/dotnet/5.0) is required to run the program.
+
+![Portalum.Payment.TestUi](/doc/TestUi.png)
 
 ## ZVT Documentation
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
