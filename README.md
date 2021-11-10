@@ -1,11 +1,8 @@
 <img src="https://raw.githubusercontent.com/Portalum/Portalum.Payment.Zvt/main/doc/logo.png" width="200">
 
 # Portalum.Payment.Zvt
-ZVT standard cash register interface
 
-This library is intended to simplify the first steps with the ZVT protocol so that you can immediately communicate with your payment terminal.
-Our implementation is designed for communication via network. But it should also be possible to communicate via Serial without much effort.
-It is also possible to easily integrate the whole thing into a web service using this implementation.
+Portalum.Payment.Zvt is a library designed to simplify communication with payment terminals. The library is based on Microsoft .NET. Communication via TCP/IP is supported and communication via a serial connection is also provided. The most important commands to handle a payment process are also already integrated.
 
 ## Supported features
 
@@ -61,8 +58,12 @@ await zvtClient.EndOfDayAsync();
 ```
 
 ## TestUi
-With the Portalum.Payment.TestUi you can test the different ZVT functions. [download here](https://github.com/Portalum/Portalum.Payment.Zvt/releases/latest/download/Portalum.Payment.Zvt.TestUi.zip)
-The [.NET Desktop Runtime 5.x](https://dotnet.microsoft.com/download/dotnet/5.0) is required to run the program.
+With the Portalum.Payment.Zvt.TestUi you can test the different ZVT functions.
+
+### To use the tool, the following steps must be performed
+
+- Install [.NET Desktop Runtime 5.x](https://dotnet.microsoft.com/download/dotnet/5.0)
+- Download and extract the TestUi ([download](https://github.com/Portalum/Portalum.Payment.Zvt/releases/latest/download/Portalum.Payment.Zvt.TestUi.zip))
 
 ![Portalum.Payment.TestUi](/doc/TestUi.png)
 
