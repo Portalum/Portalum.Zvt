@@ -71,8 +71,8 @@ With the Portalum.Payment.Zvt.TestUi you can test the different ZVT functions.
 
 Provider | Terminal | 
 --- | --- |
-CardComplete | |
-Hobex | |
+CardComplete | ingenico iWL250 |
+Hobex | ingenico Desk/3500 |
 Wordline (SIX) | yomani touch family |
 
 ### Known deviations from the standard ZVT protocol
