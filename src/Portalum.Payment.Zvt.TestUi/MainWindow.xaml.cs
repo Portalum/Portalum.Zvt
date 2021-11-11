@@ -296,9 +296,9 @@ namespace Portalum.Payment.Zvt.TestUi
             return true;
         }
 
-        private void ConnectionStateChanged()
+        private void ConnectionStateChanged(ConnectionState connectionState)
         {
-            if (!this._deviceCommunication.IsConnected)
+            if (connectionState == ConnectionState.Disconnected)
             {
                 this.DisconnectAsync().GetAwaiter().GetResult();
             }

@@ -21,7 +21,7 @@ namespace Portalum.Payment.Zvt
         public event Action<byte[]> DataSent;
 
         /// <inheritdoc />
-        public event Action ConnectionStateChanged;
+        public event Action<ConnectionState> ConnectionStateChanged;
 
         /// <summary>
         /// TcpNetwork DeviceCommunication
@@ -36,6 +36,7 @@ namespace Portalum.Payment.Zvt
         {
             this._simpleTcpClient = new SimpleTcpClient(ipAddress, port);
             this._simpleTcpClient.Events.DataReceived += this.Receive;
+            this._simpleTcpClient.Events.Connected += this.Connected;
             this._simpleTcpClient.Events.Disconnected += this.Disconnected;
             this._simpleTcpClient.Keepalive = new SimpleTcpKeepaliveSettings
             {
@@ -65,6 +66,7 @@ namespace Portalum.Payment.Zvt
                 }
 
                 this._simpleTcpClient.Events.DataReceived -= this.Receive;
+                this._simpleTcpClient.Events.Connected -= this.Connected;
                 this._simpleTcpClient.Events.Disconnected -= this.Disconnected;
 
                 if (this._simpleTcpClient.IsConnected)
@@ -114,11 +116,18 @@ namespace Portalum.Payment.Zvt
             return Task.FromResult(false);
         }
 
+        private void Connected(object sender, ClientConnectedEventArgs e)
+        {
+            this._logger?.LogInformation($"{nameof(Connected)} {e.IpPort}");
+
+            this.ConnectionStateChanged?.Invoke(ConnectionState.Connected);
+        }
+
         private void Disconnected(object sender, ClientDisconnectedEventArgs e)
         {
             this._logger?.LogInformation($"{nameof(Disconnected)} {e.IpPort} {e.Reason}");
 
-            this.ConnectionStateChanged?.Invoke();
+            this.ConnectionStateChanged?.Invoke(ConnectionState.Disconnected);
         }
 
         /// <inheritdoc />

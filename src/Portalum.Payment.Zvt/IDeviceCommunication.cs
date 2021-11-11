@@ -14,7 +14,7 @@ namespace Portalum.Payment.Zvt
         /// <summary>
         /// On connection state changed
         /// </summary>
-        event Action ConnectionStateChanged;
+        event Action<ConnectionState> ConnectionStateChanged;
 
         /// <summary>
         /// On data received

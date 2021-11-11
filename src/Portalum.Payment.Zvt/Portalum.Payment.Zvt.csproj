@@ -17,7 +17,7 @@
 
     <TargetFramework>netstandard2.1</TargetFramework>
 
-    <Version>1.4.1</Version>
+    <Version>1.4.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -22,7 +22,7 @@ namespace Portalum.Payment.Zvt
         public event Action<byte[]> DataSent;
 
         /// <inheritdoc />
-        public event Action ConnectionStateChanged;
+        public event Action<ConnectionState> ConnectionStateChanged;
 
         public const byte DLE = 0x10;
 
@@ -97,7 +97,7 @@ namespace Portalum.Payment.Zvt
         {
             this._logger?.LogInformation($"{nameof(Disconnected)}");
 
-            this.ConnectionStateChanged?.Invoke();
+            this.ConnectionStateChanged?.Invoke(ConnectionState.Disconnected);
         }
 
         /// <inheritdoc />
