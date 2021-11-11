@@ -321,7 +321,7 @@ namespace Portalum.Payment.Zvt
 
             var package = new List<byte>();
             package.AddRange(this._passwordData);
-            package.Add(0x87); //Password prefix
+            package.Add(0x87); //Receipt-no prefix
             package.AddRange(NumberHelper.IntToBcd(receiptNumber, 2));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x30 }, package);
