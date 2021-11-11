@@ -79,7 +79,17 @@ namespace Portalum.Payment.Zvt
             this._cancellationTokenSource = new CancellationTokenSource();
 
             this._waitForAcknowledge = true;
-            await this._deviceCommunication.SendAsync(data);
+            try
+            {
+                await this._deviceCommunication.SendAsync(data);
+            }
+            catch (Exception exception)
+            {
+                this._logger.LogError(exception, $"{nameof(SendCommandAsync)} - Cannot send data");
+                this._cancellationTokenSource.Dispose();
+                return false;
+            }
+
             await Task.Delay(acknowledgeReceiveTimeout, this._cancellationTokenSource.Token).ContinueWith(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion)
