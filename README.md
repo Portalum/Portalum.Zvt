@@ -2,7 +2,7 @@
 
 # Portalum.Payment.Zvt
 
-Portalum.Payment.Zvt is a library designed to simplify communication with payment terminals. The library is based on Microsoft .NET. Communication via TCP/IP is supported and communication via a serial connection is also provided. The most important commands to handle a payment process are also already integrated.
+Portalum.Payment.Zvt is a library designed to simplify communication with payment terminals via the ZVT Protocol. The library is based on Microsoft .NET. Communication via TCP/IP is supported and communication via a serial connection is also provided. The most important commands for processing a payment transaction with an electronic POS system are also already integrated.
 
 ## Supported features
 
