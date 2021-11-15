@@ -17,7 +17,11 @@ namespace Portalum.Payment.Zvt.Models
         IResponseReceiptNumber,
         IResponseTraceNumber,
         IResponseVuNumber,
-        IResponseAidAuthorisationAttribute
+        IResponseAidAuthorisationAttribute,
+        IResponseExpiryDate,
+        IResponseCardSequenceNumber,
+        IResponseTurnoverRecordNumber,
+        IResponseCardType
     {
         public string ErrorMessage { get; set; }
         public int TerminalIdentifier { get; set; }
@@ -32,5 +36,10 @@ namespace Portalum.Payment.Zvt.Models
         public int TraceNumber { get; set; }
         public string VuNumber { get; set; }
         public string AidAuthorisationAttribute { get; set; }
+        public int ExpiryDateYear { get; set; }
+        public int ExpiryDateMonth { get; set; }
+        public int CardSequenceNumber { get; set; }
+        public int TurnoverRecordNumber { get; set; }
+        public string CardType { get; set; }
     }
 }

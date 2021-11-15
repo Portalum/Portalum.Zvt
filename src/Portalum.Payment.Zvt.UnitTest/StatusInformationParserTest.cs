@@ -61,9 +61,14 @@ namespace Portalum.Payment.Zvt.UnitTest
             var statusInformation = statusInformationParser.Parse(data);
 
             Assert.AreEqual("GEN.NR.:611804", statusInformation.AdditionalText);
+            Assert.AreEqual("Maestro", statusInformation.CardType);
             Assert.AreEqual("Debit Mastercard", statusInformation.CardName);
+            Assert.AreEqual(12, statusInformation.ExpiryDateMonth);
+            Assert.AreEqual(25, statusInformation.ExpiryDateYear);
             Assert.AreEqual(20.4M, statusInformation.Amount);
             Assert.AreEqual(978, statusInformation.CurrencyCode);
+            Assert.AreEqual(470, statusInformation.TurnoverRecordNumber);
+            Assert.AreEqual(1, statusInformation.CardSequenceNumber);
             Assert.AreEqual(new TimeSpan(22, 39, 53), statusInformation.Time);
             Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
         }

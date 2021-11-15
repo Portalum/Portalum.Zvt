@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Portalum.Payment.Zvt.Parsers
 {
+    /// <summary>
+    /// BMP Parser
+    /// </summary>
     public class BmpParser
     {
         private readonly ILogger _logger;
@@ -17,7 +20,14 @@ namespace Portalum.Payment.Zvt.Parsers
         private readonly ITlvParser _tlvParser;
 
         private readonly Dictionary<byte, BmpInfo> _bmpInfos;
+        private readonly Dictionary<int, string> _cardTypes;
 
+        /// <summary>
+        /// BMP Parser
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="errorMessageRepository"></param>
+        /// <param name="tlvParser"></param>
         public BmpParser(
             ILogger logger,
             IErrorMessageRepository errorMessageRepository,
@@ -26,6 +36,49 @@ namespace Portalum.Payment.Zvt.Parsers
             this._logger = logger;
             this._errorMessageRepository = errorMessageRepository;
             this._tlvParser = tlvParser;
+
+            #region Card Types
+
+            this._cardTypes = new Dictionary<int, string>
+            {
+                { 1, "DouglasCard" },
+                //obsolete
+                { 2, "ec-card (national, international, bank-customer card)" },
+                { 3, "Miles&More" },
+                //4 RFU
+                { 5, "girocard" },
+                { 6, "Mastercard" },
+                { 7, "EAPS" },
+                { 8, "American Express" },
+                { 9, "Debit advice based on track 2 or EMV chip (e.g. EuroELV)" },
+                { 10, "Visa" },
+                { 11, "VISA electron" },
+                { 12, "Diners" },
+                { 13, "V PAY" },
+                { 14, "JCB" },
+                { 15, "REKA Card" },
+                { 16, "Esso fleet-card" },
+                { 17, "Happiness Cards" },
+                { 18, "DKV/SVG" },
+                { 19, "Transact Geschenkkarte" },
+                { 20, "Shell fleet-card" },
+                { 21, "Payeasy" },
+                { 22, "DEA" },
+                { 23, "boncard POINTS" },
+                { 24, "Leaseplan" },
+                { 25, "boncard PAY" },
+                { 26, "OK" },
+                { 27, "Klarmobil" },
+                { 28, "UTA" },
+                { 29, "Mobile World" },
+                //Geldkarte (formerly also: ec-cash with Chip) 
+                { 30, "Geldkarte" },
+                //Maestro (formerly: edc)
+                { 46, "Maestro" }
+                //TODO: complete list -> List of ZVT-card-type IDs
+            };
+
+            #endregion
 
             #region BMP Infos
 
@@ -40,8 +93,8 @@ namespace Portalum.Payment.Zvt.Parsers
                 new BmpInfo { Id = 0x0B, DataLength = 3, Description = "Trace number", TryParse = this.ParseTraceNumber },
                 new BmpInfo { Id = 0x0C, DataLength = 3, Description = "Time, format HHMMSS", TryParse = this.ParseTime },
                 new BmpInfo { Id = 0x0D, DataLength = 2, Description = "Date, format MMDD (see also AA)", TryParse = null },
-                new BmpInfo { Id = 0x0E, DataLength = 2, Description = "Expiry-date, format YYMM", TryParse = null },
-                new BmpInfo { Id = 0x17, DataLength = 2, Description = "Card sequence-number", TryParse = null },
+                new BmpInfo { Id = 0x0E, DataLength = 2, Description = "Expiry-date, format YYMM", TryParse = this.ParseExpiryDate },
+                new BmpInfo { Id = 0x17, DataLength = 2, Description = "Card sequence-number", TryParse = this.ParseCardSequenceNumber },
                 new BmpInfo { Id = 0x19, DataLength = 1, Description = "Status-byte as defined in Registration (06 00) / Payment-type as defined in Authorization (06 01) / Card-type as defined in Read Card (06 C0)", TryParse = null },
                 new BmpInfo { Id = 0x22, DataLength = 2, CalculateDataLength = this.GetDataLengthLL, Description = "PAN / EF_ID, 'E' used to indicate a masked numeric digit1. If the card-number contains an odd number of digits, it is padded with an ‘F’.", TryParse = null },
                 new BmpInfo { Id = 0x23, DataLength = 2, CalculateDataLength = this.GetDataLengthLL, Description = "Track 2 data, without start and end markers; 'E' used to indicate a masked numeric digit", TryParse = null },
@@ -65,8 +118,8 @@ namespace Portalum.Payment.Zvt.Parsers
                 new BmpInfo { Id = 0x74, DataLength = 1, Description = "Total number of chunks of the image to display.", TryParse = null },
                 new BmpInfo { Id = 0x75, DataLength = 1, Description = "Index of the chunk of the image data.", TryParse = null },
                 new BmpInfo { Id = 0x87, DataLength = 2, Description = "Receipt-number", TryParse = this.ParseReceiptNumber },
-                new BmpInfo { Id = 0x88, DataLength = 3, Description = "Turnover record number", TryParse = null },
-                new BmpInfo { Id = 0x8A, DataLength = 1, Description = "Card-type (card-number according to ZVT-protocol; see also 8C)", TryParse = null },
+                new BmpInfo { Id = 0x88, DataLength = 3, Description = "Turnover record number", TryParse = this.ParseTurnoverRecordNumber },
+                new BmpInfo { Id = 0x8A, DataLength = 1, Description = "Card-type (card-number according to ZVT-protocol; see also 8C)", TryParse = this.ParseCardType },
                 new BmpInfo { Id = 0x8B, DataLength = 2, CalculateDataLength = this.GetDataLengthLL, Description = "Card-name", TryParse = this.ParseCardName },
                 new BmpInfo { Id = 0x8C, DataLength = 1, Description = "Card-type-ID of the network operator (see also 8A)", TryParse = null },
                 new BmpInfo { Id = 0x9A, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "GeldKarte payments-/ failed-payment record/total record Geldkarte", TryParse = null },
@@ -279,6 +332,105 @@ namespace Portalum.Payment.Zvt.Parsers
                 }
 
                 typedResponse.Time = time;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseExpiryDate(byte[] data, IResponse response)
+        {
+            if (response is IResponseExpiryDate typedResponse)
+            {
+                if (data.Length != 2)
+                {
+                    return false;
+                }
+
+                var expiryDate = ByteHelper.ByteArrayToHex(data);
+
+                if (!int.TryParse(expiryDate.Substring(0,2), out var year))
+                {
+                    return false;
+                }
+
+                if (!int.TryParse(expiryDate.Substring(2, 2), out var month))
+                {
+                    return false;
+                }
+
+                typedResponse.ExpiryDateMonth = month;
+                typedResponse.ExpiryDateYear = year;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseCardSequenceNumber(byte[] data, IResponse response)
+        {
+            if (response is IResponseCardSequenceNumber typedResponse)
+            {
+                if (data.Length != 2)
+                {
+                    return false;
+                }
+
+                var number = ByteHelper.ByteArrayToHex(data);
+
+                if (!int.TryParse(number, out var cardSequenceNumber))
+                {
+                    return false;
+                }
+
+                typedResponse.CardSequenceNumber = cardSequenceNumber;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseCardType(byte[] data, IResponse response)
+        {
+            if (response is IResponseCardType typedResponse)
+            {
+                if (data.Length != 1)
+                {
+                    return false;
+                }
+
+                if (!this._cardTypes.TryGetValue(data[0], out var cardType))
+                {
+                    return false;
+                }
+
+                typedResponse.CardType = cardType;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseTurnoverRecordNumber(byte[] data, IResponse response)
+        {
+            if (response is IResponseTurnoverRecordNumber typedResponse)
+            {
+                if (data.Length != 3)
+                {
+                    return false;
+                }
+
+                var number = ByteHelper.ByteArrayToHex(data);
+                if (!int.TryParse(number, out var turnoverRecordNumber))
+                {
+                    return false;
+                }
+
+                typedResponse.TurnoverRecordNumber = turnoverRecordNumber;
+
                 return true;
             }
 
