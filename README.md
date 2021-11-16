@@ -58,7 +58,7 @@ await zvtClient.EndOfDayAsync();
 ```
 
 ## TestUi
-With the Portalum.Payment.Zvt.TestUi you can test the different ZVT functions.
+With the Portalum.Zvt.TestUi you can test the different ZVT functions.
 
 ### To use the tool, the following steps must be performed
 
