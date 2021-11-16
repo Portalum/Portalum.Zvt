@@ -28,7 +28,7 @@ jobs:
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
     - name: Build project and generate NuGet package
       run: |
-        dotnet pack --configuration Release --output $GITHUB_WORKSPACE/out src/Portalum.Payment.Zvt/Portalum.Payment.Zvt.csproj
+        dotnet pack --configuration Release --output $GITHUB_WORKSPACE/out src/Portalum.Zvt/Portalum.Zvt.csproj
     - name: Push NuGet package
       if: github.event_name != 'pull_request' && github.repository_owner == 'Portalum'
       run: |

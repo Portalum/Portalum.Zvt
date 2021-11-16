@@ -27,11 +27,11 @@ jobs:
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
     - name: Build project
       run: |
-        dotnet publish ./src/Portalum.Payment.Zvt.TestUi/Portalum.Payment.Zvt.TestUi.csproj --configuration Release --self-contained false --runtime win-x64 -p:PublishSingleFile=true --output ./publish/temp
+        dotnet publish ./src/Portalum.Zvt.TestUi/Portalum.Zvt.TestUi.csproj --configuration Release --self-contained false --runtime win-x64 -p:PublishSingleFile=true --output ./publish/temp
     - uses: papeloto/action-zip@v1
       with:
         files: ./publish/temp
-        dest: ./publish/Portalum.Payment.Zvt.TestUi.zip
+        dest: ./publish/Portalum.Zvt.TestUi.zip
     - name: Get the version
       id: get_version
       run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\//}
@@ -39,8 +39,8 @@ jobs:
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_name: Portalum/Portalum.Payment.Zvt
+        repo_name: Portalum/Portalum.Zvt
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./publish/Portalum.Payment.Zvt.TestUi.zip
+        file: ./publish/Portalum.Zvt.TestUi.zip
         tag: ${{ steps.get_version.outputs.tag }}
         overwrite: true

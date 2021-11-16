@@ -1,8 +1,8 @@
-<img src="https://raw.githubusercontent.com/Portalum/Portalum.Payment.Zvt/main/doc/logo.png" width="200">
+<img src="https://raw.githubusercontent.com/Portalum/Portalum.Zvt/main/doc/logo.png" width="200">
 
-# Portalum.Payment.Zvt
+# Portalum.Zvt
 
-Portalum.Payment.Zvt is a library designed to simplify communication with payment terminals via the ZVT Protocol. The library is based on Microsoft .NET. Communication via TCP/IP is supported and communication via a serial connection is also provided. The most important commands for processing a payment transaction with an electronic POS system are also already integrated.
+Portalum.Zvt is a library designed to simplify communication with payment terminals via the ZVT Protocol. The library is based on Microsoft .NET. Communication via TCP/IP is supported and communication via a serial connection is also provided. The most important commands for processing a payment transaction with an electronic POS system are also already integrated.
 
 ## Supported features
 
@@ -32,9 +32,9 @@ Portalum.Payment.Zvt is a library designed to simplify communication with paymen
 
 ## How can I use it?
 
-The package is available via [nuget](https://www.nuget.org/packages/Portalum.Payment.Zvt)
+The package is available via [nuget](https://www.nuget.org/packages/Portalum.Zvt)
 ```
-PM> install-package Portalum.Payment.Zvt
+PM> install-package Portalum.Zvt
 ```
 
 ## Examples
@@ -63,9 +63,9 @@ With the Portalum.Payment.Zvt.TestUi you can test the different ZVT functions.
 ### To use the tool, the following steps must be performed
 
 - Install [.NET Desktop Runtime 5.x](https://dotnet.microsoft.com/download/dotnet/5.0)
-- Download and extract the TestUi ([download](https://github.com/Portalum/Portalum.Payment.Zvt/releases/latest/download/Portalum.Payment.Zvt.TestUi.zip))
+- Download and extract the TestUi ([download](https://github.com/Portalum/Portalum.Zvt/releases/latest/download/Portalum.Zvt.TestUi.zip))
 
-![Portalum.Payment.TestUi](/doc/TestUi.png)
+![Portalum.Zvt.TestUi](/doc/TestUi.png)
 
 ## Tested Providers and Terminals
 
