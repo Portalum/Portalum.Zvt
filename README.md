@@ -37,23 +37,60 @@ The package is available via [nuget](https://www.nuget.org/packages/Portalum.Zvt
 PM> install-package Portalum.Zvt
 ```
 
+## Important information for the start
+
+Before sending a payment to the terminal, you should consider how to configure the terminal. For example, it can be set that a manual start of a payment at the terminal is no longer possible. You must also set where the receipts are printed directly via the terminal or via an external printer. For the configuration use the `Registration` command.
+
 ## Examples
+
+### Activate logging
+
+This library uses the `Microsoft.Extensions.Logging` package so you can easily decide where to write the log files, to a file or directly to the console output for example.
+To write the logging output directly to the console output, this nuget packages is needed `Microsoft.Extensions.Logging.Console`.
+
+```cs
+using var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole().SetMinimumLevel(LogLevel.Debug);
+});
+
+var deviceCommunicationLogger = loggerFactory.CreateLogger<TcpNetworkDeviceCommunication>();
+var zvtClientLogger = loggerFactory.CreateLogger<ZvtClient>();
+
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", logger: deviceCommunicationLogger);
+var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger);
+```
+
+### Set a custom terminal password
+
+```
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
+var zvtClient = new ZvtClient(deviceCommunication, password: 123456);
+```
+
+### Set a custom network device port
+
+```
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", port: 20007);
+```
 
 ### Start payment prcocess
 ```cs
-var deviceCommunication = new TcpNetworkDeviceCommunication("1.2.3.4", port: 20007);
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
 await deviceCommunication.ConnectAsync();
 
 using var zvtClient = new ZvtClient(deviceCommunication);
+zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
 await zvtClient.PaymentAsync(10.5M);
 ```
 
 ### End-of-day
 ```cs
-var deviceCommunication = new TcpNetworkDeviceCommunication("1.2.3.4", port: 20007);
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
 await deviceCommunication.ConnectAsync();
 
 using var zvtClient = new ZvtClient(deviceCommunication);
+zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
 await zvtClient.EndOfDayAsync();
 ```
 
