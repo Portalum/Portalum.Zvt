@@ -31,10 +31,12 @@ namespace Portalum.Zvt.Parsers
             {
                 foreach (var tlvInfo in tlvInfos)
                 {
-                    if (!this._tlvInfos.TryAdd(tlvInfo.Tag, tlvInfo))
+                    if (this._tlvInfos.ContainsKey(tlvInfo.Tag))
                     {
                         throw new NotSupportedException($"Cannot add tlvInfo {tlvInfo.Tag} (duplicate key)");
                     }
+
+                    this._tlvInfos.Add(tlvInfo.Tag, tlvInfo);
                 }
             }
         }

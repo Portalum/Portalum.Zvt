@@ -39,7 +39,7 @@ namespace Portalum.Zvt.Helpers
             }
             else
             {
-                item.DataLength = BitConverter.ToInt16(data.Slice(startIndex, ExtendedLengthFieldByteCount));
+                item.DataLength = BitConverter.ToInt16(data.Slice(startIndex, ExtendedLengthFieldByteCount).ToArray(), 0);
                 item.DataStartIndex = startIndex + ExtendedLengthFieldByteCount;
             }
 

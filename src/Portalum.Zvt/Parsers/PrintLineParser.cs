@@ -39,7 +39,7 @@ namespace Portalum.Zvt.Parsers
             var attribute = data.Slice(0, 1);
             var bits = BitHelper.GetBits(attribute[0]);
 
-            var text = Encoding.UTF7.GetString(data.Slice(1));
+            var text = Encoding.UTF7.GetString(data.Slice(1).ToArray());
 
             return new PrintLineInfo
             {

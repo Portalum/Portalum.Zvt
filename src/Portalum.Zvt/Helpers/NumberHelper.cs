@@ -92,7 +92,7 @@ namespace Portalum.Zvt.Helpers
         {
             var tempData = data.ToArray();
             Array.Reverse(tempData);
-            return BitConverter.ToInt16(tempData);
+            return BitConverter.ToInt16(tempData, 0);
         }
 
         public static int BoolArrayToInt(params bool[] boolArray)

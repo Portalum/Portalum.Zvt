@@ -163,10 +163,13 @@ namespace Portalum.Zvt.Parsers
             this._bmpInfos = new Dictionary<byte, BmpInfo>();
             foreach (var bmpInfo in bmpInfos)
             {
-                if (!this._bmpInfos.TryAdd(bmpInfo.Id, bmpInfo))
+                if (this._bmpInfos.ContainsKey(bmpInfo.Id))
                 {
                     throw new NotSupportedException($"Cannot add bmpInfo {bmpInfo.Id:X2} (duplicate key)");
                 }
+
+
+                this._bmpInfos.Add(bmpInfo.Id, bmpInfo);
             }
 
             #endregion
