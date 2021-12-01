@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
 using Portalum.Zvt.Repositories;
 using Portalum.Zvt.Responses;
@@ -38,7 +39,9 @@ namespace Portalum.Zvt.Parsers
             {
                 new TlvInfo { Tag = "2F", Description = "Payment-type", TryProcess = null },
                 new TlvInfo { Tag = "1F10", Description = "Cardholder authentication", TryProcess = this.SetCardholderAuthentication },
-                new TlvInfo { Tag = "1F12", Description = "Card technology", TryProcess = this.SetCardTechnology }
+                new TlvInfo { Tag = "1F12", Description = "Card technology", TryProcess = this.SetCardTechnology },
+                new TlvInfo { Tag = "60", Description = "Application", TryProcess = null },
+                new TlvInfo { Tag = "1F2B", Description = "Trace number (long format)", TryProcess = this.SetTraceNumberLongFormat }
             };
 
             var tlvParser = new TlvParser(logger, tlvInfos);
@@ -123,6 +126,17 @@ namespace Portalum.Zvt.Parsers
                     default:
                         return false;
                 }
+            }
+
+            return true;
+        }
+
+        private bool SetTraceNumberLongFormat(byte[] data, IResponse response)
+        {
+            if (response is IResponseTraceNumberLongFormat typedResponse)
+            {
+                var number = NumberHelper.BcdToInt(data);
+                typedResponse.TraceNumberLongFormat = number;
             }
 
             return true;

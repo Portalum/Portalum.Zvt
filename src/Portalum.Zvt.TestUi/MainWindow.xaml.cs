@@ -223,6 +223,10 @@ namespace Portalum.Zvt.TestUi
             {
                 lines.Add($"TraceNumber: {statusInformation.TraceNumber}");
             }
+            if (statusInformation.TraceNumberLongFormat > 0)
+            {
+                lines.Add($"TraceNumberLongFormat: {statusInformation.TraceNumberLongFormat}");
+            }
             if (!string.IsNullOrEmpty(statusInformation.VuNumber))
             {
                 lines.Add($"VU-Nr.: {statusInformation.VuNumber}");

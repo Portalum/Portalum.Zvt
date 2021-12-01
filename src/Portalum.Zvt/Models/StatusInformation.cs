@@ -16,6 +16,7 @@ namespace Portalum.Zvt.Models
         IResponseCurrencyCode,
         IResponseReceiptNumber,
         IResponseTraceNumber,
+        IResponseTraceNumberLongFormat,
         IResponseVuNumber,
         IResponseAidAuthorisationAttribute,
         IResponseExpiryDate,
@@ -34,6 +35,7 @@ namespace Portalum.Zvt.Models
         public int CurrencyCode { get; set; }
         public int ReceiptNumber { get; set; }
         public int TraceNumber { get; set; }
+        public int TraceNumberLongFormat { get; set; }
         public string VuNumber { get; set; }
         public string AidAuthorisationAttribute { get; set; }
         public int ExpiryDateYear { get; set; }
