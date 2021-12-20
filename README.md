@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/Portalum/Portalum.Zvt/main/doc/logo.png" width="200">
+<img src="https://raw.githubusercontent.com/Portalum/Portalum.Zvt/main/doc/logo.png" width="200" title="Portalum Zvt Library" alt="Portalum Zvt Library">
 
 # Portalum.Zvt
 
