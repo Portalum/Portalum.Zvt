@@ -12,10 +12,36 @@ namespace Portalum.Zvt.TestUi
         public RegistrationConfigurationDialog()
         {
             this.InitializeComponent();
+            this.UpdateRegistrationConfig();
         }
 
-        private void ButtonSave_Click(object sender, RoutedEventArgs e)
+        private void UpdateRegistrationConfig()
         {
+            if (this.CheckBoxAllowAdministrationViaPaymentTerminal == null)
+            {
+                return;
+            }
+
+            if (this.CheckBoxAllowStartPaymentViaPaymentTerminal == null)
+            {
+                return;
+            }
+
+            if (this.CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal == null)
+            {
+                return;
+            }
+
+            if (this.CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal == null)
+            {
+                return;
+            }
+
+            if (this.CheckBoxSendIntermediateStatusInformation == null)
+            {
+                return;
+            }
+
             this.RegistrationConfig = new RegistrationConfig
             {
                 AllowAdministrationViaPaymentTerminal = this.CheckBoxAllowAdministrationViaPaymentTerminal.IsChecked.Value,
@@ -26,8 +52,26 @@ namespace Portalum.Zvt.TestUi
                 ActivateTlvSupport = this.CheckBoxActivateTlvSupport.IsChecked.Value
             };
 
+            this.SetTitle();
+        }
+
+        private void SetTitle()
+        {
+            var configByte = this.RegistrationConfig.GetConfigByte().ToString("X2");
+            this.Title = $"Registration Configuration (ConfigByte:{configByte})";
+        }
+
+        private void ButtonSave_Click(object sender, RoutedEventArgs e)
+        {
+            this.UpdateRegistrationConfig();
+
             this.DialogResult = true;
             this.Close();
+        }
+
+        private void CheckBoxChanged(object sender, RoutedEventArgs e)
+        {
+            this.UpdateRegistrationConfig();
         }
     }
 }
