@@ -4,6 +4,7 @@ using Portalum.Zvt.Models;
 using Portalum.Zvt.Repositories;
 using Portalum.Zvt.Responses;
 using System;
+using System.Text;
 
 namespace Portalum.Zvt.Parsers
 {
@@ -19,9 +20,11 @@ namespace Portalum.Zvt.Parsers
         /// StatusInformationParser
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="encoding"></param>
         /// <param name="errorMessageRepository"></param>
         public StatusInformationParser(
             ILogger logger,
+            Encoding encoding,
             IErrorMessageRepository errorMessageRepository)
         {
             this._logger = logger;
@@ -45,7 +48,7 @@ namespace Portalum.Zvt.Parsers
             };
 
             var tlvParser = new TlvParser(logger, tlvInfos);
-            var bmpParser = new BmpParser(logger, errorMessageRepository, tlvParser);
+            var bmpParser = new BmpParser(logger, encoding, errorMessageRepository, tlvParser);
             this._bmpParser = bmpParser;
         }
 

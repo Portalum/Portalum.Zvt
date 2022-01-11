@@ -77,7 +77,8 @@ namespace Portalum.Zvt
 
             if (receiveHandler == default)
             {
-                this._receiveHandler = new ReceiveHandler(logger, errorMessageRepository, intermediateStatusRepository);
+                var encoding = Encoding.GetEncoding(437);
+                this._receiveHandler = new ReceiveHandler(logger, encoding, errorMessageRepository, intermediateStatusRepository);
             }
             else
             {

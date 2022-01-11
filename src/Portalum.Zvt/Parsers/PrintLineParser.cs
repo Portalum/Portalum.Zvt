@@ -12,15 +12,19 @@ namespace Portalum.Zvt.Parsers
     public class PrintLineParser : IPrintLineParser
     {
         private readonly ILogger _logger;
+        private readonly Encoding _encoding;
 
         /// <summary>
         /// PrintLineParser
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="encoding"></param>
         public PrintLineParser(
-            ILogger logger)
+            ILogger logger,
+            Encoding encoding)
         {
             this._logger = logger;
+            this._encoding = encoding;
         }
 
         /// <inheritdoc />
@@ -39,7 +43,7 @@ namespace Portalum.Zvt.Parsers
             var attribute = data.Slice(0, 1);
             var bits = BitHelper.GetBits(attribute[0]);
 
-            var text = Encoding.UTF7.GetString(data.Slice(1).ToArray());
+            var text = this._encoding.GetString(data.Slice(1).ToArray());
 
             return new PrintLineInfo
             {

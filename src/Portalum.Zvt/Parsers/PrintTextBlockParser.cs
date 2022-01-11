@@ -13,6 +13,7 @@ namespace Portalum.Zvt.Parsers
     public class PrintTextBlockParser : IPrintTextBlockParser
     {
         private readonly ILogger _logger;
+        private readonly Encoding _encoding;
         private readonly BmpParser _bmpParser;
         private readonly TlvParser _tlvParser;
 
@@ -24,12 +25,15 @@ namespace Portalum.Zvt.Parsers
         /// PrintTextBlockParser
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="encoding"></param>
         /// <param name="errorMessageRepository"></param>
         public PrintTextBlockParser(
             ILogger logger,
+            Encoding encoding,
             IErrorMessageRepository errorMessageRepository)
         {
             this._logger = logger;
+            this._encoding = encoding;
 
             var tlvInfos = new TlvInfo[]
             {
@@ -40,7 +44,7 @@ namespace Portalum.Zvt.Parsers
             };
 
             this._tlvParser = new TlvParser(logger, tlvInfos);
-            this._bmpParser = new BmpParser(logger, errorMessageRepository, this._tlvParser);
+            this._bmpParser = new BmpParser(logger, encoding, errorMessageRepository, this._tlvParser);
 
             this._receiptType = ReceiptType.Unknown;
             this._receiptContent = new StringBuilder();
@@ -86,8 +90,7 @@ namespace Portalum.Zvt.Parsers
 
         private bool AddTextLine(byte[] data, IResponse response)
         {
-            //var textBlock1 = Encoding.UTF7.GetString(data);
-            var textBlock = Encoding.GetEncoding(437).GetString(data);
+            var textBlock = this._encoding.GetString(data);
             this._receiptContent.AppendLine(textBlock);
 
             return true;

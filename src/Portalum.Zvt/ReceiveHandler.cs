@@ -4,6 +4,7 @@ using Portalum.Zvt.Models;
 using Portalum.Zvt.Parsers;
 using Portalum.Zvt.Repositories;
 using System;
+using System.Text;
 
 namespace Portalum.Zvt
 {
@@ -45,6 +46,7 @@ namespace Portalum.Zvt
         /// ReceiveHandler
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="encoding"></param>
         /// <param name="errorMessageRepository"></param>
         /// <param name="intermediateStatusRepository"></param>
         /// <param name="printLineParser"></param>
@@ -53,6 +55,7 @@ namespace Portalum.Zvt
         /// <param name="intermediateStatusInformationParser"></param>
         public ReceiveHandler(
             ILogger logger,
+            Encoding encoding,
             IErrorMessageRepository errorMessageRepository,
             IIntermediateStatusRepository intermediateStatusRepository,
             IPrintLineParser printLineParser = default,
@@ -64,19 +67,19 @@ namespace Portalum.Zvt
             this._errorMessageRepository = errorMessageRepository;
 
             this._printLineParser = printLineParser == default
-                ? new PrintLineParser(logger)
+                ? new PrintLineParser(logger, encoding)
                 : printLineParser;
 
             this._printTextBlockParser = printTextBlockParser == default
-                ? new PrintTextBlockParser(logger, errorMessageRepository)
+                ? new PrintTextBlockParser(logger, encoding, errorMessageRepository)
                 : printTextBlockParser;
 
             this._statusInformationParser = statusInformationParser == default
-                ? new StatusInformationParser(logger, errorMessageRepository)
+                ? new StatusInformationParser(logger, encoding, errorMessageRepository)
                 : statusInformationParser;
 
             this._intermediateStatusInformationParser = intermediateStatusInformationParser == default
-                ? new IntermediateStatusInformationParser(logger, intermediateStatusRepository, errorMessageRepository)
+                ? new IntermediateStatusInformationParser(logger, encoding, intermediateStatusRepository, errorMessageRepository)
                 : intermediateStatusInformationParser;
         }
 
@@ -136,7 +139,6 @@ namespace Portalum.Zvt
                 this._logger.LogDebug($"{nameof(ProcessData)} - 'Command not supported' received");
                 this.NotSupportedReceived?.Invoke();
                 return true;
-                //TODO: Process this event and return an other error
             }
 
             //Completion (3.2 Completion)

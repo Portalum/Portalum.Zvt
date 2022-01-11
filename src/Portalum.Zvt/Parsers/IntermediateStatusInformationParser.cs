@@ -13,6 +13,7 @@ namespace Portalum.Zvt.Parsers
     public class IntermediateStatusInformationParser : IIntermediateStatusInformationParser
     {
         private readonly ILogger _logger;
+        private readonly Encoding _encoding;
         private readonly IIntermediateStatusRepository _intermediateStatusRepository;
         private readonly BmpParser _bmpParser;
         private readonly TlvParser _tlvParser;
@@ -23,14 +24,17 @@ namespace Portalum.Zvt.Parsers
         /// IntermediateStatusInformationParser
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="encoding"></param>
         /// <param name="intermediateStatusRepository"></param>
         /// <param name="errorMessageRepository"></param>
         public IntermediateStatusInformationParser(
             ILogger logger,
+            Encoding encoding,
             IIntermediateStatusRepository intermediateStatusRepository,
             IErrorMessageRepository errorMessageRepository)
         {
             this._logger = logger;
+            this._encoding = encoding;
             this._intermediateStatusRepository = intermediateStatusRepository;
 
             var tlvInfos = new TlvInfo[]
@@ -40,7 +44,7 @@ namespace Portalum.Zvt.Parsers
             };
 
             this._tlvParser = new TlvParser(logger, tlvInfos);
-            this._bmpParser = new BmpParser(logger, errorMessageRepository, this._tlvParser);
+            this._bmpParser = new BmpParser(logger, encoding, errorMessageRepository, this._tlvParser);
 
             this._tlvTextContent = new StringBuilder();
         }
@@ -89,7 +93,7 @@ namespace Portalum.Zvt.Parsers
 
         private bool AddTextLine(byte[] data, IResponse response)
         {
-            var textBlock = Encoding.GetEncoding(437).GetString(data);
+            var textBlock = this._encoding.GetString(data);
             this._tlvTextContent.AppendLine(textBlock);
 
             return true;

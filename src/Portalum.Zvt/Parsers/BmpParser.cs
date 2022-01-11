@@ -18,6 +18,7 @@ namespace Portalum.Zvt.Parsers
         private readonly ILogger _logger;
         private readonly IErrorMessageRepository _errorMessageRepository;
         private readonly ITlvParser _tlvParser;
+        private readonly Encoding _encoding;
 
         private readonly Dictionary<byte, BmpInfo> _bmpInfos;
         private readonly Dictionary<int, string> _cardTypes;
@@ -26,14 +27,17 @@ namespace Portalum.Zvt.Parsers
         /// BMP Parser
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="encoding"></param>
         /// <param name="errorMessageRepository"></param>
         /// <param name="tlvParser"></param>
         public BmpParser(
             ILogger logger,
+            Encoding encoding,
             IErrorMessageRepository errorMessageRepository,
             ITlvParser tlvParser)
         {
             this._logger = logger;
+            this._encoding = encoding;
             this._errorMessageRepository = errorMessageRepository;
             this._tlvParser = tlvParser;
 
@@ -470,7 +474,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseVuNumber typedResponse)
             {
-                var number = Encoding.ASCII.GetString(data).TrimEnd();
+                var number = this._encoding.GetString(data).TrimEnd();
                 typedResponse.VuNumber = number;
 
                 return true;
@@ -483,7 +487,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseAidAuthorisationAttribute typedResponse)
             {
-                var number = Encoding.ASCII.GetString(data).TrimEnd('\0');
+                var number = this._encoding.GetString(data).TrimEnd('\0');
                 typedResponse.AidAuthorisationAttribute = number;
 
                 return true;
@@ -509,7 +513,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseAdditionalText typedResponse)
             {
-                var text = Encoding.UTF7.GetString(data);
+                var text = this._encoding.GetString(data);
                 typedResponse.AdditionalText = text;
 
                 return true;
@@ -537,7 +541,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseCardName typedResponse)
             {
-                var cardName = Encoding.UTF7.GetString(data);
+                var cardName = this._encoding.GetString(data);
                 typedResponse.CardName = cardName.TrimEnd('\0');
 
                 return true;
