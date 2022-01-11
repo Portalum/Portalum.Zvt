@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Portalum.Zvt.Parsers;
 using Portalum.Zvt.Repositories;
+using System.Text;
 
 namespace Portalum.Zvt.UnitTest
 {
@@ -10,10 +11,12 @@ namespace Portalum.Zvt.UnitTest
         private IntermediateStatusInformationParser GetIntermediateStatusInformationParser()
         {
             var logger = LoggerHelper.GetLogger();
+            var encoding = Encoding.GetEncoding(437);
+
             IIntermediateStatusRepository intermediateStatusRepository = new EnglishIntermediateStatusRepository();
             IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
 
-            return new IntermediateStatusInformationParser(logger.Object, intermediateStatusRepository, errorMessageRepository);
+            return new IntermediateStatusInformationParser(logger.Object, encoding, intermediateStatusRepository, errorMessageRepository);
         }
 
         [TestMethod]

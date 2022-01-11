@@ -4,6 +4,7 @@ using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
 using Portalum.Zvt.Repositories;
 using System.Diagnostics;
+using System.Text;
 
 namespace Portalum.Zvt.UnitTest
 {
@@ -16,7 +17,9 @@ namespace Portalum.Zvt.UnitTest
             IIntermediateStatusRepository intermediateStatusRepository = new EnglishIntermediateStatusRepository();
 
             var logger = LoggerHelper.GetLogger();
-            return new ReceiveHandler(logger.Object, errorMessageRepository, intermediateStatusRepository);
+            var encoding = Encoding.GetEncoding(437);
+
+            return new ReceiveHandler(logger.Object, encoding, errorMessageRepository, intermediateStatusRepository);
         }
 
         [TestMethod]

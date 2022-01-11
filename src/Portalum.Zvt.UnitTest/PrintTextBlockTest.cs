@@ -23,7 +23,9 @@ namespace Portalum.Zvt.UnitTest
             IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
 
             var logger = LoggerHelper.GetLogger();
-            return new PrintTextBlockParser(logger.Object, errorMessageRepository);
+            var encoding = Encoding.GetEncoding(437);
+
+            return new PrintTextBlockParser(logger.Object, encoding, errorMessageRepository);
         }
 
         [TestMethod]

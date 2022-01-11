@@ -3,6 +3,7 @@ using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Parsers;
 using Portalum.Zvt.Repositories;
 using System;
+using System.Text;
 
 namespace Portalum.Zvt.UnitTest
 {
@@ -12,9 +13,10 @@ namespace Portalum.Zvt.UnitTest
         private StatusInformationParser GetStatusInformationParser()
         {
             var logger = LoggerHelper.GetLogger();
+            var encoding = Encoding.GetEncoding(437);
             IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
 
-            return new StatusInformationParser(logger.Object, errorMessageRepository);
+            return new StatusInformationParser(logger.Object, encoding, errorMessageRepository);
         }
 
         [TestMethod]

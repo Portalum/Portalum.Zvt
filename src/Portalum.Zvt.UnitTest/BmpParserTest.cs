@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Portalum.Zvt.Parsers;
 using Portalum.Zvt.Repositories;
+using System.Text;
 
 namespace Portalum.Zvt.UnitTest
 {
@@ -13,7 +14,9 @@ namespace Portalum.Zvt.UnitTest
 
             var logger = LoggerHelper.GetLogger();
             var tlvParser = new TlvParser(logger.Object);
-            return new BmpParser(logger.Object, errorMessageRepository, tlvParser);
+            var encoding = Encoding.GetEncoding(437);
+
+            return new BmpParser(logger.Object, encoding, errorMessageRepository, tlvParser);
         }
 
         [TestMethod]
