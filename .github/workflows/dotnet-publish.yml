@@ -28,7 +28,7 @@ jobs:
     - name: Build project
       run: |
         dotnet publish ./src/Portalum.Zvt.TestUi/Portalum.Zvt.TestUi.csproj --configuration Release --self-contained false --runtime win-x64 -p:PublishSingleFile=true --output ./publish/temp
-    - uses: papeloto/action-zip@v1
+    - uses: vimtor/action-zip@v1
       with:
         files: ./publish/temp
         dest: ./publish/Portalum.Zvt.TestUi.zip
