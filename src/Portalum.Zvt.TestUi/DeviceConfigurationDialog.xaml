@@ -1,0 +1,17 @@
+﻿<Window x:Class="Portalum.Zvt.TestUi.DeviceConfigurationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
+        mc:Ignorable="d"
+        Title="Device Configuration" Height="180" Width="328" ResizeMode="NoResize" WindowStartupLocation="Manual">
+    <Grid>
+        <Button Content="Connect" HorizontalAlignment="Left" Margin="128,106,0,0" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="103" RenderTransformOrigin="0.525,2.063"/>
+        <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="128,46,0,0" VerticalAlignment="Top" Width="177" />
+        <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="10.15.0.130" TextWrapping="Wrap" VerticalAlignment="Top" Width="103" Margin="128,22,0,0" Height="19" FontSize="13"/>
+        <Label Content="Terminal IpAddress:" HorizontalAlignment="Left" Margin="10,19,0,0" VerticalAlignment="Top"/>
+        <Label Content="Language:" HorizontalAlignment="Left" Margin="59,44,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

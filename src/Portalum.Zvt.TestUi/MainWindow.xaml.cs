@@ -23,9 +23,12 @@ namespace Portalum.Zvt.TestUi
         private ZvtClient _zvtClient;
         private int _outputRowNumber = 0;
         private StringBuilder _printLineCache;
+        private DeviceConfiguration _deviceConfiguration;
 
-        public MainWindow()
+        public MainWindow(DeviceConfiguration deviceConfiguration)
         {
+            this._deviceConfiguration = deviceConfiguration;
+
             this._loggerFactory = LoggerFactory.Create(builder =>
                 builder.AddFile("default.log", LogLevel.Debug, outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} {SourceContext} {Message:lj}{NewLine}{Exception}").SetMinimumLevel(LogLevel.Debug));
 
@@ -33,8 +36,9 @@ namespace Portalum.Zvt.TestUi
             this.TextBlockStatus.Text = string.Empty;
 
             this._printLineCache = new StringBuilder();
-            this.TextBoxIpAddress.Background = Brushes.White;
             this.ButtonDisconnect.IsEnabled = false;
+
+            _ = Task.Run(async () => await this.ConnectAsync());
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -49,33 +53,117 @@ namespace Portalum.Zvt.TestUi
 
         private async void ButtonConnect_Click(object sender, RoutedEventArgs e)
         {
+            await this.ConnectAsync();
+        }
+
+        private async void ButtonDisconnect_Click(object sender, RoutedEventArgs e)
+        {
+            if (!await this.DisconnectAsync())
+            {
+                MessageBox.Show("Cannot disconnect");
+                return;
+            }
+        }
+
+        private async Task<bool> ConnectAsync()
+        {
+            this.ButtonConnect.Dispatcher.Invoke(() =>
+            {
+                this.ButtonConnect.IsEnabled = false;
+            });
+
             var loggerCommunication = this._loggerFactory.CreateLogger<TcpNetworkDeviceCommunication>();
             var loggerZvtClient = this._loggerFactory.CreateLogger<ZvtClient>();
 
-            this.TextBoxIpAddress.Background = Brushes.White;
-
-            var ipAddress = this.TextBoxIpAddress.Text;
-            this._deviceCommunication = new TcpNetworkDeviceCommunication(ipAddress, logger: loggerCommunication);
-            this._deviceCommunication.ConnectionStateChanged += ConnectionStateChanged;
+            this._deviceCommunication = new TcpNetworkDeviceCommunication(this._deviceConfiguration.IpAddress, logger: loggerCommunication);
+            this._deviceCommunication.ConnectionStateChanged += this.ConnectionStateChanged;
 
             this.CommunicationUserControl.SetDeviceCommunication(this._deviceCommunication);
 
+            this.LabelConnectionStatus.Dispatcher.Invoke(() =>
+            {
+                this.LabelConnectionStatus.Content = "Try connect...";
+                this.LabelConnectionStatus.Foreground = Brushes.Black;
+                this.LabelConnectionStatus.Background = Brushes.Yellow;
+            });
+
+            await Task.Delay(50);
+
             if (!await this._deviceCommunication.ConnectAsync())
             {
-                this.TextBoxIpAddress.Background = Brushes.OrangeRed;
-                MessageBox.Show("Cannot connect");
-                return;
+                this.LabelConnectionStatus.Dispatcher.Invoke(() =>
+                {
+                    this.LabelConnectionStatus.Content = "Cannot connect";
+                    this.LabelConnectionStatus.Foreground = Brushes.White;
+                    this.LabelConnectionStatus.Background = Brushes.OrangeRed;
+                });
+
+                this.ButtonConnect.Dispatcher.Invoke(() =>
+                {
+                    this.ButtonConnect.IsEnabled = true;
+                });
+
+                return false;
             }
 
-            this.TextBoxIpAddress.Background = Brushes.GreenYellow;
-            this.ButtonDisconnect.IsEnabled = true;
-            this.ButtonConnect.IsEnabled = false;
+            this.ButtonDisconnect.Dispatcher.Invoke(() =>
+            {
+                this.ButtonDisconnect.IsEnabled = true;
+            });
 
-            this._zvtClient = new ZvtClient(this._deviceCommunication, logger: loggerZvtClient, language: Zvt.Language.German);
+            this._zvtClient = new ZvtClient(this._deviceCommunication, logger: loggerZvtClient, language: this._deviceConfiguration.Language);
             this._zvtClient.LineReceived += this.LineReceived;
             this._zvtClient.ReceiptReceived += this.ReceiptReceived;
             this._zvtClient.StatusInformationReceived += this.StatusInformationReceived;
             this._zvtClient.IntermediateStatusInformationReceived += this.IntermediateStatusInformationReceived;
+
+            this.LabelConnectionStatus.Dispatcher.Invoke(() =>
+            {
+                this.LabelConnectionStatus.Content = "Connected";
+                this.LabelConnectionStatus.Foreground = Brushes.Black;
+                this.LabelConnectionStatus.Background = Brushes.GreenYellow;
+            });
+
+            return true;
+        }
+
+        private async Task<bool> DisconnectAsync()
+        {
+            if (!await this._deviceCommunication.DisconnectAsync())
+            {
+                return false;
+            }
+
+            this._deviceCommunication.ConnectionStateChanged -= this.ConnectionStateChanged;
+
+            if (this._deviceCommunication is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            this._zvtClient.LineReceived -= this.LineReceived;
+            this._zvtClient.ReceiptReceived -= this.ReceiptReceived;
+            this._zvtClient.StatusInformationReceived -= this.StatusInformationReceived;
+            this._zvtClient.IntermediateStatusInformationReceived -= this.IntermediateStatusInformationReceived;
+            this._zvtClient?.Dispose();
+
+            this.ButtonDisconnect.Dispatcher.Invoke(() =>
+            {
+                this.ButtonDisconnect.IsEnabled = false;
+            });
+            this.ButtonConnect.Dispatcher.Invoke(() =>
+            {
+                this.ButtonConnect.IsEnabled = true;
+            });
+
+            this.LabelConnectionStatus.Dispatcher.Invoke(() =>
+            {
+                this.LabelConnectionStatus.Content = "Disconnected";
+                this.LabelConnectionStatus.Foreground = Brushes.Black;
+                this.LabelConnectionStatus.Background = Brushes.Transparent;
+            });
+
+            return true;
         }
 
         private void AddOutputElement(OutputInfo outputInfo, Brush backgroundColor)
@@ -259,45 +347,6 @@ namespace Portalum.Zvt.TestUi
             {
                 this.TextBlockStatus.Text = message;
             });
-        }
-
-        private async void ButtonDisconnect_Click(object sender, RoutedEventArgs e)
-        {
-            if (!await this.DisconnectAsync())
-            {
-                MessageBox.Show("Cannot disconnect");
-                return;
-            }
-        }
-
-        private async Task<bool> DisconnectAsync()
-        {
-            if (!await this._deviceCommunication.DisconnectAsync())
-            {
-                return false;
-            }
-
-            this._deviceCommunication.ConnectionStateChanged -= ConnectionStateChanged;
-
-            if (this._deviceCommunication is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
-            this._zvtClient.LineReceived -= this.LineReceived;
-            this._zvtClient.ReceiptReceived -= this.ReceiptReceived;
-            this._zvtClient.StatusInformationReceived -= this.StatusInformationReceived;
-            this._zvtClient.IntermediateStatusInformationReceived -= this.IntermediateStatusInformationReceived;
-            this._zvtClient?.Dispose();
-
-            this.Dispatcher.Invoke(() =>
-            {
-                this.ButtonDisconnect.IsEnabled = false;
-                this.ButtonConnect.IsEnabled = true;
-                this.TextBoxIpAddress.Background = Brushes.White;
-            });
-
-            return true;
         }
 
         private void ConnectionStateChanged(ConnectionState connectionState)
