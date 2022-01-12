@@ -39,6 +39,7 @@ namespace Portalum.Zvt
             throw new NotImplementedException("We currently only use network payment terminals");
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             this.Dispose(true);

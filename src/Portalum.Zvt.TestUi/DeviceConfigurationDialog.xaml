@@ -11,7 +11,9 @@
         <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="128,46,0,0" VerticalAlignment="Top" Width="177" />
         <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="10.15.0.130" TextWrapping="Wrap" VerticalAlignment="Top" Width="103" Margin="128,22,0,0" Height="19" FontSize="13"/>
         <Label Content="Terminal IpAddress:" HorizontalAlignment="Left" Margin="10,19,0,0" VerticalAlignment="Top"/>
-        <Label Content="Language:" HorizontalAlignment="Left" Margin="59,44,0,0" VerticalAlignment="Top"/>
+        <Label Content="Language:" HorizontalAlignment="Left" Margin="58,44,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="128,73,0,0" VerticalAlignment="Top" Width="177" />
+        <Label Content="Encoding:" HorizontalAlignment="Left" Margin="61,71,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

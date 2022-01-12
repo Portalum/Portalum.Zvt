@@ -28,27 +28,34 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="ipAddress"></param>
         /// <param name="port"></param>
+        /// <param name="enableKeepAlive">Enable TcpKeepAlive</param>
         /// <param name="logger"></param>
         public TcpNetworkDeviceCommunication(
             string ipAddress,
             int port = 20007,
+            bool enableKeepAlive = true,
             ILogger<TcpNetworkDeviceCommunication> logger = default)
         {
             this._simpleTcpClient = new SimpleTcpClient(ipAddress, port);
             this._simpleTcpClient.Events.DataReceived += this.Receive;
             this._simpleTcpClient.Events.Connected += this.Connected;
             this._simpleTcpClient.Events.Disconnected += this.Disconnected;
-            this._simpleTcpClient.Keepalive = new SimpleTcpKeepaliveSettings
+
+            if (enableKeepAlive)
             {
-                EnableTcpKeepAlives = true,
-                TcpKeepAliveTime = 2,
-                TcpKeepAliveInterval = 2,
-                TcpKeepAliveRetryCount = 1
-            };
+                this._simpleTcpClient.Keepalive = new SimpleTcpKeepaliveSettings
+                {
+                    EnableTcpKeepAlives = true,
+                    TcpKeepAliveTime = 2,
+                    TcpKeepAliveInterval = 2,
+                    TcpKeepAliveRetryCount = 1
+                };
+            }
 
             this._logger = logger;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             this.Dispose(true);
@@ -89,6 +96,7 @@ namespace Portalum.Zvt
         {
             try
             {
+                this._logger?.LogInformation($"{nameof(ConnectAsync)}");
                 this._simpleTcpClient.Connect();
                 return Task.FromResult(true);
             }
@@ -105,6 +113,7 @@ namespace Portalum.Zvt
         {
             try
             {
+                this._logger?.LogInformation($"{nameof(DisconnectAsync)}");
                 this._simpleTcpClient.Disconnect();
                 return Task.FromResult(true);
             }

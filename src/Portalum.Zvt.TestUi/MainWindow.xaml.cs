@@ -111,7 +111,13 @@ namespace Portalum.Zvt.TestUi
                 this.ButtonDisconnect.IsEnabled = true;
             });
 
-            this._zvtClient = new ZvtClient(this._deviceCommunication, logger: loggerZvtClient, language: this._deviceConfiguration.Language);
+            var zvtClientConfig = new ZvtClientConfig
+            {
+                Encoding = this._deviceConfiguration.Encoding,
+                Language = this._deviceConfiguration.Language
+            };
+
+            this._zvtClient = new ZvtClient(this._deviceCommunication, logger: loggerZvtClient, zvtClientConfig);
             this._zvtClient.LineReceived += this.LineReceived;
             this._zvtClient.ReceiptReceived += this.ReceiptReceived;
             this._zvtClient.StatusInformationReceived += this.StatusInformationReceived;

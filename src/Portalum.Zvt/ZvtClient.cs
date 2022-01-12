@@ -25,7 +25,7 @@ namespace Portalum.Zvt
         private readonly byte[] _passwordData;
 
         private readonly ZvtCommunication _zvtCommunication;
-        private readonly IReceiveHandler _receiveHandler;
+        private IReceiveHandler _receiveHandler;
 
         public event Action<StatusInformation> StatusInformationReceived;
         public event Action<string> IntermediateStatusInformationReceived;
@@ -53,48 +53,57 @@ namespace Portalum.Zvt
             }
             this._logger = logger;
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             this._passwordData = NumberHelper.IntToBcd(password);
-
-            #region Language
-
-            IErrorMessageRepository errorMessageRepository;
-            IIntermediateStatusRepository intermediateStatusRepository;
-            if (language == Language.German)
-            {
-                errorMessageRepository = new EnglishErrorMessageRepository(); //No Germman translation available
-                intermediateStatusRepository = new GermanIntermediateStatusRepository();
-            }
-            else
-            {
-                errorMessageRepository = new EnglishErrorMessageRepository();
-                intermediateStatusRepository = new EnglishIntermediateStatusRepository();
-            }
-
-            #endregion
 
             #region ReceiveHandler
 
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             if (receiveHandler == default)
             {
-                var encoding = Encoding.GetEncoding(437);
-                this._receiveHandler = new ReceiveHandler(logger, encoding, errorMessageRepository, intermediateStatusRepository);
+                this.InitializeReceiveHandler(language, Encoding.GetEncoding(437));
             }
             else
             {
                 this._receiveHandler = receiveHandler;
+                this.RegisterReceiveHandlerEvents();
             }
-            
-            this._receiveHandler.IntermediateStatusInformationReceived += this.ProcessIntermediateStatusInformationReceived;
-            this._receiveHandler.StatusInformationReceived += this.ProcessStatusInformationReceived;
-            this._receiveHandler.LineReceived += this.ProcessLineReceived;
-            this._receiveHandler.ReceiptReceived += this.ProcessReceiptReceived;
 
             #endregion
 
             this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
             this._zvtCommunication.DataReceived += this.DataReceived;
+        }
 
+        /// <summary>
+        /// ZvtClient
+        /// </summary>
+        /// <param name="deviceCommunication"></param>
+        /// <param name="logger"></param>
+        /// <param name="clientConfig">ZVT Configuration</param>
+        public ZvtClient(
+            IDeviceCommunication deviceCommunication,
+            ILogger<ZvtClient> logger = default,
+            ZvtClientConfig clientConfig = default)
+        {
+            if (logger == null)
+            {
+                logger = new NullLogger<ZvtClient>();
+            }
+            this._logger = logger;
+
+            if (clientConfig == default)
+            {
+                clientConfig = new ZvtClientConfig();
+            }
+
+            this._passwordData = NumberHelper.IntToBcd(clientConfig.Password);
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            this.InitializeReceiveHandler(clientConfig.Language, this.GetEncoding(clientConfig.Encoding));
+
+            this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
+            this._zvtCommunication.DataReceived += this.DataReceived;
         }
 
         /// <summary>
@@ -117,11 +126,63 @@ namespace Portalum.Zvt
                 this._zvtCommunication.DataReceived -= this.DataReceived;
                 this._zvtCommunication.Dispose();
 
-                this._receiveHandler.IntermediateStatusInformationReceived -= this.ProcessIntermediateStatusInformationReceived;
-                this._receiveHandler.StatusInformationReceived -= this.ProcessStatusInformationReceived;
-                this._receiveHandler.LineReceived -= this.ProcessLineReceived;
-                this._receiveHandler.ReceiptReceived -= this.ProcessReceiptReceived;
+                this.UnregisterReceiveHandlerEvents();
             }
+        }
+
+        private Encoding GetEncoding(ZvtEncoding zvtEncoding)
+        {
+            switch (zvtEncoding)
+            {
+                case ZvtEncoding.UTF7:
+                    return Encoding.UTF7;
+                case ZvtEncoding.UTF8:
+                    return Encoding.UTF8;
+                case ZvtEncoding.CodePage437:
+                default:
+                    return Encoding.GetEncoding(437);
+            }
+        }
+
+        private void InitializeReceiveHandler(Language language, Encoding encoding)
+        {
+            IErrorMessageRepository errorMessageRepository = this.GetErrorMessageRepository(language);
+            IIntermediateStatusRepository intermediateStatusRepository = this.GetIntermediateStatusRepository(language);
+
+            this._receiveHandler = new ReceiveHandler(this._logger, encoding, errorMessageRepository, intermediateStatusRepository);
+            this.RegisterReceiveHandlerEvents();
+        }
+
+        private void RegisterReceiveHandlerEvents()
+        {
+            this._receiveHandler.IntermediateStatusInformationReceived += this.ProcessIntermediateStatusInformationReceived;
+            this._receiveHandler.StatusInformationReceived += this.ProcessStatusInformationReceived;
+            this._receiveHandler.LineReceived += this.ProcessLineReceived;
+            this._receiveHandler.ReceiptReceived += this.ProcessReceiptReceived;
+        }
+
+        private void UnregisterReceiveHandlerEvents()
+        {
+            this._receiveHandler.IntermediateStatusInformationReceived -= this.ProcessIntermediateStatusInformationReceived;
+            this._receiveHandler.StatusInformationReceived -= this.ProcessStatusInformationReceived;
+            this._receiveHandler.LineReceived -= this.ProcessLineReceived;
+            this._receiveHandler.ReceiptReceived -= this.ProcessReceiptReceived;
+        }
+
+        private IErrorMessageRepository GetErrorMessageRepository(Language language)
+        {
+            //No German translation available
+            return new EnglishErrorMessageRepository();
+        }
+
+        private IIntermediateStatusRepository GetIntermediateStatusRepository(Language language)
+        {
+            if (language == Language.German)
+            {
+                return new GermanIntermediateStatusRepository();
+            }
+            
+            return new EnglishIntermediateStatusRepository();
         }
 
         private void ProcessIntermediateStatusInformationReceived(string message)
