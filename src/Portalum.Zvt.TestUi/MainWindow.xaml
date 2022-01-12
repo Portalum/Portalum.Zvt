@@ -37,6 +37,7 @@
                     </ScrollViewer>
                     <TextBlock x:Name="TextBlockStatus" HorizontalAlignment="Left" Margin="7,116,0,0" Text="TextBlockStatus" Background="#FFFFE599" TextWrapping="Wrap" VerticalAlignment="Top" Height="53" Width="289"/>
                     <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="145,12,0,0" VerticalAlignment="Top" Width="151"/>
+                    <Button x:Name="ButtonAbort" Content="Abort" HorizontalAlignment="Left" Margin="197,82,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonAbort_Click"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Communication">

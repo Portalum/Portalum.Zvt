@@ -144,7 +144,9 @@ namespace Portalum.Zvt
             }
         }
 
-        private void InitializeReceiveHandler(Language language, Encoding encoding)
+        private void InitializeReceiveHandler(
+            Language language,
+            Encoding encoding)
         {
             IErrorMessageRepository errorMessageRepository = this.GetErrorMessageRepository(language);
             IIntermediateStatusRepository intermediateStatusRepository = this.GetIntermediateStatusRepository(language);
@@ -213,7 +215,9 @@ namespace Portalum.Zvt
             }
         }
 
-        private async Task<CommandResponse> SendCommandAsync(byte[] commandData, int commandResultTimeout = 90000)
+        private async Task<CommandResponse> SendCommandAsync(
+            byte[] commandData,
+            int commandResultTimeoutInSeconds = 600)
         {
             using var cancellationTokenSource = new CancellationTokenSource();
             var commandResponse = new CommandResponse
@@ -258,12 +262,12 @@ namespace Portalum.Zvt
                     return commandResponse;
                 }
 
-                await Task.Delay(commandResultTimeout, cancellationTokenSource.Token).ContinueWith(task =>
+                await Task.Delay(TimeSpan.FromSeconds(commandResultTimeoutInSeconds), cancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (task.Status == TaskStatus.RanToCompletion)
                     {
                         commandResponse.State = CommandResponseState.Timeout;
-                        this._logger.LogError($"{nameof(SendCommandAsync)} - No result received in the specified timeout {commandResultTimeout}ms");
+                        this._logger.LogError($"{nameof(SendCommandAsync)} - No result received in the specified timeout {commandResultTimeoutInSeconds}ms");
                     }
                 });
             }
@@ -277,7 +281,9 @@ namespace Portalum.Zvt
             return commandResponse;
         }
 
-        private byte[] CreatePackage(byte[] controlField, IEnumerable<byte> packageData)
+        private byte[] CreatePackage(
+            byte[] controlField,
+            IEnumerable<byte> packageData)
         {
             var package = new List<byte>();
             package.AddRange(controlField);
@@ -321,14 +327,21 @@ namespace Portalum.Zvt
                 //package.Add(0x00); //TLV-Length
 
                 //Add TLV Container permit 06D3 (Card complete)
-                package.Add(0x06); //TLV
-                package.Add(0x06); //tlv legnth
-                package.Add(0x26); //list of permitted ZVT-Commands
+                package.Add(0x06); //TLV Indicator
+                package.Add(0x09); //TLV Legnth
+
+                package.Add(0x26); //List of permitted ZVT-Commands
                 package.Add(0x04); //length
                 package.Add(0x0A); //ZVT-command
                 package.Add(0x02); //length
                 package.Add(0x06); //06 first hex of print text block
                 package.Add(0xD3); //D3 second hex of print text block
+
+                //? Wait time for card
+                package.Add(0x1F);
+                package.Add(0x5B);
+                //package.Add(0x01); //length
+                package.Add(0x08); //seconds
 
                 //TLV TAG
                 //10 - Number of columns and number of lines of the merchant-display
@@ -462,10 +475,35 @@ namespace Portalum.Zvt
         {
             this._logger.LogInformation($"{nameof(LogOffAsync)} - Execute");
 
-            var package = new List<byte>();
+            var package = Array.Empty<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x02 }, package);
             return await this.SendCommandAsync(fullPackage);
+        }
+
+        /// <summary>
+        /// Abort (06 B0)
+        /// </summary>
+        /// <returns></returns>
+        public async Task<CommandResponse> AbortAsync()
+        {
+            this._logger.LogInformation($"{nameof(AbortAsync)} - Execute");
+
+            var package = Array.Empty<byte>();
+
+            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0xB0 }, package);
+            if (!await this._zvtCommunication.SendCommandAsync(fullPackage))
+            {
+                return new CommandResponse
+                {
+                    State = CommandResponseState.Error
+                };
+            }
+
+            return new CommandResponse
+            {
+                State = CommandResponseState.Successful
+            };
         }
 
         /// <summary>

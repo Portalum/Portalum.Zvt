@@ -365,9 +365,23 @@ namespace Portalum.Zvt.TestUi
 
         private void ProcessCommandRespone(CommandResponse commandResponse)
         {
-            if (commandResponse.State != CommandResponseState.Successful)
+            switch (commandResponse.State)
             {
-                MessageBox.Show("Command is not successful", $"{commandResponse.State}", MessageBoxButton.OK, MessageBoxImage.Error);
+                case CommandResponseState.Successful:
+                    break;
+                case CommandResponseState.Unknown:
+                    MessageBox.Show($"State: {commandResponse.State}", "Unkown Command", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    break;
+                case CommandResponseState.Abort:
+                case CommandResponseState.Timeout:
+                    MessageBox.Show($"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}", "Command is not successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+                case CommandResponseState.NotSupported:
+                case CommandResponseState.Error:
+                    MessageBox.Show($"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}", "Command is not successful", MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
         }
 
@@ -518,6 +532,19 @@ namespace Portalum.Zvt.TestUi
 
             this.ButtonDiagnosis.IsEnabled = false;
             var commandResponse = await this._zvtClient.DiagnosisAsync();
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonDiagnosis.IsEnabled = true;
+        }
+
+        private async void ButtonAbort_Click(object sender, RoutedEventArgs e)
+        {
+            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            {
+                return;
+            }
+
+            this.ButtonDiagnosis.IsEnabled = false;
+            var commandResponse = await this._zvtClient.AbortAsync();
             this.ProcessCommandRespone(commandResponse);
             this.ButtonDiagnosis.IsEnabled = true;
         }
