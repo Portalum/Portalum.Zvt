@@ -493,7 +493,9 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
+            this.ButtonReversal.IsEnabled = false;
             await this._zvtClient?.ReversalAsync(receiptNumber);
+            this.ButtonReversal.IsEnabled = true;
         }
 
         private async void ButtonLogOff_Click(object sender, RoutedEventArgs e)
@@ -503,7 +505,9 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
+            this.ButtonLogOff.IsEnabled = false;
             await this._zvtClient.LogOffAsync();
+            this.ButtonLogOff.IsEnabled = true;
         }
 
         private async void ButtonDiagnosis_Click(object sender, RoutedEventArgs e)
@@ -513,7 +517,9 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
+            this.ButtonDiagnosis.IsEnabled = false;
             await this._zvtClient.DiagnosisAsync();
+            this.ButtonDiagnosis.IsEnabled = true;
         }
     }
 }
