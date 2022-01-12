@@ -155,7 +155,7 @@ namespace Portalum.Zvt
                 var errorCode = apduData[0];
                 var errorMessage = this._errorMessageRepository.GetMessage(errorCode);
 
-                this._logger.LogDebug($"{nameof(ProcessData)} - 'Abort' received {errorMessage}");
+                this._logger.LogDebug($"{nameof(ProcessData)} - 'Abort' received with message:{errorMessage}");
                 this.AbortReceived?.Invoke(errorMessage);
 
                 return true;

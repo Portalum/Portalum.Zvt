@@ -213,26 +213,33 @@ namespace Portalum.Zvt
             }
         }
 
-        private async Task<CommandResponseState> SendCommandAsync(byte[] commandData, int commandResultTimeout = 90000)
+        private async Task<CommandResponse> SendCommandAsync(byte[] commandData, int commandResultTimeout = 90000)
         {
             using var cancellationTokenSource = new CancellationTokenSource();
-            var commandResult = CommandResponseState.Unknown;
+            var commandResponse = new CommandResponse
+            {
+                State = CommandResponseState.Unknown
+            };
 
             void completionReceived()
             {
-                commandResult = CommandResponseState.Successful;
+                commandResponse.State = CommandResponseState.Successful;
+
                 cancellationTokenSource.Cancel();
             }
 
             void abortReceived(string errorMessage)
             {
-                commandResult = CommandResponseState.Abort;
+                commandResponse.State = CommandResponseState.Abort;
+                commandResponse.ErrorMessage = errorMessage;
+
                 cancellationTokenSource.Cancel();
             }
 
             void notSupportedReceived()
             {
-                commandResult = CommandResponseState.NotSupported;
+                commandResponse.State = CommandResponseState.NotSupported;
+
                 cancellationTokenSource.Cancel();
             }
 
@@ -247,14 +254,15 @@ namespace Portalum.Zvt
                 if (!await this._zvtCommunication.SendCommandAsync(commandData))
                 {
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command");
-                    return CommandResponseState.Error;
+                    commandResponse.State = CommandResponseState.Error;
+                    return commandResponse;
                 }
 
                 await Task.Delay(commandResultTimeout, cancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (task.Status == TaskStatus.RanToCompletion)
                     {
-                        commandResult = CommandResponseState.Timeout;
+                        commandResponse.State = CommandResponseState.Timeout;
                         this._logger.LogError($"{nameof(SendCommandAsync)} - No result received in the specified timeout {commandResultTimeout}ms");
                     }
                 });
@@ -266,7 +274,7 @@ namespace Portalum.Zvt
                 this._receiveHandler.CompletionReceived -= completionReceived;
             }
 
-            return commandResult;
+            return commandResponse;
         }
 
         private byte[] CreatePackage(byte[] controlField, IEnumerable<byte> packageData)
@@ -339,12 +347,7 @@ namespace Portalum.Zvt
             }
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x00 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -362,12 +365,7 @@ namespace Portalum.Zvt
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x01 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -387,12 +385,7 @@ namespace Portalum.Zvt
             package.AddRange(NumberHelper.IntToBcd(receiptNumber, 2));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x30 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -410,12 +403,7 @@ namespace Portalum.Zvt
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x31 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -431,12 +419,7 @@ namespace Portalum.Zvt
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x50 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -452,12 +435,7 @@ namespace Portalum.Zvt
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x10 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -473,12 +451,7 @@ namespace Portalum.Zvt
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x20 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -492,12 +465,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x02 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
 
         /// <summary>
@@ -511,12 +479,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x70 }, package);
-            var responseStatus = await this.SendCommandAsync(fullPackage);
-
-            return new CommandResponse
-            {
-                State = responseStatus
-            };
+            return await this.SendCommandAsync(fullPackage);
         }
     }
 }
