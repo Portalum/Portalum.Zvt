@@ -363,6 +363,14 @@ namespace Portalum.Zvt.TestUi
             }
         }
 
+        private void ProcessCommandRespone(CommandResponse commandResponse)
+        {
+            if (commandResponse.State != CommandResponseState.Successful)
+            {
+                MessageBox.Show("Command is not successful", $"{commandResponse.State}", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private async Task RegistrationAsync(RegistrationConfig registrationConfig)
         {
             if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
@@ -372,10 +380,7 @@ namespace Portalum.Zvt.TestUi
 
             this.ButtonRegistration.IsEnabled = false;
             var commandResponse = await this._zvtClient?.RegistrationAsync(registrationConfig);
-            if (commandResponse.State != CommandResponseState.Successful)
-            {
-                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
-            }
+            this.ProcessCommandRespone(commandResponse);
             this.ButtonRegistration.IsEnabled = true;
         }
 
@@ -388,10 +393,7 @@ namespace Portalum.Zvt.TestUi
 
             this.ButtonPay.IsEnabled = false;
             var commandResponse = await this._zvtClient?.PaymentAsync(amount);
-            if (commandResponse.State != CommandResponseState.Successful)
-            {
-                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
-            }
+            this.ProcessCommandRespone(commandResponse);
             this.ButtonPay.IsEnabled = true;
         }
 
@@ -404,10 +406,7 @@ namespace Portalum.Zvt.TestUi
 
             this.ButtonEndOfDay.IsEnabled = false;
             var commandResponse = await this._zvtClient?.EndOfDayAsync();
-            if (commandResponse.State != CommandResponseState.Successful)
-            {
-                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
-            }
+            this.ProcessCommandRespone(commandResponse);
             this.ButtonEndOfDay.IsEnabled = true;
         }
 
@@ -420,10 +419,7 @@ namespace Portalum.Zvt.TestUi
 
             this.ButtonRepeatReceipt.IsEnabled = false;
             var commandResponse = await this._zvtClient?.RepeatLastReceiptAsync();
-            if (commandResponse.State != CommandResponseState.Successful)
-            {
-                MessageBox.Show($"Command is not successful, current state:{commandResponse.State}");
-            }
+            this.ProcessCommandRespone(commandResponse);
             this.ButtonRepeatReceipt.IsEnabled = true;
         }
 
@@ -478,7 +474,8 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
-            await this._zvtClient?.RefundAsync(amount);
+            var commandResponse = await this._zvtClient?.RefundAsync(amount);
+            this.ProcessCommandRespone(commandResponse);
         }
 
         private async  void ButtonReversal_Click(object sender, RoutedEventArgs e)
@@ -494,7 +491,8 @@ namespace Portalum.Zvt.TestUi
             }
 
             this.ButtonReversal.IsEnabled = false;
-            await this._zvtClient?.ReversalAsync(receiptNumber);
+            var commandResponse = await this._zvtClient?.ReversalAsync(receiptNumber);
+            this.ProcessCommandRespone(commandResponse);
             this.ButtonReversal.IsEnabled = true;
         }
 
@@ -506,7 +504,8 @@ namespace Portalum.Zvt.TestUi
             }
 
             this.ButtonLogOff.IsEnabled = false;
-            await this._zvtClient.LogOffAsync();
+            var commandResponse = await this._zvtClient.LogOffAsync();
+            this.ProcessCommandRespone(commandResponse);
             this.ButtonLogOff.IsEnabled = true;
         }
 
@@ -518,7 +517,8 @@ namespace Portalum.Zvt.TestUi
             }
 
             this.ButtonDiagnosis.IsEnabled = false;
-            await this._zvtClient.DiagnosisAsync();
+            var commandResponse = await this._zvtClient.DiagnosisAsync();
+            this.ProcessCommandRespone(commandResponse);
             this.ButtonDiagnosis.IsEnabled = true;
         }
     }
