@@ -548,5 +548,18 @@ namespace Portalum.Zvt.TestUi
             this.ProcessCommandRespone(commandResponse);
             this.ButtonDiagnosis.IsEnabled = true;
         }
+
+        private async void ButtonSoftwareUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            {
+                return;
+            }
+
+            this.ButtonSoftwareUpdate.IsEnabled = false;
+            var commandResponse = await this._zvtClient.SoftwareUpdateAsync();
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonSoftwareUpdate.IsEnabled = true;
+        }
     }
 }

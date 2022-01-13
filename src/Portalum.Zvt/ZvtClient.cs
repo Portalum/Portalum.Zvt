@@ -519,5 +519,19 @@ namespace Portalum.Zvt
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x70 }, package);
             return await this.SendCommandAsync(fullPackage);
         }
+
+        /// <summary>
+        /// Software-Update (08 10)
+        /// </summary>
+        /// <returns></returns>
+        public async Task<CommandResponse> SoftwareUpdateAsync()
+        {
+            this._logger.LogInformation($"{nameof(SoftwareUpdateAsync)} - Execute");
+
+            var package = new List<byte>();
+
+            var fullPackage = this.CreatePackage(new byte[] { 0x08, 0x10 }, package);
+            return await this.SendCommandAsync(fullPackage);
+        }
     }
 }

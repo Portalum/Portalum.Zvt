@@ -6,38 +6,78 @@
         xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
         mc:Ignorable="d"
         Title="Portalum ZVT TestUi (ECR)" Height="450" Width="800" Closing="Window_Closing">
+    <Window.Resources>
+
+
+        <ControlTemplate x:Key="TintedGroupBox" TargetType="GroupBox">
+            <Grid>
+                <!--Grid Rows split the GroupBox into two areas -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <!--Header area-->
+                <Border
+                  Grid.Row="0"
+                  Background="#FFE8E8E8"
+                  BorderBrush="#FFAAAAAA"
+                  BorderThickness="1"
+                  CornerRadius="0,0,0,0">
+                    <ContentPresenter Margin="4" ContentSource="Header" RecognizesAccessKey="True" />
+                </Border>
+                <!-- Main client area -->
+                <Border
+                  Grid.Row="1"
+                  Background="#FFD1D1CF"
+                  BorderBrush="#FFAAAAAA"
+                  BorderThickness="1,0,1,1"
+                  CornerRadius="0,0,0,0">
+                    <ContentPresenter Margin="0" />
+                </Border>
+            </Grid>
+        </ControlTemplate>
+
+    </Window.Resources>
     <Grid>
         <TabControl>
             <TabItem Header="Common">
                 <Grid Background="#FFE5E5E5">
-                    <Button x:Name="ButtonConnect" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="58" Height="29" Margin="7,10,0,0"/>
-                    <Button x:Name="ButtonDisconnect" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonDisconnect_Click" Width="70" Height="29" Margin="70,10,0,0"/>
-                    <Button x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="7,48,0,0"/>
-                    <Button x:Name="ButtonEndOfDay" Content="End of Day" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonEndOfDay_Click" Width="90" Height="29" Margin="7,82,0,0"/>
-                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,174,0,0" Height="50
-                            " VerticalAlignment="Top" HorizontalAlignment="Left" Width="289">
-                        <Grid>
-                            <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,0,0,0" Text="20.4" TextWrapping="Wrap" VerticalAlignment="Center" Width="111" TextAlignment="Right" FontSize="20"/>
-                            <Button x:Name="ButtonPay" Content="Pay" HorizontalAlignment="Left" Margin="126,0,0,0" VerticalAlignment="Center" Click="ButtonPay_Click" Height="29" Width="60"/>
-                            <Button x:Name="ButtonRefund" Content="Refund" HorizontalAlignment="Left" Margin="191,0,0,0" VerticalAlignment="Center" Click="ButtonRefund_Click" Width="60" Height="29"/>
-                        </Grid>
-                    </Border>
-                    <Border BorderThickness="1" BorderBrush="#FF727070" Margin="7,231,0,0" Height="59" VerticalAlignment="Top" HorizontalAlignment="Left" Width="289">
-                        <Grid>
-                            <TextBox x:Name="TextBoxReceiptNumber" HorizontalAlignment="Left" Text="0000" TextWrapping="Wrap" VerticalAlignment="Top" Width="112" TextAlignment="Right" FontSize="20" Margin="10,19,0,0"/>
-                            <Button x:Name="ButtonReversal" Content="Reversal" HorizontalAlignment="Left" Margin="127,19,0,0" VerticalAlignment="Top" Width="60" Height="29" Click="ButtonReversal_Click"/>
-                            <Label Content="ReceiptNumber" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,-1,0,0" FontSize="10" Width="83"/>
-                        </Grid>
-                    </Border>
-                    <Button x:Name="ButtonRepeatReceipt" Content="Repeat Receipt" HorizontalAlignment="Left" Margin="102,82,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
-                    <Button x:Name="ButtonLogOff" Content="Log Off" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="102,48,0,0" Click="ButtonLogOff_Click"/>
-                    <Button x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="197,48,0,0" Click="ButtonDiagnosis_Click"/>
                     <ScrollViewer x:Name="OutputScrollViewer" Margin="307,0,0,0" Background="#FFF9F9F9">
                         <Grid x:Name="Output"></Grid>
                     </ScrollViewer>
-                    <TextBlock x:Name="TextBlockStatus" HorizontalAlignment="Left" Margin="7,116,0,0" Text="TextBlockStatus" Background="#FFFFE599" TextWrapping="Wrap" VerticalAlignment="Top" Height="53" Width="289"/>
-                    <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="145,12,0,0" VerticalAlignment="Top" Width="151"/>
-                    <Button x:Name="ButtonAbort" Content="Abort" HorizontalAlignment="Left" Margin="197,82,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonAbort_Click"/>
+                    <TextBlock x:Name="TextBlockStatus" HorizontalAlignment="Left" Margin="0,128,0,0" Text="TextBlockStatus" Background="#FFFFE599" TextWrapping="Wrap" Width="307" Height="57" VerticalAlignment="Top"/>
+                    <GroupBox  Template = "{StaticResource TintedGroupBox}" Header="Configuration" Margin="0,64,0,0" Height="62" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
+                        <Grid>
+                            <Button x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="3,3,0,0"/>
+                            <Button x:Name="ButtonLogOff" Content="Log Off" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="98,3,0,0" Click="ButtonLogOff_Click"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox  Template = "{StaticResource TintedGroupBox}" Header="Connection" Margin="0,1,0,0" Height="62" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
+                        <Grid>
+                            <Button x:Name="ButtonConnect" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="58" Height="29" Margin="3,3,0,0"/>
+                            <Button x:Name="ButtonDisconnect" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonDisconnect_Click" Width="70" Height="29" Margin="66,3,0,0"/>
+                            <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="141,5,0,0" VerticalAlignment="Top" Width="151"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox  Template = "{StaticResource TintedGroupBox}" Header="Advanced" Margin="0,309,0,0" HorizontalAlignment="Left" Width="307" Height="97" VerticalAlignment="Top">
+                        <Grid>
+                            <Button x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="193,3,0,0" Click="ButtonDiagnosis_Click"/>
+                            <Button x:Name="ButtonRepeatReceipt" Content="Repeat Receipt" HorizontalAlignment="Left" Margin="98,3,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
+                            <Button x:Name="ButtonEndOfDay" Content="End of Day" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonEndOfDay_Click" Width="90" Height="29" Margin="3,3,0,0"/>
+                            <Button x:Name="ButtonSoftwareUpdate" Content="Software Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="3,38,0,0" FontSize="11" Click="ButtonSoftwareUpdate_Click"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox  Template = "{StaticResource TintedGroupBox}" Header="Payment" Margin="0,186,0,0" HorizontalAlignment="Left" Width="307" Height="122" VerticalAlignment="Top">
+                        <Grid>
+                            <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,8,0,0" Text="20.4" TextWrapping="Wrap" Width="111" TextAlignment="Right" FontSize="20" Height="29" VerticalAlignment="Top"/>
+                            <Button x:Name="ButtonPay" Content="Pay" HorizontalAlignment="Left" Margin="126,8,0,0" VerticalAlignment="Top" Click="ButtonPay_Click" Height="29" Width="80"/>
+                            <Button x:Name="ButtonRefund" Content="Refund" HorizontalAlignment="Left" Margin="211,8,0,0" VerticalAlignment="Top" Click="ButtonRefund_Click" Width="80" Height="29"/>
+                            <TextBox x:Name="TextBoxReceiptNumber" HorizontalAlignment="Left" Text="0000" TextWrapping="Wrap" VerticalAlignment="Top" Width="111" TextAlignment="Right" FontSize="20" Margin="10,57,0,0"/>
+                            <Button x:Name="ButtonReversal" Content="Reversal" HorizontalAlignment="Left" Margin="126,57,0,0" VerticalAlignment="Top" Width="80" Height="29" Click="ButtonReversal_Click"/>
+                            <Label Content="ReceiptNumber" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,37,0,0" FontSize="10" Width="83"/>
+                            <Button x:Name="ButtonAbort" Content="Abort" HorizontalAlignment="Left" Margin="211,57,0,0" VerticalAlignment="Top" Width="80" Height="29" Click="ButtonAbort_Click"/>
+                        </Grid>
+                    </GroupBox>
                 </Grid>
             </TabItem>
             <TabItem Header="Communication">

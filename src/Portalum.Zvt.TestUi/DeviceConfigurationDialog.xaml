@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
         mc:Ignorable="d"
-        Title="Device Configuration" Height="180" Width="328" ResizeMode="NoResize" WindowStartupLocation="Manual">
+        Title="ZVT Device Configuration" Height="214" Width="350" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        <Button Content="Connect" HorizontalAlignment="Left" Margin="128,106,0,0" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="103" RenderTransformOrigin="0.525,2.063"/>
-        <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="128,46,0,0" VerticalAlignment="Top" Width="177" />
-        <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="10.15.0.130" TextWrapping="Wrap" VerticalAlignment="Top" Width="103" Margin="128,22,0,0" Height="19" FontSize="13"/>
-        <Label Content="Terminal IpAddress:" HorizontalAlignment="Left" Margin="10,19,0,0" VerticalAlignment="Top"/>
-        <Label Content="Language:" HorizontalAlignment="Left" Margin="58,44,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="128,73,0,0" VerticalAlignment="Top" Width="177" />
-        <Label Content="Encoding:" HorizontalAlignment="Left" Margin="61,71,0,0" VerticalAlignment="Top"/>
+        <Button Content="Connect" HorizontalAlignment="Left" Margin="128,118,0,0" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="177" RenderTransformOrigin="0.525,2.063" FontSize="16"/>
+        <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="128,52,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
+        <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="192.168.100.20" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="128,22,0,0" Height="24" FontSize="16"/>
+        <Label Content="IpAddress:" HorizontalAlignment="Left" Margin="39,19,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Label Content="Language:" HorizontalAlignment="Left" Margin="40,50,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="128,84,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
+        <Label Content="Encoding:" HorizontalAlignment="Left" Margin="44,82,0,0" VerticalAlignment="Top" FontSize="16"/>
 
     </Grid>
 </Window>

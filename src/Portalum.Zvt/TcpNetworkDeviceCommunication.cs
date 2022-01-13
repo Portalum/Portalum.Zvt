@@ -33,7 +33,7 @@ namespace Portalum.Zvt
         public TcpNetworkDeviceCommunication(
             string ipAddress,
             int port = 20007,
-            bool enableKeepAlive = true,
+            bool enableKeepAlive = false,
             ILogger<TcpNetworkDeviceCommunication> logger = default)
         {
             this._simpleTcpClient = new SimpleTcpClient(ipAddress, port);
