@@ -79,6 +79,7 @@ namespace Portalum.Zvt.Parsers
                         break;
                     case 0x01:
                         typedResponse.CardholderAuthentication = "Signature";
+                        typedResponse.PrintoutNeeded = true;
                         break;
                     case 0x02:
                         typedResponse.CardholderAuthentication = "Online Pin";
@@ -91,12 +92,15 @@ namespace Portalum.Zvt.Parsers
                         break;
                     case 0x05:
                         typedResponse.CardholderAuthentication = "Offline encrypted Pin + signature";
+                        typedResponse.PrintoutNeeded = true;
                         break;
                     case 0x06:
                         typedResponse.CardholderAuthentication = "Offline plaintext Pin + signature";
+                        typedResponse.PrintoutNeeded = true;
                         break;
                     case 0x07:
                         typedResponse.CardholderAuthentication = "Online Pin + signature";
+                        typedResponse.PrintoutNeeded = true;
                         break;
                     case 0xFF:
                         typedResponse.CardholderAuthentication = "Unknown cardholder verification";

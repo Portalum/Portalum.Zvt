@@ -30,6 +30,7 @@ namespace Portalum.Zvt.Models
         public string CardName { get; set; }
         public decimal Amount { get; set; }
         public string CardholderAuthentication { get; set; }
+        public bool PrintoutNeeded { get; set; }
         public string CardTechnology { get; set; }
         public TimeSpan Time { get; set; }
         public int CurrencyCode { get; set; }

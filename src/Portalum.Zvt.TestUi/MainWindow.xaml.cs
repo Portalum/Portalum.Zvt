@@ -313,6 +313,10 @@ namespace Portalum.Zvt.TestUi
             {
                 lines.Add($"CardholderAuthentication: {statusInformation.CardholderAuthentication}");
             }
+            if (statusInformation.PrintoutNeeded)
+            {
+                lines.Add($"PrintoutNeeded: {statusInformation.PrintoutNeeded}");
+            }
             if (statusInformation.TraceNumber > 0)
             {
                 lines.Add($"TraceNumber: {statusInformation.TraceNumber}");
