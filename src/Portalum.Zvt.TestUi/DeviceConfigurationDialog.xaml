@@ -5,15 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
         mc:Ignorable="d"
-        Title="ZVT Device Configuration" Height="214" Width="350" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
-    <Grid>
-        <Button Content="Connect" HorizontalAlignment="Left" Margin="128,118,0,0" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="177" RenderTransformOrigin="0.525,2.063" FontSize="16"/>
-        <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="128,52,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
-        <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="192.168.100.20" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="128,22,0,0" Height="24" FontSize="16"/>
-        <Label Content="IpAddress:" HorizontalAlignment="Left" Margin="39,19,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Label Content="Language:" HorizontalAlignment="Left" Margin="40,50,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="128,84,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
-        <Label Content="Encoding:" HorizontalAlignment="Left" Margin="44,82,0,0" VerticalAlignment="Top" FontSize="16"/>
+        Title="ZVT Device Configuration" Height="470" Width="540" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+    <Grid Margin="20" Background="#607686">
+        <Grid.Effect>
+            <DropShadowEffect BlurRadius="12" Direction="-90" RenderingBias="Quality" ShadowDepth="1"/>
+        </Grid.Effect>
+        <Button Content="Connect" HorizontalAlignment="Center" Margin="0,392,0,0" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="500" RenderTransformOrigin="0.525,2.063" FontSize="16" Background="White" Height="39"/>
+        <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="214,279,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
+        <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="192.168.100.20" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="214,245,0,0" Height="24" FontSize="16"/>
+        <Label Content="IpAddress:" HorizontalAlignment="Left" Margin="125,242,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+        <Label Content="Language:" HorizontalAlignment="Left" Margin="126,277,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+        <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="214,315,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
+        <Label Content="Encoding:" HorizontalAlignment="Left" Margin="130,313,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+        <Image HorizontalAlignment="Left" Height="220" VerticalAlignment="Top" Width="500" Source="/SplashScreen.png"/>
 
     </Grid>
 </Window>

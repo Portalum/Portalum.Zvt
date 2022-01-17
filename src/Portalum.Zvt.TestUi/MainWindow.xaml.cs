@@ -80,23 +80,13 @@ namespace Portalum.Zvt.TestUi
 
             this.CommunicationUserControl.SetDeviceCommunication(this._deviceCommunication);
 
-            this.LabelConnectionStatus.Dispatcher.Invoke(() =>
-            {
-                this.LabelConnectionStatus.Content = "Try connect...";
-                this.LabelConnectionStatus.Foreground = Brushes.Black;
-                this.LabelConnectionStatus.Background = Brushes.Yellow;
-            });
+            this.SetConnectionInfo("Try connect...", Colors.White, Colors.Yellow);
 
             await Task.Delay(50);
 
             if (!await this._deviceCommunication.ConnectAsync())
             {
-                this.LabelConnectionStatus.Dispatcher.Invoke(() =>
-                {
-                    this.LabelConnectionStatus.Content = "Cannot connect";
-                    this.LabelConnectionStatus.Foreground = Brushes.White;
-                    this.LabelConnectionStatus.Background = Brushes.OrangeRed;
-                });
+                this.SetConnectionInfo("Cannot connect", Colors.White, Colors.OrangeRed);
 
                 this.ButtonConnect.Dispatcher.Invoke(() =>
                 {
@@ -123,12 +113,7 @@ namespace Portalum.Zvt.TestUi
             this._zvtClient.StatusInformationReceived += this.StatusInformationReceived;
             this._zvtClient.IntermediateStatusInformationReceived += this.IntermediateStatusInformationReceived;
 
-            this.LabelConnectionStatus.Dispatcher.Invoke(() =>
-            {
-                this.LabelConnectionStatus.Content = "Connected";
-                this.LabelConnectionStatus.Foreground = Brushes.Black;
-                this.LabelConnectionStatus.Background = Brushes.GreenYellow;
-            });
+            this.SetConnectionInfo("Connected", Colors.White, Colors.GreenYellow);
 
             return true;
         }
@@ -162,14 +147,20 @@ namespace Portalum.Zvt.TestUi
                 this.ButtonConnect.IsEnabled = true;
             });
 
-            this.LabelConnectionStatus.Dispatcher.Invoke(() =>
-            {
-                this.LabelConnectionStatus.Content = "Disconnected";
-                this.LabelConnectionStatus.Foreground = Brushes.Black;
-                this.LabelConnectionStatus.Background = Brushes.Transparent;
-            });
+            this.SetConnectionInfo("Disconnected", Colors.White, Colors.Transparent);
 
             return true;
+        }
+
+        private void SetConnectionInfo(string text, Color textColor, Color backgroundColor)
+        {
+            this.LabelConnectionStatus.Dispatcher.Invoke(() =>
+            {
+                this.LabelConnectionStatus.Content = text;
+                this.LabelConnectionStatus.Foreground = new SolidColorBrush(textColor);
+                this.LabelConnectionStatus.BorderBrush = new SolidColorBrush(backgroundColor);
+                this.LabelConnectionStatus.Background = new SolidColorBrush(backgroundColor) { Opacity = 0.7 };
+            });
         }
 
         private void AddOutputElement(OutputInfo outputInfo, Brush backgroundColor)
@@ -564,6 +555,11 @@ namespace Portalum.Zvt.TestUi
             var commandResponse = await this._zvtClient.SoftwareUpdateAsync();
             this.ProcessCommandRespone(commandResponse);
             this.ButtonSoftwareUpdate.IsEnabled = true;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

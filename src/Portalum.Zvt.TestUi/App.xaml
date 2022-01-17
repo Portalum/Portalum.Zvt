@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
              Startup="ApplicationStart">
     <Application.Resources>
-         
+
     </Application.Resources>
 </Application>
