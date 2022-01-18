@@ -5,15 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
         mc:Ignorable="d"
-        Title="change by code" Height="223" Width="425" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="change by code"
+        Height="223"
+        Width="425"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#607686"
+        Template="{StaticResource WindowWithColoredTitleBarNoResize}">
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0 64 0 0" NonClientFrameEdges="Left,Bottom,Right" />
+    </WindowChrome.WindowChrome>
+
     <Grid>
-        <CheckBox x:Name="CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal" Content="Receipt printout for payment functions via Payment Terminal" HorizontalAlignment="Left" Margin="26,24,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
-        <CheckBox x:Name="CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal" Content="Receipt printout for administration functions via Payment Terminal" HorizontalAlignment="Left" Margin="26,44,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
-        <CheckBox x:Name="CheckBoxSendIntermediateStatusInformation" IsChecked="True"  Content="Send Intermediate Status information" HorizontalAlignment="Left" Margin="26,65,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
-        <CheckBox x:Name="CheckBoxAllowStartPaymentViaPaymentTerminal" Content="Allow start payment via Payment Terminal" HorizontalAlignment="Left" Margin="26,85,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
-        <CheckBox x:Name="CheckBoxAllowAdministrationViaPaymentTerminal" Content="Allow administration via Payment Terminal" HorizontalAlignment="Left" Margin="26,105,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
-        <Button x:Name="ButtonSave" Content="Save" Margin="10,155,10,0" VerticalAlignment="Top" Click="ButtonSave_Click"/>
-        <CheckBox x:Name="CheckBoxActivateTlvSupport" Content="Activate TLV Support" HorizontalAlignment="Left" Margin="26,124,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal" Content="Receipt printout for payment functions via Payment Terminal" HorizontalAlignment="Left" Margin="26,24,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
+        <CheckBox x:Name="CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal" Content="Receipt printout for administration functions via Payment Terminal" HorizontalAlignment="Left" Margin="26,44,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
+        <CheckBox x:Name="CheckBoxSendIntermediateStatusInformation" IsChecked="True"  Content="Send Intermediate Status information" HorizontalAlignment="Left" Margin="26,65,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
+        <CheckBox x:Name="CheckBoxAllowStartPaymentViaPaymentTerminal" Content="Allow start payment via Payment Terminal" HorizontalAlignment="Left" Margin="26,85,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
+        <CheckBox x:Name="CheckBoxAllowAdministrationViaPaymentTerminal" Content="Allow administration via Payment Terminal" HorizontalAlignment="Left" Margin="26,105,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
+        <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSave" Content="Save" Margin="10,155,10,0" VerticalAlignment="Top" Click="ButtonSave_Click" Height="29"/>
+        <CheckBox x:Name="CheckBoxActivateTlvSupport" Content="Activate TLV Support" HorizontalAlignment="Left" Margin="26,124,0,0" VerticalAlignment="Top" IsChecked="True" Foreground="White"/>
 
     </Grid>
 </Window>

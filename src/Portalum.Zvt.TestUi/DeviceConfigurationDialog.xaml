@@ -17,7 +17,7 @@
         <Label Content="Language:" HorizontalAlignment="Left" Margin="126,277,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
         <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="214,315,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
         <Label Content="Encoding:" HorizontalAlignment="Left" Margin="130,313,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
-        <Image HorizontalAlignment="Left" Height="220" VerticalAlignment="Top" Width="500" Source="/SplashScreen.png"/>
+        <Image HorizontalAlignment="Left" Height="220" VerticalAlignment="Top" Width="500" Source="SplashScreen.png"/>
 
     </Grid>
 </Window>

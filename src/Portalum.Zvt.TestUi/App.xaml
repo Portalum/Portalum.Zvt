@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
              Startup="ApplicationStart">
     <Application.Resources>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/StyleDictionary.xaml" />
+                <ResourceDictionary Source="Resources/TemplateDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

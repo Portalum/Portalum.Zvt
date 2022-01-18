@@ -5,173 +5,95 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Portalum.Zvt.TestUi"
         mc:Ignorable="d"
-        Title="TestUi"
+        Title="Portalum ZVT TestUi (ECR)"
         Height="560"
         Width="780"
         Closing="Window_Closing"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent">
- 
+        Background="#607686"
+        Template="{StaticResource WindowWithColoredTitleBar}">
+
     <WindowChrome.WindowChrome>
-        <WindowChrome 
-        CaptionHeight="10"
-        ResizeBorderThickness="20"
-        NonClientFrameEdges="None"/>
+        <WindowChrome GlassFrameThickness="0 64 0 0" NonClientFrameEdges="Left,Bottom,Right" />
     </WindowChrome.WindowChrome>
-    
-    <Window.Resources>
-        <Style x:Key="BaseButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="Black" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border CornerRadius="2" Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#98C011" />
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#4B5C68" />
-                </Trigger>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#CC98C011" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        
-        <ControlTemplate x:Key="TintedGroupBox" TargetType="GroupBox">
-            <Grid>
-                <!--Grid Rows split the GroupBox into two areas -->
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <!--Header area-->
-                <Border
-                  Grid.Row="0"
-                  Background="#98C011"
-                  BorderBrush="#607686"
-                  BorderThickness="1"
-                  CornerRadius="0,0,0,0">
-                    <ContentPresenter Margin="10,8,4,8" ContentSource="Header" RecognizesAccessKey="True" />
 
-                </Border>
-                <!-- Main client area -->
-                <Border
-                  Grid.Row="1"
-                  Background="#607686"
-                  BorderBrush="#607686"
-                  BorderThickness="1,0,1,1"
-                  CornerRadius="0,0,0,0">
-                    <ContentPresenter Margin="0" />
-                </Border>
-            </Grid>
-        </ControlTemplate>
-    </Window.Resources>
-    
-    <Grid Background="#607686" Margin="20">
-        <Grid.Effect>
-            <DropShadowEffect BlurRadius="5" Direction="-90" RenderingBias="Quality" ShadowDepth="1"/>
-        </Grid.Effect>
-
-        <DockPanel x:Name="RootWindow" Panel.ZIndex="1">
-            <DockPanel x:Name="TitleBar" DockPanel.Dock="Top">
-                <Button x:Name="CloseButton"
-                        Content="X"
-                        DockPanel.Dock="Right"
-                        Width="26"
-                        BorderBrush="White"
-                        Background="#FF98C011"
-                        Foreground="White"
-                        Click="CloseButton_Click" />
-                <TextBlock HorizontalAlignment="Center" Foreground="#FFFFFF" FontSize="20">Portalum ZVT TestUi (ECR)</TextBlock>
-            </DockPanel>
-
-            <TabControl Margin="0" BorderThickness="0,2,0,0" BorderBrush="#98C011" Background="#607686" Padding="0">
-                <TabControl.Resources>
-                    <Style TargetType="TabItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="TabItem">
-                                    <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="#4B5C68" CornerRadius="2,2,0,0" Margin="4,4,0,0" Padding="8">
-                                        <ContentPresenter x:Name="ContentSite"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        ContentSource="Header"
-                                        Margin="10,4,10,2"/>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="#FFFFFF"/>
-                                            <Setter TargetName="Border" Property="Background" Value="#98C011" />
-                                        </Trigger>
-                                        <Trigger Property="IsSelected" Value="False">
-                                            <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="#DDDDDD"/>
-                                            <Setter TargetName="Border" Property="Background" Value="#4B5C68" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </TabControl.Resources>
-                <TabItem Header="Common">
-                    <Grid Background="#607686">
-                        <ScrollViewer x:Name="OutputScrollViewer" Margin="307,57,0,0" Background="#22FFFFFF">
-                            <Grid x:Name="Output"></Grid>
-                        </ScrollViewer>
-                        <TextBlock x:Name="TextBlockStatus" Margin="307,0,0,0" Padding="5,20" Text="TextBlockStatus" Background="#FFEAEAEA" TextWrapping="Wrap" Height="57" VerticalAlignment="Top"/>
-                        <GroupBox Template="{StaticResource TintedGroupBox}" Header="Configuration" Foreground="White" Margin="0,82,0,0" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
-                            <Grid>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="10,0,0,0"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonLogOff" Content="Log Off" HorizontalAlignment="Left" VerticalAlignment="Center" Width="91" Height="29" Click="ButtonLogOff_Click" Margin="105,0,0,0"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Template="{StaticResource TintedGroupBox}" Header="Connection" Foreground="White" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
-                            <Grid>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonConnect" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonConnect_Click" Width="58" Height="29" Margin="10,0,0,0"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonDisconnect" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonDisconnect_Click" Width="70" Height="29" Margin="73,0,0,0"/>
-                                <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="148,0,0,0" VerticalAlignment="Center" Width="147" Height="29" BorderThickness="1,1,1,1" BorderBrush="#FF919191" />
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Template="{StaticResource TintedGroupBox}" Header="Advanced" Foreground="White" Margin="0,310,0,0" HorizontalAlignment="Left" Width="307" Height="126" VerticalAlignment="Top">
-                            <Grid>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="205,9,0,0" Click="ButtonDiagnosis_Click"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRepeatReceipt" Content="Repeat Receipt" HorizontalAlignment="Center" Margin="0,9,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonEndOfDay" Content="End of Day" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonEndOfDay_Click" Width="90" Height="29" Margin="10,9,0,0"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSoftwareUpdate" Content="Software Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="10,47,0,0" FontSize="11" Click="ButtonSoftwareUpdate_Click"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Template="{StaticResource TintedGroupBox}" Header="Payment" Foreground="White" Margin="0,162,0,0" HorizontalAlignment="Left" Width="307" Height="148" VerticalAlignment="Top">
-                            <Grid>
-                                <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,22,0,0" Text="20.4" TextWrapping="Wrap" Width="111" TextAlignment="Right" FontSize="20" Height="29" VerticalAlignment="Top"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonPay" Content="Pay" HorizontalAlignment="Left" Margin="126,22,0,0" VerticalAlignment="Top" Click="ButtonPay_Click" Height="29" Width="80"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRefund" Content="Refund" HorizontalAlignment="Left" Margin="211,22,0,0" VerticalAlignment="Top" Click="ButtonRefund_Click" Width="80" Height="29"/>
-                                <TextBox x:Name="TextBoxReceiptNumber" HorizontalAlignment="Left" Text="0000" TextWrapping="Wrap" VerticalAlignment="Top" Width="111" TextAlignment="Right" FontSize="20" Margin="10,69,0,0"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonReversal" Content="Reversal" HorizontalAlignment="Left" Margin="126,69,0,0" VerticalAlignment="Top" Width="80" Height="29" Click="ButtonReversal_Click"/>
-                                <Label Content="ReceiptNumber" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="10" Width="83" Foreground="White"/>
-                                <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonAbort" Content="Abort" HorizontalAlignment="Left" Margin="211,69,0,0" VerticalAlignment="Top" Width="80" Height="29" Click="ButtonAbort_Click"/>
-                                <Label Content="Amount" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,4,0,0" FontSize="10" Width="83" Foreground="White"/>
-                            </Grid>
-                        </GroupBox>
-                        <Label Content="Status" HorizontalAlignment="Left" Margin="305,-4,0,0" VerticalAlignment="Top" Foreground="#44666666" />
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Communication">
-                    <Grid Background="#FFE5E5E5" Margin="0">
-                        <local:CommunicationUserControl x:Name="CommunicationUserControl" />
-                    </Grid>
-                </TabItem>
-            </TabControl>
-        </DockPanel>
+    <Grid>
+        <TabControl Margin="0" BorderThickness="0,2,0,0" BorderBrush="#98C011" Background="#607686" Padding="0">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="#4B5C68" CornerRadius="2,2,0,0" Margin="4,4,0,0" Padding="8">
+                                    <ContentPresenter x:Name="ContentSite"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    ContentSource="Header"
+                                    Margin="10,4,10,2"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="#FFFFFF"/>
+                                        <Setter TargetName="Border" Property="Background" Value="#98C011" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="#DDDDDD"/>
+                                        <Setter TargetName="Border" Property="Background" Value="#4B5C68" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+            <TabItem Header="Common">
+                <Grid>
+                    <ScrollViewer x:Name="OutputScrollViewer" Margin="307,57,4,0" Background="#22FFFFFF">
+                        <Grid x:Name="Output"></Grid>
+                    </ScrollViewer>
+                    <TextBlock x:Name="TextBlockStatus" Margin="307,0,4,0" Padding="5,20" Text="TextBlockStatus" Background="#FFEAEAEA" TextWrapping="Wrap" Height="57" VerticalAlignment="Top" FontSize="14" FontWeight="Bold"/>
+                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Configuration" Foreground="White" Margin="0,82,0,0" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
+                        <Grid>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="10,0,0,0"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonLogOff" Content="Log Off" HorizontalAlignment="Left" VerticalAlignment="Center" Width="91" Height="29" Click="ButtonLogOff_Click" Margin="105,0,0,0"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Connection" Foreground="White" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
+                        <Grid>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonConnect" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonConnect_Click" Width="58" Height="29" Margin="10,0,0,0"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonDisconnect" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonDisconnect_Click" Width="70" Height="29" Margin="73,0,0,0"/>
+                            <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="148,0,0,0" VerticalAlignment="Center" Width="147" Height="29" BorderThickness="1,1,1,1" BorderBrush="#FF919191" />
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Advanced" Foreground="White" Margin="0,310,0,0" HorizontalAlignment="Left" Width="307" Height="126" VerticalAlignment="Top">
+                        <Grid>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="205,9,0,0" Click="ButtonDiagnosis_Click"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRepeatReceipt" Content="Repeat Receipt" HorizontalAlignment="Center" Margin="0,9,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonEndOfDay" Content="End of Day" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonEndOfDay_Click" Width="90" Height="29" Margin="10,9,0,0"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSoftwareUpdate" Content="Software Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="10,47,0,0" FontSize="11" Click="ButtonSoftwareUpdate_Click"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Payment" Foreground="White" Margin="0,162,0,0" HorizontalAlignment="Left" Width="307" Height="148" VerticalAlignment="Top">
+                        <Grid>
+                            <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,22,0,0" Text="20.4" TextWrapping="Wrap" Width="111" TextAlignment="Right" FontSize="20" Height="29" VerticalAlignment="Top"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonPay" Content="Pay" HorizontalAlignment="Left" Margin="126,22,0,0" VerticalAlignment="Top" Click="ButtonPay_Click" Height="29" Width="80"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRefund" Content="Refund" HorizontalAlignment="Left" Margin="211,22,0,0" VerticalAlignment="Top" Click="ButtonRefund_Click" Width="80" Height="29"/>
+                            <TextBox x:Name="TextBoxReceiptNumber" HorizontalAlignment="Left" Text="0000" TextWrapping="Wrap" VerticalAlignment="Top" Width="111" TextAlignment="Right" FontSize="20" Margin="10,69,0,0"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonReversal" Content="Reversal" HorizontalAlignment="Left" Margin="126,69,0,0" VerticalAlignment="Top" Width="80" Height="29" Click="ButtonReversal_Click"/>
+                            <Label Content="ReceiptNumber" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,50,0,0" FontSize="10" Width="84" Foreground="White"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonAbort" Content="Abort" HorizontalAlignment="Left" Margin="211,69,0,0" VerticalAlignment="Top" Width="80" Height="29" Click="ButtonAbort_Click"/>
+                            <Label Content="Amount" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,3,0,0" FontSize="10" Width="84" Foreground="White"/>
+                        </Grid>
+                    </GroupBox>
+                    <Label Content="Status" HorizontalAlignment="Left" Margin="305,-4,0,0" VerticalAlignment="Top" Foreground="#44666666" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Communication">
+                <Grid Background="#FFE5E5E5" Margin="0">
+                    <local:CommunicationUserControl x:Name="CommunicationUserControl" />
+                </Grid>
+            </TabItem>
+        </TabControl>
 
     </Grid>
 </Window>
