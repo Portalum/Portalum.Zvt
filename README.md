@@ -20,6 +20,8 @@ Portalum.Zvt is a library designed to simplify communication with payment termin
 - Send Turnover Totals
 - Repeat Receipt
 - Diagnosis
+- Abort
+- Software-Update
 
 ### Commands from Payment Terminal
 
@@ -102,7 +104,7 @@ With the Portalum.Zvt.TestUi you can test the different ZVT functions.
 
 ### To use the tool, the following steps must be performed
 
-- Install [.NET Desktop Runtime 5.x](https://dotnet.microsoft.com/download/dotnet/5.0)
+- Install [.NET Desktop Runtime 6.x](https://dotnet.microsoft.com/download/dotnet/6.0)
 - Download and extract the TestUi ([download](https://github.com/Portalum/Portalum.Zvt/releases/latest/download/Portalum.Zvt.TestUi.zip))
 
 ![Portalum.Zvt.TestUi](/doc/TestUi.png)
