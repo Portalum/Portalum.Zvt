@@ -125,14 +125,14 @@ namespace Portalum.Zvt
             return Task.FromResult(false);
         }
 
-        private void Connected(object sender, ClientConnectedEventArgs e)
+        private void Connected(object sender, ConnectionEventArgs e)
         {
             this._logger?.LogInformation($"{nameof(Connected)} {e.IpPort}");
 
             this.ConnectionStateChanged?.Invoke(ConnectionState.Connected);
         }
 
-        private void Disconnected(object sender, ClientDisconnectedEventArgs e)
+        private void Disconnected(object sender, ConnectionEventArgs e)
         {
             this._logger?.LogInformation($"{nameof(Disconnected)} {e.IpPort} {e.Reason}");
 
