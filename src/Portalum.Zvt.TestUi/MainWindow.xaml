@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="Portalum ZVT TestUi (ECR)"
         Height="560"
-        Width="780"
+        Width="800"
+        MinWidth="600"
         Closing="Window_Closing"
         WindowStartupLocation="CenterScreen"
         Background="#607686"
@@ -49,9 +50,9 @@
             <TabItem Header="Common">
                 <Grid>
                     <ScrollViewer x:Name="OutputScrollViewer" Margin="307,57,4,0" Background="#22FFFFFF">
-                        <Grid x:Name="Output"></Grid>
+                        <Grid x:Name="Output" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
                     </ScrollViewer>
-                    <TextBlock x:Name="TextBlockStatus" Margin="307,0,4,0" Padding="5,20" Text="TextBlockStatus" Background="#FFEAEAEA" TextWrapping="Wrap" Height="57" VerticalAlignment="Top" FontSize="14" FontWeight="Bold"/>
+                    <TextBlock x:Name="TextBlockStatus" Margin="307,0,4,0" Padding="4,16" Text="TextBlockStatus" Background="#FFEAEAEA" TextWrapping="Wrap" Height="57" VerticalAlignment="Top" FontSize="14" FontWeight="Bold"/>
                     <GroupBox Template="{StaticResource TintedGroupBox}" Header="Configuration" Foreground="White" Margin="0,82,0,0" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
                         <Grid>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="10,0,0,0"/>
@@ -85,7 +86,7 @@
                             <Label Content="Amount" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,3,0,0" FontSize="10" Width="84" Foreground="White"/>
                         </Grid>
                     </GroupBox>
-                    <Label Content="Status" HorizontalAlignment="Left" Margin="305,-4,0,0" VerticalAlignment="Top" Foreground="#44666666" />
+                    <Label Content="Status" HorizontalAlignment="Left" Margin="306,-4,0,0" VerticalAlignment="Top" Foreground="#55666666" />
                 </Grid>
             </TabItem>
             <TabItem Header="Communication">

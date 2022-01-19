@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Portalum.Zvt.TestUi
+namespace Portalum.Zvt.TestUi.Dialogs
 {
     /// <summary>
     /// Interaction logic for RegistrationDialog.xaml

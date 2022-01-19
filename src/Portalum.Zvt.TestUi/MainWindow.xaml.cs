@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portalum.Zvt.Models;
+using Portalum.Zvt.TestUi.Dialogs;
+using Portalum.Zvt.TestUi.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,8 +24,8 @@ namespace Portalum.Zvt.TestUi
         private IDeviceCommunication _deviceCommunication;
         private ZvtClient _zvtClient;
         private int _outputRowNumber = 0;
-        private StringBuilder _printLineCache;
-        private DeviceConfiguration _deviceConfiguration;
+        private readonly StringBuilder _printLineCache;
+        private readonly DeviceConfiguration _deviceConfiguration;
 
         public MainWindow(DeviceConfiguration deviceConfiguration)
         {
@@ -163,58 +165,97 @@ namespace Portalum.Zvt.TestUi
             });
         }
 
-        private void AddOutputElement(OutputInfo outputInfo, Brush backgroundColor)
+        private void AddOutputElement(OutputInfo outputInfo, Brush backgroundColor, double? width = default)
         {
             this.Output.Dispatcher.Invoke(() =>
             {
-                var inlines = new List<Inline>
-                {
-                    new Bold(new Run(outputInfo.Title)),
-                };
+                var boxSize = width ?? this.Output.ActualWidth;
+                //var boxSize = width ?? this.OutputScrollViewer.ViewportWidth;
 
-                foreach (var line in outputInfo.Lines)
-                {
-                    inlines.Add(new LineBreak());
-                    inlines.Add(new Run(line.TrimEnd()));
-                }
+                #region Create TextBlock
 
                 var textBlock = new TextBlock
                 {
                     Padding = new Thickness(10),
                     TextWrapping = TextWrapping.Wrap,
-                    Width = this.Output.ActualWidth
+                    Width = boxSize
                 };
 
                 textBlock.Inlines.Add(new Run($"{DateTime.Now:HH:mm:ss.fff}") { Foreground = Brushes.DarkGray, FontSize = 9 });
                 textBlock.Inlines.Add(new LineBreak());
-                textBlock.Inlines.AddRange(inlines);
-                textBlock.Measure(new Size(textBlock.Width, 1000));
 
-                var canvas = new Canvas
+                var inlines = new List<Inline>
                 {
-                    Background = backgroundColor,
-                    Height = textBlock.DesiredSize.Height,
-                    Margin = new Thickness(10),
-                    Effect = new DropShadowEffect
-                    {
-                        Color = Colors.DimGray,
-                        BlurRadius = 10,
-                        Direction = 0,
-                        ShadowDepth = 0.5,
-                        Opacity = 0.2
-                    }
+                    new Bold(new Run(outputInfo.Title)),
                 };
 
-                canvas.Children.Add(textBlock);
-                Grid.SetRow(canvas, this._outputRowNumber++);
+                if (outputInfo.Lines != null && outputInfo.Lines.Length > 0)
+                {
+                    foreach (var line in outputInfo.Lines)
+                    {
+                        inlines.Add(new LineBreak());
+                        inlines.Add(new Run(line.TrimEnd()));
+                    }
+                }
+
+                textBlock.Inlines.AddRange(inlines);
+
+                textBlock.Measure(new Size(textBlock.Width, 1000));
+
+                #endregion
+
+                #region Draw InfoBox
+
+                var shadow = new DropShadowEffect
+                {
+                    Color = Colors.DimGray,
+                    BlurRadius = 10,
+                    Direction = 0,
+                    ShadowDepth = 0.5,
+                    Opacity = 0.2
+                };
+
+                var canvasHeader = new Canvas
+                {
+                    Background = backgroundColor,
+                    Height = 3,
+                    Width = width ?? double.NaN,
+                    Margin = new Thickness(10, 10, 10, 0),
+                    Effect = shadow
+                };
+
+                var canvasContent = new Canvas
+                {
+                    Background = Brushes.White,
+                    Height = textBlock.DesiredSize.Height,
+                    Width = width ?? double.NaN,
+                    Margin = new Thickness(10, 0, 10, 10),
+                    Effect = shadow
+                };
+
+                #endregion
+
+                canvasContent.Children.Add(textBlock);
+
+                Grid.SetRow(canvasHeader, this._outputRowNumber++);              
+
+                var rowDefinitionHeader = new RowDefinition
+                {
+                    Height = new GridLength(0, GridUnitType.Star)
+                };
+
+                this.Output.RowDefinitions.Add(rowDefinitionHeader);
+                this.Output.Children.Add(canvasHeader);
+
+                Grid.SetRow(canvasContent, this._outputRowNumber++);
 
                 var rowDefinition = new RowDefinition
                 {
                     Height = new GridLength(0, GridUnitType.Star)
                 };
-
                 this.Output.RowDefinitions.Add(rowDefinition);
-                this.Output.Children.Add(canvas);
+                this.Output.Children.Add(canvasContent);
+                
             });
 
             this.OutputScrollViewer.Dispatcher.Invoke(() =>
@@ -241,7 +282,7 @@ namespace Portalum.Zvt.TestUi
 
             try
             {
-                this.AddOutputElement(outputInfo, Brushes.White);
+                this.AddOutputElement(outputInfo, Brushes.White, 230);
             }
             catch (Exception exception)
             {
@@ -363,26 +404,58 @@ namespace Portalum.Zvt.TestUi
             switch (commandResponse.State)
             {
                 case CommandResponseState.Successful:
+                    this.AddOutputElement(new OutputInfo
+                    {
+                        Title = "Successful"
+                    }, Brushes.LightGreen);
                     break;
                 case CommandResponseState.Unknown:
-                    MessageBox.Show($"State: {commandResponse.State}", "Unkown Command", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    this.AddOutputElement(new OutputInfo
+                    {
+                        Title = "Unkown Command",
+                        Lines = new[] { $"State: {commandResponse.State}" }
+                    }, Brushes.Orange);
                     break;
                 case CommandResponseState.Abort:
                 case CommandResponseState.Timeout:
-                    MessageBox.Show($"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}", "Command is not successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                    this.AddOutputElement(new OutputInfo
+                    {
+                        Title = "Command is not successful",
+                        Lines = new[] { $"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}" }
+                    }, Brushes.Yellow);
                     break;
                 case CommandResponseState.NotSupported:
                 case CommandResponseState.Error:
-                    MessageBox.Show($"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}", "Command is not successful", MessageBoxButton.OK, MessageBoxImage.Error);
+                    this.AddOutputElement(new OutputInfo
+                    {
+                        Title = "Command is not successful",
+                        Lines = new[] { $"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}" }
+                    }, Brushes.IndianRed);
                     break;
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        private async Task RegistrationAsync(RegistrationConfig registrationConfig)
+        private bool IsZvtClientReady()
         {
             if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            {
+                this.AddOutputElement(new OutputInfo
+                {
+                    Title = "ZVT Client not ready",
+                    Lines = new [] { "Check if the connection is active" }
+                }, Brushes.Red);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task RegistrationAsync(RegistrationConfig registrationConfig)
+        {
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -395,7 +468,7 @@ namespace Portalum.Zvt.TestUi
 
         private async Task PaymentAsync(decimal amount)
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -408,7 +481,7 @@ namespace Portalum.Zvt.TestUi
 
         private async Task EndOfDayAsync()
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -421,7 +494,7 @@ namespace Portalum.Zvt.TestUi
 
         private async Task RepeatLastReceiptAsync()
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -478,7 +551,7 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -489,12 +562,12 @@ namespace Portalum.Zvt.TestUi
 
         private async  void ButtonReversal_Click(object sender, RoutedEventArgs e)
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!int.TryParse(this.TextBoxReceiptNumber.Text, out var receiptNumber))
             {
                 return;
             }
 
-            if (!int.TryParse(this.TextBoxReceiptNumber.Text, out var receiptNumber))
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -507,7 +580,7 @@ namespace Portalum.Zvt.TestUi
 
         private async void ButtonLogOff_Click(object sender, RoutedEventArgs e)
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -520,7 +593,7 @@ namespace Portalum.Zvt.TestUi
 
         private async void ButtonDiagnosis_Click(object sender, RoutedEventArgs e)
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -533,7 +606,7 @@ namespace Portalum.Zvt.TestUi
 
         private async void ButtonAbort_Click(object sender, RoutedEventArgs e)
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }
@@ -546,7 +619,7 @@ namespace Portalum.Zvt.TestUi
 
         private async void ButtonSoftwareUpdate_Click(object sender, RoutedEventArgs e)
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (!this.IsZvtClientReady())
             {
                 return;
             }

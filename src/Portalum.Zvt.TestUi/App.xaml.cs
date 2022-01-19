@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Portalum.Zvt.TestUi.Dialogs;
+using System.Windows;
 
 namespace Portalum.Zvt.TestUi
 {

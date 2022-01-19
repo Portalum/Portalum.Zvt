@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Portalum.Zvt.TestUi.Models;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;

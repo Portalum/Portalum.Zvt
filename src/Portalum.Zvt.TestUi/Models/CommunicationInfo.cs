@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Portalum.Zvt.TestUi
+namespace Portalum.Zvt.TestUi.Models
 {
     public class CommunicationInfo
     {

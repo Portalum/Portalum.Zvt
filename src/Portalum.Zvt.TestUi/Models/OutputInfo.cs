@@ -1,4 +1,4 @@
-﻿namespace Portalum.Zvt.TestUi
+﻿namespace Portalum.Zvt.TestUi.Models
 {
     internal class OutputInfo
     {
