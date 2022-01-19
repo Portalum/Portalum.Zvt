@@ -282,7 +282,8 @@ namespace Portalum.Zvt.TestUi
 
             try
             {
-                this.AddOutputElement(outputInfo, Brushes.White, 230);
+                var receiptWidth = 230;
+                this.AddOutputElement(outputInfo, Brushes.White, receiptWidth);
             }
             catch (Exception exception)
             {
@@ -305,7 +306,8 @@ namespace Portalum.Zvt.TestUi
                     }
                 };
 
-                this.AddOutputElement(outputInfo, Brushes.White);
+                var receiptWidth = 230;
+                this.AddOutputElement(outputInfo, Brushes.White, receiptWidth);
 
                 this._printLineCache.Clear();
                 return;

@@ -217,7 +217,8 @@ namespace Portalum.Zvt
 
         private async Task<CommandResponse> SendCommandAsync(
             byte[] commandData,
-            int commandResultTimeoutInSeconds = 600)
+            int commandResultTimeoutInSeconds = 600,
+            bool endAfterAcknowledge = false)
         {
             using var cancellationTokenSource = new CancellationTokenSource();
             var commandResponse = new CommandResponse
@@ -262,6 +263,12 @@ namespace Portalum.Zvt
                     return commandResponse;
                 }
 
+                if (endAfterAcknowledge)
+                {
+                    commandResponse.State = CommandResponseState.Successful;
+                    return commandResponse;
+                }
+                
                 await Task.Delay(TimeSpan.FromSeconds(commandResultTimeoutInSeconds), cancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (task.Status == TaskStatus.RanToCompletion)
@@ -478,7 +485,7 @@ namespace Portalum.Zvt
             var package = Array.Empty<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x02 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true);
         }
 
         /// <summary>
@@ -492,18 +499,7 @@ namespace Portalum.Zvt
             var package = Array.Empty<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0xB0 }, package);
-            if (!await this._zvtCommunication.SendCommandAsync(fullPackage))
-            {
-                return new CommandResponse
-                {
-                    State = CommandResponseState.Error
-                };
-            }
-
-            return new CommandResponse
-            {
-                State = CommandResponseState.Successful
-            };
+            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true);
         }
 
         /// <summary>
