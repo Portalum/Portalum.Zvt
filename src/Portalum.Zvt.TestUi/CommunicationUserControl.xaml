@@ -7,10 +7,10 @@
              mc:Ignorable="d" HorizontalContentAlignment="Stretch"  VerticalContentAlignment="Stretch" >
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Padding="2">
             <MenuItem x:Name="ButtonSave" Header="Save" Click="ButtonSave_Click"/>
             <MenuItem x:Name="ButtonClear" Header="Clear" Click="ButtonClear_Click"/>
         </Menu>
