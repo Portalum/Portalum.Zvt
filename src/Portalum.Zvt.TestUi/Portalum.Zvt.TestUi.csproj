@@ -4,7 +4,10 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Application.ico</ApplicationIcon>
+
+    <Version>2.5.4</Version>
+    <Company>Portalum</Company>
   </PropertyGroup>
 
   <ItemGroup>
