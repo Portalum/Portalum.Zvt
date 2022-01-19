@@ -335,7 +335,7 @@ namespace Portalum.Zvt
 
                 //Add TLV Container permit 06D3 (Card complete)
                 package.Add(0x06); //TLV Indicator
-                package.Add(0x09); //TLV Legnth
+                package.Add(0x06); //TLV Legnth
 
                 package.Add(0x26); //List of permitted ZVT-Commands
                 package.Add(0x04); //length
@@ -343,12 +343,6 @@ namespace Portalum.Zvt
                 package.Add(0x02); //length
                 package.Add(0x06); //06 first hex of print text block
                 package.Add(0xD3); //D3 second hex of print text block
-
-                //? Wait time for card
-                package.Add(0x1F);
-                package.Add(0x5B);
-                //package.Add(0x01); //length
-                package.Add(0x08); //seconds
 
                 //TLV TAG
                 //10 - Number of columns and number of lines of the merchant-display
