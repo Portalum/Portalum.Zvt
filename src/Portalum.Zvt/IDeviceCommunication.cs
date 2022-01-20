@@ -4,12 +4,20 @@ using System.Threading.Tasks;
 
 namespace Portalum.Zvt
 {
+    /// <summary>
+    /// Interface DeviceCommunication
+    /// </summary>
     public interface IDeviceCommunication
     {
         /// <summary>
         /// Is the device connected
         /// </summary>
         bool IsConnected { get; }
+
+        /// <summary>
+        /// The identifier for example the IpAddress or the SerialPort
+        /// </summary>
+        string ConnectionIdentifier { get; }
 
         /// <summary>
         /// On connection state changed

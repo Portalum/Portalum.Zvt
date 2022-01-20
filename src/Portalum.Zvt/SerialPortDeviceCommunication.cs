@@ -14,6 +14,7 @@ namespace Portalum.Zvt
     public class SerialPortDeviceCommunication : IDeviceCommunication, IDisposable
     {
         private readonly ILogger<SerialPortDeviceCommunication> _logger;
+        private readonly string _comPort;
 
         /// <inheritdoc />
         public event Action<byte[]> DataReceived;
@@ -35,6 +36,7 @@ namespace Portalum.Zvt
             string comPort,
             ILogger<SerialPortDeviceCommunication> logger = default)
         {
+            this._comPort = comPort;
             this._logger = logger;
             throw new NotImplementedException("We currently only use network payment terminals");
         }
@@ -59,6 +61,12 @@ namespace Portalum.Zvt
         public bool IsConnected
         {
             get { return false; }
+        }
+
+        /// <inheritdoc />
+        public string ConnectionIdentifier
+        {
+            get { return this._comPort; }
         }
 
         /// <inheritdoc />

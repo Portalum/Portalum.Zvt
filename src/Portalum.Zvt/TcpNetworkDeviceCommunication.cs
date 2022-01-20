@@ -11,6 +11,7 @@ namespace Portalum.Zvt
     /// </summary>
     public class TcpNetworkDeviceCommunication : IDeviceCommunication, IDisposable
     {
+        private readonly string _ipAddress;
         private readonly SimpleTcpClient _simpleTcpClient;
         private readonly ILogger<TcpNetworkDeviceCommunication> _logger;
 
@@ -36,6 +37,8 @@ namespace Portalum.Zvt
             bool enableKeepAlive = false,
             ILogger<TcpNetworkDeviceCommunication> logger = default)
         {
+            this._ipAddress = ipAddress;
+
             this._simpleTcpClient = new SimpleTcpClient(ipAddress, port);
             this._simpleTcpClient.Events.DataReceived += this.Receive;
             this._simpleTcpClient.Events.Connected += this.Connected;
@@ -89,6 +92,12 @@ namespace Portalum.Zvt
         public bool IsConnected
         {
             get { return this._simpleTcpClient.IsConnected; }
+        }
+
+        /// <inheritdoc />
+        public string ConnectionIdentifier
+        {
+            get { return this._ipAddress; }
         }
 
         /// <inheritdoc />
