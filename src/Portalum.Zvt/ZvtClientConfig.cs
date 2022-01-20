@@ -1,4 +1,6 @@
-﻿namespace Portalum.Zvt
+﻿using System;
+
+namespace Portalum.Zvt
 {
     /// <summary>
     /// ZVT Client Config
@@ -17,5 +19,9 @@
         /// ZVT Encoding
         /// </summary>
         public ZvtEncoding Encoding { get; set; } = ZvtEncoding.CodePage437;
+        /// <summary>
+        /// Timeout after Command Acknowledge and Completion
+        /// </summary>
+        public TimeSpan CommandCompletionTimeout = TimeSpan.FromSeconds(180);
     }
 }

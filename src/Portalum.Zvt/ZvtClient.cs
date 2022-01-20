@@ -26,6 +26,7 @@ namespace Portalum.Zvt
 
         private readonly ZvtCommunication _zvtCommunication;
         private IReceiveHandler _receiveHandler;
+        private readonly TimeSpan _commandCompletionTimeout;
 
         public event Action<StatusInformation> StatusInformationReceived;
         public event Action<string> IntermediateStatusInformationReceived;
@@ -47,6 +48,8 @@ namespace Portalum.Zvt
             IReceiveHandler receiveHandler = default,
             Language language = Language.English)
         {
+            this._commandCompletionTimeout = TimeSpan.FromSeconds(120);
+
             if (logger == null)
             {
                 logger = new NullLogger<ZvtClient>();
@@ -96,6 +99,8 @@ namespace Portalum.Zvt
             {
                 clientConfig = new ZvtClientConfig();
             }
+
+            this._commandCompletionTimeout = clientConfig.CommandCompletionTimeout;
 
             this._passwordData = NumberHelper.IntToBcd(clientConfig.Password);
 
@@ -217,7 +222,6 @@ namespace Portalum.Zvt
 
         private async Task<CommandResponse> SendCommandAsync(
             byte[] commandData,
-            int commandResultTimeoutInSeconds = 600,
             bool endAfterAcknowledge = false)
         {
             using var cancellationTokenSource = new CancellationTokenSource();
@@ -269,12 +273,12 @@ namespace Portalum.Zvt
                     return commandResponse;
                 }
                 
-                await Task.Delay(TimeSpan.FromSeconds(commandResultTimeoutInSeconds), cancellationTokenSource.Token).ContinueWith(task =>
+                await Task.Delay(this._commandCompletionTimeout, cancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (task.Status == TaskStatus.RanToCompletion)
                     {
                         commandResponse.State = CommandResponseState.Timeout;
-                        this._logger.LogError($"{nameof(SendCommandAsync)} - No result received in the specified timeout {commandResultTimeoutInSeconds}ms");
+                        this._logger.LogError($"{nameof(SendCommandAsync)} - No result received in the specified timeout {this._commandCompletionTimeout.TotalMilliseconds}ms");
                     }
                 });
             }
