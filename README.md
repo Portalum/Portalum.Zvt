@@ -9,7 +9,11 @@ Portalum.Zvt is a library designed to simplify communication with payment termin
 
 ## Supported features
 
+The following features of the ZVT protocol were implemented.
+
 ### Commands to Payment Terminal
+
+Commands sent from the cash register to the payment terminal
 
 - Registration
 - Log-Off
@@ -24,6 +28,8 @@ Portalum.Zvt is a library designed to simplify communication with payment termin
 - Software-Update
 
 ### Commands from Payment Terminal
+
+Information sent from the payment terminal to the cash register
 
 - Status-Information
 - Intermediate StatusInformation
@@ -47,6 +53,8 @@ PM> install-package Portalum.Zvt
 Before sending a payment to the terminal, you should consider how to configure the terminal. For example, it can be set that a manual start of a payment at the terminal is no longer possible. You must also set where the receipts are printed directly via the terminal or via an external printer. For the configuration use the `Registration` command.
 
 ## Examples
+
+Here you can find some code examples how to use this library
 
 ### Activate logging
 
@@ -102,7 +110,7 @@ await zvtClient.EndOfDayAsync();
 ## TestUi
 With the Portalum.Zvt.TestUi you can test the different ZVT functions.
 
-### To use the tool, the following steps must be performed
+**To use the tool, the following steps must be performed**
 
 - Install [.NET Desktop Runtime 6.x](https://dotnet.microsoft.com/download/dotnet/6.0)
 - Download and extract the TestUi ([download](https://github.com/Portalum/Portalum.Zvt/releases/latest/download/Portalum.Zvt.TestUi.zip))
@@ -110,6 +118,8 @@ With the Portalum.Zvt.TestUi you can test the different ZVT functions.
 ![Portalum.Zvt.TestUi](/doc/TestUi.png)
 
 ## Tested Providers and Terminals
+
+We have already been able to test the terminals of these payment service providers.
 
 Provider | Terminal | 
 --- | --- |
@@ -128,5 +138,8 @@ Wordline (SIX) | yomani touch family |
 - Sends TLV data even without `TLV-activation`
 
 ## ZVT Documentation
+
+The official documentation of the ZVT protocol is available here
+
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
 - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
