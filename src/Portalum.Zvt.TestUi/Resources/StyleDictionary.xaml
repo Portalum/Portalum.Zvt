@@ -2,8 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <Style x:Key="BaseButtonStyle" TargetType="Button">
-        <Setter Property="Foreground" Value="Black" />
-        <Setter Property="Background" Value="White" />
+        <Setter Property="Foreground" Value="{StaticResource ButtonForeground}" />
+        <Setter Property="Background" Value="{StaticResource ButtonBackground}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -15,13 +15,13 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#98C011" />
+                <Setter Property="Background" Value="{StaticResource ButtonIsPressed}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="#4B5C68" />
+                <Setter Property="Background" Value="{StaticResource ButtonIsDisabled}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#CC98C011" />
+                <Setter Property="Background" Value="{StaticResource ButtonIsMouseOver}" />
             </Trigger>
         </Style.Triggers>
     </Style>

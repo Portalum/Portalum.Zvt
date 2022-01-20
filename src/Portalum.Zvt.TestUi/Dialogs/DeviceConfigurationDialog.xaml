@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Portalum.Zvt.TestUi.Dialogs"
         mc:Ignorable="d"
         Title="ZVT Device Configuration" Height="470" Width="540" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
-    <Grid Margin="20" Background="#607686" FocusManager.FocusedElement="{Binding ElementName=TextBoxIpAddress}">
+    <Grid Margin="20" Background="{StaticResource SecondaryColor}" FocusManager.FocusedElement="{Binding ElementName=TextBoxIpAddress}">
         <Grid.Effect>
             <DropShadowEffect BlurRadius="12" Direction="-90" RenderingBias="Quality" ShadowDepth="1"/>
         </Grid.Effect>

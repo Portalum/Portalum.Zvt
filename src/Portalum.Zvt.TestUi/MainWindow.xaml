@@ -11,7 +11,7 @@
         MinWidth="600"
         Closing="Window_Closing"
         WindowStartupLocation="CenterScreen"
-        Background="#607686"
+        Background="{StaticResource SecondaryColor}"
         Template="{StaticResource WindowWithColoredTitleBar}">
 
     <WindowChrome.WindowChrome>
@@ -19,13 +19,13 @@
     </WindowChrome.WindowChrome>
 
     <Grid>
-        <TabControl Margin="0" BorderThickness="0,2,0,0" BorderBrush="#98C011" Background="#607686" Padding="0">
+        <TabControl Margin="0" BorderThickness="0,2,0,0" BorderBrush="{StaticResource PrimaryColor}" Background="{StaticResource SecondaryColor}" Padding="0">
             <TabControl.Resources>
                 <Style TargetType="TabItem">
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="TabItem">
-                                <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="#4B5C68" CornerRadius="2,2,0,0" Margin="4,4,0,0" Padding="8">
+                                <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{StaticResource SecondaryColor}" CornerRadius="2,2,0,0" Margin="4,4,0,0" Padding="8">
                                     <ContentPresenter x:Name="ContentSite"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Center"
@@ -35,11 +35,11 @@
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsSelected" Value="True">
                                         <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="#FFFFFF"/>
-                                        <Setter TargetName="Border" Property="Background" Value="#98C011" />
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource PrimaryColor}" />
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="False">
                                         <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="#DDDDDD"/>
-                                        <Setter TargetName="Border" Property="Background" Value="#4B5C68" />
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource SecondaryColor}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -53,20 +53,20 @@
                         <Grid x:Name="Output" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
                     </ScrollViewer>
                     <TextBlock x:Name="TextBlockStatus" Margin="307,0,4,0" Padding="4,16" Text="TextBlockStatus" Background="#FFEAEAEA" TextWrapping="Wrap" Height="57" VerticalAlignment="Top" FontSize="14" FontWeight="Bold"/>
-                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Configuration" Foreground="White" Margin="0,82,0,0" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
+                    <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Configuration" Foreground="White" Margin="0,82,0,0" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
                         <Grid>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRegistration" Content="Registration" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonRegistration_Click" Width="90" Height="29" Margin="10,0,0,0"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonLogOff" Content="Log Off" HorizontalAlignment="Left" VerticalAlignment="Center" Width="91" Height="29" Click="ButtonLogOff_Click" Margin="105,0,0,0"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Connection" Foreground="White" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
+                    <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Connection" Foreground="White" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307">
                         <Grid>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonConnect" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonConnect_Click" Width="58" Height="29" Margin="10,0,0,0"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonDisconnect" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonDisconnect_Click" Width="70" Height="29" Margin="73,0,0,0"/>
-                            <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="148,0,0,0" VerticalAlignment="Center" Width="147" Height="29" BorderThickness="1,1,1,1" BorderBrush="#FF919191" />
+                            <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="148,0,0,0" VerticalAlignment="Center" Width="147" Height="29" BorderThickness="1,1,1,1" BorderBrush="#FF919191" FontSize="11" />
                         </Grid>
                     </GroupBox>
-                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Advanced" Foreground="White" Margin="0,310,0,0" HorizontalAlignment="Left" Width="307" Height="126" VerticalAlignment="Top">
+                    <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Advanced" Foreground="White" Margin="0,310,0,0" HorizontalAlignment="Left" Width="307" Height="126" VerticalAlignment="Top">
                         <Grid>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="205,9,0,0" Click="ButtonDiagnosis_Click"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRepeatReceipt" Content="Repeat Receipt" HorizontalAlignment="Center" Margin="0,9,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
@@ -74,7 +74,7 @@
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSoftwareUpdate" Content="Software Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="10,47,0,0" FontSize="11" Click="ButtonSoftwareUpdate_Click"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Template="{StaticResource TintedGroupBox}" Header="Payment" Foreground="White" Margin="0,162,0,0" HorizontalAlignment="Left" Width="307" Height="148" VerticalAlignment="Top">
+                    <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Payment" Foreground="White" Margin="0,162,0,0" HorizontalAlignment="Left" Width="307" Height="148" VerticalAlignment="Top">
                         <Grid>
                             <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,22,0,0" Text="20.4" TextWrapping="Wrap" Width="111" TextAlignment="Right" FontSize="20" Height="29" VerticalAlignment="Top"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonPay" Content="Pay" HorizontalAlignment="Left" Margin="126,22,0,0" VerticalAlignment="Top" Click="ButtonPay_Click" Height="29" Width="80"/>

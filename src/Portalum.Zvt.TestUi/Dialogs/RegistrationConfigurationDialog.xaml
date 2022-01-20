@@ -10,7 +10,7 @@
         Width="425"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#607686"
+        Background="{StaticResource SecondaryColor}"
         Template="{StaticResource WindowWithColoredTitleBarNoResize}">
     
     <WindowChrome.WindowChrome>

@@ -23,4 +23,11 @@
     <ProjectReference Include="..\Portalum.Zvt\Portalum.Zvt.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Update="Resources\ColorDictionary.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
 </Project>

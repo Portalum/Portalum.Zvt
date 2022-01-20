@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+
     <ControlTemplate x:Key="WindowWithColoredTitleBar" TargetType="Window">
         <Border Padding="0 30 0 0">
             <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
@@ -37,7 +37,7 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="TintedGroupBox" TargetType="GroupBox">
+    <ControlTemplate x:Key="GroupBoxWithHeader" TargetType="GroupBox">
         <Grid>
             <!--Grid Rows split the GroupBox into two areas -->
             <Grid.RowDefinitions>
@@ -47,8 +47,8 @@
             <!--Header area-->
             <Border
                   Grid.Row="0"
-                  Background="#98C011"
-                  BorderBrush="#607686"
+                  Background="{StaticResource PrimaryColor}"
+                  BorderBrush="{StaticResource SecondaryColor}"
                   BorderThickness="1"
                   CornerRadius="0,0,0,0">
                 <ContentPresenter Margin="10,8,4,8" ContentSource="Header" RecognizesAccessKey="True" />
@@ -57,13 +57,13 @@
             <!-- Main client area -->
             <Border
                   Grid.Row="1"
-                  Background="#607686"
-                  BorderBrush="#607686"
+                  Background="{StaticResource SecondaryColor}"
+                  BorderBrush="{StaticResource SecondaryColor}"
                   BorderThickness="1,0,1,1"
                   CornerRadius="0,0,0,0">
                 <ContentPresenter Margin="0" />
             </Border>
         </Grid>
     </ControlTemplate>
-    
+
 </ResourceDictionary>

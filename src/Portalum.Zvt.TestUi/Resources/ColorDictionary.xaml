@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="PrimaryColor">#98C011</SolidColorBrush>
+    <SolidColorBrush x:Key="SecondaryColor">#607686</SolidColorBrush>
+
+    <SolidColorBrush x:Key="ButtonBackground">White</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonForeground">Black</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonIsPressed">#98C011</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonIsDisabled">#4B5C68</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonIsMouseOver">#CC98C011</SolidColorBrush>
+    
+</ResourceDictionary>

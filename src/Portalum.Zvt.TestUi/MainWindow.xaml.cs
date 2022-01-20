@@ -82,7 +82,7 @@ namespace Portalum.Zvt.TestUi
 
             this.CommunicationUserControl.SetDeviceCommunication(this._deviceCommunication);
 
-            this.SetConnectionInfo("Try connect...", Colors.White, Colors.Yellow);
+            this.SetConnectionInfo($"Try connect {this._deviceCommunication.ConnectionIdentifier}", Colors.White, Colors.Yellow);
 
             await Task.Delay(50);
 
@@ -401,6 +401,14 @@ namespace Portalum.Zvt.TestUi
             }
         }
 
+        private void AddCommandInfo(string command)
+        {
+            this.AddOutputElement(new OutputInfo
+            {
+                Title = $"{command} sent"
+            }, Brushes.LightSkyBlue);
+        }
+
         private void ProcessCommandRespone(CommandResponse commandResponse)
         {
             switch (commandResponse.State)
@@ -462,6 +470,8 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
+            this.AddCommandInfo("Registration (06 00)");
+
             this.ButtonRegistration.IsEnabled = false;
             var commandResponse = await this._zvtClient?.RegistrationAsync(registrationConfig);
             this.ProcessCommandRespone(commandResponse);
@@ -474,6 +484,8 @@ namespace Portalum.Zvt.TestUi
             {
                 return;
             }
+
+            this.AddCommandInfo("Payment/Authorization (06 01)");
 
             this.ButtonPay.IsEnabled = false;
             var commandResponse = await this._zvtClient?.PaymentAsync(amount);
@@ -488,6 +500,8 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
+            this.AddCommandInfo("EndOfDay (06 50)");
+
             this.ButtonEndOfDay.IsEnabled = false;
             var commandResponse = await this._zvtClient?.EndOfDayAsync();
             this.ProcessCommandRespone(commandResponse);
@@ -501,10 +515,100 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
+            this.AddCommandInfo("RepeatLastReceiptAsync (06 20)");
+
             this.ButtonRepeatReceipt.IsEnabled = false;
             var commandResponse = await this._zvtClient?.RepeatLastReceiptAsync();
             this.ProcessCommandRespone(commandResponse);
             this.ButtonRepeatReceipt.IsEnabled = true;
+        }
+
+        private async Task RefundAsync(decimal amount)
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("Refund (06 31)");
+
+            var commandResponse = await this._zvtClient?.RefundAsync(amount);
+            this.ProcessCommandRespone(commandResponse);
+        }
+
+        private async Task ReversalAsync(int receiptNumber)
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("Reversal (06 30)");
+
+            this.ButtonReversal.IsEnabled = false;
+            var commandResponse = await this._zvtClient?.ReversalAsync(receiptNumber);
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonReversal.IsEnabled = true;
+        }
+
+        private async Task LogOffAsync()
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("LogOff (06 02)");
+
+            this.ButtonLogOff.IsEnabled = false;
+            var commandResponse = await this._zvtClient.LogOffAsync();
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonLogOff.IsEnabled = true;
+        }
+
+        private async Task DiagnosisAsync()
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("Diagnosis (06 70)");
+
+            this.ButtonDiagnosis.IsEnabled = false;
+            var commandResponse = await this._zvtClient.DiagnosisAsync();
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonDiagnosis.IsEnabled = true;
+        }
+
+        private async Task AbortAsync()
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("Abort (06 B0)");
+
+            this.ButtonDiagnosis.IsEnabled = false;
+            var commandResponse = await this._zvtClient.AbortAsync();
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonDiagnosis.IsEnabled = true;
+        }
+
+        private async Task SoftwareUpdateAsync()
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("SoftwareUpdate (08 10)");
+
+            this.ButtonSoftwareUpdate.IsEnabled = false;
+            var commandResponse = await this._zvtClient.SoftwareUpdateAsync();
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonSoftwareUpdate.IsEnabled = true;
         }
 
         private async void ButtonRegistration_Click(object sender, RoutedEventArgs e)
@@ -553,13 +657,7 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
-            if (!this.IsZvtClientReady())
-            {
-                return;
-            }
-
-            var commandResponse = await this._zvtClient?.RefundAsync(amount);
-            this.ProcessCommandRespone(commandResponse);
+            await this.RefundAsync(amount);
         }
 
         private async  void ButtonReversal_Click(object sender, RoutedEventArgs e)
@@ -569,67 +667,27 @@ namespace Portalum.Zvt.TestUi
                 return;
             }
 
-            if (!this.IsZvtClientReady())
-            {
-                return;
-            }
-
-            this.ButtonReversal.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.ReversalAsync(receiptNumber);
-            this.ProcessCommandRespone(commandResponse);
-            this.ButtonReversal.IsEnabled = true;
+            await this.ReversalAsync(receiptNumber);
         }
 
         private async void ButtonLogOff_Click(object sender, RoutedEventArgs e)
         {
-            if (!this.IsZvtClientReady())
-            {
-                return;
-            }
-
-            this.ButtonLogOff.IsEnabled = false;
-            var commandResponse = await this._zvtClient.LogOffAsync();
-            this.ProcessCommandRespone(commandResponse);
-            this.ButtonLogOff.IsEnabled = true;
+            await this.LogOffAsync();
         }
 
         private async void ButtonDiagnosis_Click(object sender, RoutedEventArgs e)
         {
-            if (!this.IsZvtClientReady())
-            {
-                return;
-            }
-
-            this.ButtonDiagnosis.IsEnabled = false;
-            var commandResponse = await this._zvtClient.DiagnosisAsync();
-            this.ProcessCommandRespone(commandResponse);
-            this.ButtonDiagnosis.IsEnabled = true;
+            await this.DiagnosisAsync();
         }
 
         private async void ButtonAbort_Click(object sender, RoutedEventArgs e)
         {
-            if (!this.IsZvtClientReady())
-            {
-                return;
-            }
-
-            this.ButtonDiagnosis.IsEnabled = false;
-            var commandResponse = await this._zvtClient.AbortAsync();
-            this.ProcessCommandRespone(commandResponse);
-            this.ButtonDiagnosis.IsEnabled = true;
+            await this.AbortAsync();
         }
 
         private async void ButtonSoftwareUpdate_Click(object sender, RoutedEventArgs e)
         {
-            if (!this.IsZvtClientReady())
-            {
-                return;
-            }
-
-            this.ButtonSoftwareUpdate.IsEnabled = false;
-            var commandResponse = await this._zvtClient.SoftwareUpdateAsync();
-            this.ProcessCommandRespone(commandResponse);
-            this.ButtonSoftwareUpdate.IsEnabled = true;
+            await this.SoftwareUpdateAsync();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
