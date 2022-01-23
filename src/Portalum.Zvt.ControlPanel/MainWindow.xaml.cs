@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portalum.Zvt.Models;
-using Portalum.Zvt.TestUi.Dialogs;
-using Portalum.Zvt.TestUi.Models;
+using Portalum.Zvt.ControlPanel.Dialogs;
+using Portalum.Zvt.ControlPanel.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,7 +13,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 
-namespace Portalum.Zvt.TestUi
+namespace Portalum.Zvt.ControlPanel
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

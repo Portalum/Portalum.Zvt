@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portalum.Zvt", "Portalum.Zv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portalum.Zvt.UnitTest", "Portalum.Zvt.UnitTest\Portalum.Zvt.UnitTest.csproj", "{69CC4AA8-F9B1-40CF-8DF4-739B680B79B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portalum.Zvt.TestUi", "Portalum.Zvt.TestUi\Portalum.Zvt.TestUi.csproj", "{42D3E1B1-3A26-4964-B5D2-81FA55E2AA3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portalum.Zvt.ControlPanel", "Portalum.Zvt.ControlPanel\Portalum.Zvt.ControlPanel.csproj", "{42D3E1B1-3A26-4964-B5D2-81FA55E2AA3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

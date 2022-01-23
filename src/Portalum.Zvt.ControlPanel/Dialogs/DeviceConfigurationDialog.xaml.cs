@@ -1,9 +1,9 @@
-﻿using Portalum.Zvt.TestUi.Models;
+﻿using Portalum.Zvt.ControlPanel.Models;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Portalum.Zvt.TestUi.Dialogs
+namespace Portalum.Zvt.ControlPanel.Dialogs
 {
     /// <summary>
     /// Interaction logic for DeviceConfigurationDialog.xaml

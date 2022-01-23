@@ -1,4 +1,4 @@
-name: .NET TestUi
+name: .NET Portalum.Zvt.ControlPanel
 
 on:
   push:
@@ -27,11 +27,11 @@ jobs:
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
     - name: Build project
       run: |
-        dotnet publish ./src/Portalum.Zvt.TestUi/Portalum.Zvt.TestUi.csproj --configuration Release --self-contained false --runtime win-x64 -p:PublishReadyToRun=true -p:PublishSingleFile=true --output ./publish/temp
+        dotnet publish ./src/Portalum.Zvt.ControlPanel/Portalum.Zvt.ControlPanel.csproj --configuration Release --self-contained false --runtime win-x64 -p:PublishReadyToRun=true -p:PublishSingleFile=true --output ./publish/temp
     - uses: vimtor/action-zip@v1
       with:
         files: ./publish/temp
-        dest: ./publish/Portalum.Zvt.TestUi.zip
+        dest: ./publish/Portalum.Zvt.ControlPanel.zip
     - name: Get the version
       id: get_version
       run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\//}
@@ -41,6 +41,6 @@ jobs:
       with:
         repo_name: Portalum/Portalum.Zvt
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./publish/Portalum.Zvt.TestUi.zip
+        file: ./publish/Portalum.Zvt.ControlPanel.zip
         tag: ${{ steps.get_version.outputs.tag }}
         overwrite: true

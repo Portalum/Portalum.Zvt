@@ -1,4 +1,4 @@
-﻿using Portalum.Zvt.TestUi.Models;
+﻿using Portalum.Zvt.ControlPanel.Models;
 using System;
 using System.IO;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Windows.Controls;
 
-namespace Portalum.Zvt.TestUi
+namespace Portalum.Zvt.ControlPanel
 {
     /// <summary>
     /// Interaction logic for CommunicationUserControl.xaml

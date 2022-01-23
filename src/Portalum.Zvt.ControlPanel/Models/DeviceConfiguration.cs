@@ -1,4 +1,4 @@
-﻿namespace Portalum.Zvt.TestUi.Models
+﻿namespace Portalum.Zvt.ControlPanel.Models
 {
     public class DeviceConfiguration
     {

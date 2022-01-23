@@ -1,7 +1,7 @@
-﻿using Portalum.Zvt.TestUi.Dialogs;
+﻿using Portalum.Zvt.ControlPanel.Dialogs;
 using System.Windows;
 
-namespace Portalum.Zvt.TestUi
+namespace Portalum.Zvt.ControlPanel
 {
     /// <summary>
     /// Interaction logic for App.xaml
