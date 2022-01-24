@@ -1,6 +1,6 @@
 # Portalum.Zvt - ZVT Client for .NET
 
-<img src="https://raw.githubusercontent.com/Portalum/Portalum.Zvt/main/doc/logo.png" width="140" title="Portalum Zvt Client" alt="Portalum Zvt Client" align="left">
+<img src="https://raw.githubusercontent.com/Portalum/Portalum.Zvt/main/doc/logo.png" width="150" title="Portalum Zvt Client" alt="Portalum Zvt Client" align="left">
 
 Portalum.Zvt is a library designed to simplify communication with payment terminals via the **ZVT Protocol**. The library is based on Microsoft .NET.
 
