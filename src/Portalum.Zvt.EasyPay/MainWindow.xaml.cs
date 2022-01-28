@@ -2,6 +2,7 @@
 using Portalum.Zvt.EasyPay.Models;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Portalum.Zvt.EasyPay
 {
@@ -10,27 +11,53 @@ namespace Portalum.Zvt.EasyPay
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly ILoggerFactory _loggerFactory;
         private readonly PaymentTerminalConfig _paymentTerminalConfig;
 
+        private readonly ILogger _logger;
+
         public MainWindow(
+            ILoggerFactory loggerFactory,
             PaymentTerminalConfig paymentTerminalConfig,
             decimal amount)
         {
+            this._loggerFactory = loggerFactory;
             this._paymentTerminalConfig = paymentTerminalConfig;
 
-            this.InitializeComponent();
+            this._logger = loggerFactory.CreateLogger<MainWindow>();
 
+            this.InitializeComponent();
             this.LabelAmount.Content = $"{amount:C2}";
+
+            this.UpdateStatus("Preparing...", StatusType.Information);
 
             _ = Task.Run(async () => await this.StartPaymentAsync(amount));
         }
 
+        private void UpdateStatus(string status, StatusType statusType)
+        {
+            this.LabelStatus.Dispatcher.Invoke(() =>
+            {
+                var brushForeground = Brushes.White;
+                var brushBackground = Brushes.Transparent;
+
+                if (statusType == StatusType.Error)
+                {
+                    brushForeground = new SolidColorBrush(Color.FromRgb(255, 21, 21));
+                    brushBackground = Brushes.White;
+                }
+
+                this.LabelStatus.Foreground = brushForeground;
+                this.LabelStatus.Background = brushBackground;
+
+
+                this.LabelStatus.Content = status;
+            });
+        }
+
         private async Task StartPaymentAsync(decimal amount)
         {
-            using var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole().SetMinimumLevel(LogLevel.Debug);
-            });
+            this._logger.LogInformation($"{nameof(StartPaymentAsync)} - Start");
 
             var zvtClientConfig = new ZvtClientConfig
             {
@@ -39,8 +66,8 @@ namespace Portalum.Zvt.EasyPay
                 Password = 000000
             };
 
-            var deviceCommunicationLogger = loggerFactory.CreateLogger<TcpNetworkDeviceCommunication>();
-            var zvtClientLogger = loggerFactory.CreateLogger<ZvtClient>();
+            var deviceCommunicationLogger = this._loggerFactory.CreateLogger<TcpNetworkDeviceCommunication>();
+            var zvtClientLogger = this._loggerFactory.CreateLogger<ZvtClient>();
 
             using var deviceCommunication = new TcpNetworkDeviceCommunication(
                 this._paymentTerminalConfig.IpAddress,
@@ -48,23 +75,44 @@ namespace Portalum.Zvt.EasyPay
                 enableKeepAlive: false,
                 logger: deviceCommunicationLogger);
 
+            this.UpdateStatus("Connect to payment terminal...", StatusType.Information);
+
             if (!await deviceCommunication.ConnectAsync())
             {
+                this.UpdateStatus("Cannot connect to payment terminal", StatusType.Error);
+                await Task.Delay(3000);
+
+                this._logger.LogError($"{nameof(StartPaymentAsync)} - Cannot connect to {this._paymentTerminalConfig.IpAddress}:{this._paymentTerminalConfig.Port}");
                 Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-2); });
                 return;
             }
 
-            using var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger, clientConfig: zvtClientConfig);
-
-            var response = await zvtClient.PaymentAsync(amount);
-            if (response.State == CommandResponseState.Successful)
+            var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger, clientConfig: zvtClientConfig);
+            try
             {
-                Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(0); });
-                return;
-            }
+                zvtClient.IntermediateStatusInformationReceived += this.IntermediateStatusInformationReceived;
 
-            Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-3); });
-            return;
+                var response = await zvtClient.PaymentAsync(amount);
+                if (response.State == CommandResponseState.Successful)
+                {
+                    this._logger.LogInformation($"{nameof(StartPaymentAsync)} - Successful");
+                    Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(0); });
+                    return;
+                }
+
+                this._logger.LogInformation($"{nameof(StartPaymentAsync)} - Not successful");
+                Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-3); });
+            }
+            finally
+            {
+                zvtClient.IntermediateStatusInformationReceived -= this.IntermediateStatusInformationReceived;
+                zvtClient.Dispose();
+            }
+        }
+
+        private void IntermediateStatusInformationReceived(string status)
+        {
+            this.UpdateStatus(status, StatusType.Information);
         }
     }
 }

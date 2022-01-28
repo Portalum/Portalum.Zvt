@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Portalum.Zvt.EasyPay": {
+      "commandName": "Project",
+      "commandLineArgs": "--amount 3"
+    }
+  }
+}

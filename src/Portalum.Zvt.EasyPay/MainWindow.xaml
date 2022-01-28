@@ -19,7 +19,8 @@
 
     <Grid>
         <Image HorizontalAlignment="Left" Height="150" Margin="10,0,0,0" VerticalAlignment="Center" Width="113" Source="/logo.png"/>
-        <Label x:Name="LabelAmount" Content="20,00" HorizontalAlignment="Left" Margin="121,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="48" FontWeight="Bold"/>
-        <Label Content="Amount" HorizontalAlignment="Left" Margin="125,40,0,0" VerticalAlignment="Top" Foreground="White" FontSize="14"/>
+        <Label x:Name="LabelAmount" Content="20,00" HorizontalAlignment="Left" Margin="117,33,0,0" VerticalAlignment="Top" Foreground="White" FontSize="48" FontWeight="Bold"/>
+        <Label Content="Amount" HorizontalAlignment="Left" Margin="121,24,0,0" VerticalAlignment="Top" Foreground="White" FontSize="14"/>
+        <Label x:Name="LabelStatus" Content="Status" HorizontalAlignment="Left" Margin="121,112,0,0" VerticalAlignment="Top" Foreground="White" FontSize="14"/>
     </Grid>
 </Window>
