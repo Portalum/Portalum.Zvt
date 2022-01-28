@@ -165,12 +165,17 @@ namespace Portalum.Zvt.ControlPanel
             });
         }
 
-        private void AddOutputElement(OutputInfo outputInfo, Brush backgroundColor, double? width = default)
+        private void AddOutputElement(
+            OutputInfo outputInfo,
+            Brush backgroundColor,
+            double? width = default,
+            bool useMonospacedFont = false)
         {
             this.Output.Dispatcher.Invoke(() =>
             {
+                var monospacedFont = new FontFamily("Courier New");
+
                 var boxSize = width ?? this.Output.ActualWidth;
-                //var boxSize = width ?? this.OutputScrollViewer.ViewportWidth;
 
                 #region Create TextBlock
 
@@ -186,15 +191,23 @@ namespace Portalum.Zvt.ControlPanel
 
                 var inlines = new List<Inline>
                 {
-                    new Bold(new Run(outputInfo.Title)),
+                    new Bold(new Run(outputInfo.Title))
                 };
 
                 if (outputInfo.Lines != null && outputInfo.Lines.Length > 0)
                 {
+                    inlines.Add(new LineBreak());
+
                     foreach (var line in outputInfo.Lines)
                     {
+                        var textRun = new Run(line.TrimEnd());
+                        if (useMonospacedFont)
+                        {
+                            textRun.FontFamily = monospacedFont;
+                        }
+
                         inlines.Add(new LineBreak());
-                        inlines.Add(new Run(line.TrimEnd()));
+                        inlines.Add(textRun);
                     }
                 }
 
@@ -283,7 +296,7 @@ namespace Portalum.Zvt.ControlPanel
             try
             {
                 var receiptWidth = 230;
-                this.AddOutputElement(outputInfo, Brushes.White, receiptWidth);
+                this.AddOutputElement(outputInfo, Brushes.White, receiptWidth, useMonospacedFont: true);
             }
             catch (Exception exception)
             {
@@ -307,7 +320,7 @@ namespace Portalum.Zvt.ControlPanel
                 };
 
                 var receiptWidth = 230;
-                this.AddOutputElement(outputInfo, Brushes.White, receiptWidth);
+                this.AddOutputElement(outputInfo, Brushes.White, receiptWidth, useMonospacedFont: true);
 
                 this._printLineCache.Clear();
                 return;
