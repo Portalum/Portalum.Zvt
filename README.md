@@ -120,6 +120,27 @@ With the Portalum.Zvt.ControlPanel you can test the different ZVT functions.
 
 ![Portalum.Zvt.ControlPanel](/doc/ControlPanel.png)
 
+## EasyPay
+EasyPay allows to start a payment at the payment terminal with the passing of the amount
+
+![Portalum.Zvt.EasyPay](/doc/EasyPay.png)
+
+```bash
+Portalum.Zvt.EasyPay.exe --amount 1.23
+```
+
+The configuration of the payment terminal `IpAddress` and the `Port` must be set in the `appsettings.json`. A log file is created automatically.
+
+
+**ReturnCodes**
+ReturnCode | Status | Description | 
+--- | --- | --- |
+-1 | Error | Command line parameter invalid |
+-2 | Error | Configuration file not available |
+-3 | Error | Cannot connect |
+-4 | Error | Payment not successful |
+0 | Successful | Payment successful |
+
 ## Tested Providers and Terminals
 
 We have already been able to test the terminals of these payment service providers.
