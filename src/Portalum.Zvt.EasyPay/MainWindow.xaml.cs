@@ -83,7 +83,7 @@ namespace Portalum.Zvt.EasyPay
                 await Task.Delay(3000);
 
                 this._logger.LogError($"{nameof(StartPaymentAsync)} - Cannot connect to {this._paymentTerminalConfig.IpAddress}:{this._paymentTerminalConfig.Port}");
-                Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-2); });
+                Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-3); });
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace Portalum.Zvt.EasyPay
                 this.UpdateStatus("Payment not successful", StatusType.Error);
                 await Task.Delay(1000);
 
-                Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-3); });
+                Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-4); });
             }
             finally
             {
