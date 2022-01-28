@@ -96,11 +96,19 @@ namespace Portalum.Zvt.EasyPay
                 if (response.State == CommandResponseState.Successful)
                 {
                     this._logger.LogInformation($"{nameof(StartPaymentAsync)} - Successful");
+
+                    this.UpdateStatus("Payment successful", StatusType.Information);
+                    await Task.Delay(1000);
+
                     Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(0); });
                     return;
                 }
 
                 this._logger.LogInformation($"{nameof(StartPaymentAsync)} - Not successful");
+
+                this.UpdateStatus("Payment not successful", StatusType.Error);
+                await Task.Delay(1000);
+
                 Application.Current.Dispatcher.Invoke(() => { Application.Current.Shutdown(-3); });
             }
             finally
