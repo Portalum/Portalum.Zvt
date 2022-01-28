@@ -133,7 +133,7 @@ Wordline (SIX) | yomani touch family |
 ### Known deviations from the standard ZVT protocol
 
 #### CardComplete
-- Encoding is fixed to `UTF-8` instead of default character set `CP437`. There is no way to configure this
+- Encoding is fixed to `UTF-7` instead of default character set `CP437`. There is no way to configure this
 - `Print Line` contains TLV data at the end of the package, after `TLV-activation`. According to official documentation, there should be no TLV data here
 
 #### Hobex
