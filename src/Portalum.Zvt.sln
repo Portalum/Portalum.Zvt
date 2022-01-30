@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portalum.Zvt.UnitTest", "Po
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portalum.Zvt.ControlPanel", "Portalum.Zvt.ControlPanel\Portalum.Zvt.ControlPanel.csproj", "{42D3E1B1-3A26-4964-B5D2-81FA55E2AA3D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portalum.Zvt.EasyPay", "Portalum.Zvt.EasyPay\Portalum.Zvt.EasyPay.csproj", "{B220FFF9-1396-4607-8B39-D6AE6CD5A66A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{42D3E1B1-3A26-4964-B5D2-81FA55E2AA3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42D3E1B1-3A26-4964-B5D2-81FA55E2AA3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42D3E1B1-3A26-4964-B5D2-81FA55E2AA3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B220FFF9-1396-4607-8B39-D6AE6CD5A66A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B220FFF9-1396-4607-8B39-D6AE6CD5A66A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B220FFF9-1396-4607-8B39-D6AE6CD5A66A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B220FFF9-1396-4607-8B39-D6AE6CD5A66A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
