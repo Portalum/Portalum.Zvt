@@ -120,6 +120,10 @@ With the Portalum.Zvt.ControlPanel you can test the different ZVT functions.
 
 ![Portalum.Zvt.ControlPanel](/doc/ControlPanel.png)
 
+## EasyPay
+When you only want to transmit an amount to the payment terminal.<br>
+Then you can still look at our small tool. [Portalum.Zvt.EasyPay](https://github.com/Portalum/Portalum.Zvt.EasyPay)
+
 ## Tested Providers and Terminals
 
 We have already been able to test the terminals of these payment service providers.
