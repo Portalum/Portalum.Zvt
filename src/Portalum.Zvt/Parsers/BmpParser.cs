@@ -298,7 +298,7 @@ namespace Portalum.Zvt.Parsers
                 new BmpInfo { Id = 0x2A, DataLength = 15, Description = "VU-number", TryParse = this.ParseVuNumber },
                 new BmpInfo { Id = 0x2D, DataLength = 2, Description = "Track 1 data, without start and end markers", TryParse = null },
                 new BmpInfo { Id = 0x2E, DataLength = 3, CalculateDataLength = this.GetDataLengthLL, Description = "Synchronous chip data", TryParse = null },
-                new BmpInfo { Id = 0x37, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Trace-number of the original transaction for reversal", TryParse = null },
+                new BmpInfo { Id = 0x37, DataLength = 3, Description = "Trace-number of the original transaction for reversal", TryParse = null },
                 new BmpInfo { Id = 0x3A, DataLength = 2, Description = "CVV/CVC value, right padded with ‘F’ if less than 4 digits", TryParse = null },
                 new BmpInfo { Id = 0x3B, DataLength = 8, Description = "AID authorisation-attribute", TryParse = this.ParseAuthorisationAttribute },
                 new BmpInfo { Id = 0x3C, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Additional-data/additional-text", TryParse = this.ParseAdditionalText },
