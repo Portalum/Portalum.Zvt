@@ -2,6 +2,7 @@
 using Portalum.Zvt.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,12 +10,13 @@ using System.Threading.Tasks;
 namespace Portalum.Zvt
 {
     /// <summary>
-    /// SerialPort DeviceCommunication
+    /// SerialPort DeviceCommunication (Untested prototype)
     /// </summary>
     public class SerialPortDeviceCommunication : IDeviceCommunication, IDisposable
     {
         private readonly ILogger<SerialPortDeviceCommunication> _logger;
         private readonly string _comPort;
+        private SerialPort _serialPort;
 
         /// <inheritdoc />
         public event Action<byte[]> DataReceived;
@@ -38,7 +40,11 @@ namespace Portalum.Zvt
         {
             this._comPort = comPort;
             this._logger = logger;
-            throw new NotImplementedException("We currently only use network payment terminals");
+
+            this._logger.LogInformation($"{nameof(SerialPortDeviceCommunication)} - This is an untested prototype");
+
+            this._serialPort = new SerialPort(comPort);
+            this._serialPort.DataReceived += this.Receive;
         }
 
         /// <inheritdoc />
@@ -53,7 +59,8 @@ namespace Portalum.Zvt
             // Check to see if Dispose has already been called.
             if (disposing)
             {
-
+                this._serialPort.DataReceived -= this.Receive;
+                this._serialPort.Dispose();
             }
         }
 
@@ -74,9 +81,9 @@ namespace Portalum.Zvt
         {
             try
             {
-                throw new NotImplementedException();
-                //TODO: Add logic
-                //return Task.FromResult(true);
+                this._serialPort.Open();
+
+                return Task.FromResult(true);
             }
             catch (Exception exception)
             {
@@ -91,7 +98,7 @@ namespace Portalum.Zvt
         {
             try
             {
-                //TODO: Add logic
+                this._serialPort.Close();
                 return Task.FromResult(true);
             }
             catch (Exception exception)
@@ -132,14 +139,18 @@ namespace Portalum.Zvt
             this.DataSent?.Invoke(package);
 
             this._logger?.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(package)}");
-            //TODO: Add send logic
-            throw new NotImplementedException();
+
+            this._serialPort.Write(package, 0, package.Length);
         }
 
-        private void Receive(object sender, byte[] data)
+        private void Receive(object sender, SerialDataReceivedEventArgs e)
         {
-            this._logger?.LogDebug($"{nameof(Receive)} - {BitConverter.ToString(data)}");
-            this.DataReceived?.Invoke(data);
+            var buffer = new byte[this._serialPort.BytesToRead];
+
+            this._serialPort.Read(buffer, 0, buffer.Length);
+
+            this._logger?.LogDebug($"{nameof(Receive)} - {BitConverter.ToString(buffer)}");
+            this.DataReceived?.Invoke(buffer);
         }
     }
 }
