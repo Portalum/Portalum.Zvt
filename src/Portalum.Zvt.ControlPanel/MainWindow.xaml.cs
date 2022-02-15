@@ -545,8 +545,10 @@ namespace Portalum.Zvt.ControlPanel
 
             this.AddCommandInfo("Refund (06 31)");
 
+            this.ButtonRefund.IsEnabled = false;
             var commandResponse = await this._zvtClient?.RefundAsync(amount);
             this.ProcessCommandRespone(commandResponse);
+            this.ButtonRefund.IsEnabled = true;
         }
 
         private async Task ReversalAsync(int receiptNumber)
