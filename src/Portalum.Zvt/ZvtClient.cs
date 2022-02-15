@@ -17,9 +17,12 @@ namespace Portalum.Zvt
     /// </summary>
     public class ZvtClient : IDisposable
     {
-        //Documentation
-        //https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
-        //https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
+        /*
+         * The implementation of this client is based on the following documents
+         * ZVT Revision 13.09 (2020-11-20)
+         * - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
+         * - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
+        */
 
         private readonly ILogger<ZvtClient> _logger;
         private readonly byte[] _passwordData;
@@ -222,9 +225,12 @@ namespace Portalum.Zvt
 
         private async Task<CommandResponse> SendCommandAsync(
             byte[] commandData,
-            bool endAfterAcknowledge = false)
+            bool endAfterAcknowledge = false,
+            CancellationToken cancellationToken = default)
         {
-            using var cancellationTokenSource = new CancellationTokenSource();
+            using var dataReceivcedCancellationTokenSource = new CancellationTokenSource();
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, dataReceivcedCancellationTokenSource.Token);
+
             var commandResponse = new CommandResponse
             {
                 State = CommandResponseState.Unknown
@@ -234,7 +240,7 @@ namespace Portalum.Zvt
             {
                 commandResponse.State = CommandResponseState.Successful;
 
-                cancellationTokenSource.Cancel();
+                dataReceivcedCancellationTokenSource.Cancel();
             }
 
             void abortReceived(string errorMessage)
@@ -242,14 +248,14 @@ namespace Portalum.Zvt
                 commandResponse.State = CommandResponseState.Abort;
                 commandResponse.ErrorMessage = errorMessage;
 
-                cancellationTokenSource.Cancel();
+                dataReceivcedCancellationTokenSource.Cancel();
             }
 
             void notSupportedReceived()
             {
                 commandResponse.State = CommandResponseState.NotSupported;
 
-                cancellationTokenSource.Cancel();
+                dataReceivcedCancellationTokenSource.Cancel();
             }
 
             try
@@ -260,7 +266,7 @@ namespace Portalum.Zvt
 
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
-                if (!await this._zvtCommunication.SendCommandAsync(commandData))
+                if (!await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken))
                 {
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command");
                     commandResponse.State = CommandResponseState.Error;
@@ -272,8 +278,8 @@ namespace Portalum.Zvt
                     commandResponse.State = CommandResponseState.Successful;
                     return commandResponse;
                 }
-                
-                await Task.Delay(this._commandCompletionTimeout, cancellationTokenSource.Token).ContinueWith(task =>
+
+                await Task.Delay(this._commandCompletionTimeout, linkedCancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (task.Status == TaskStatus.RanToCompletion)
                     {
@@ -308,8 +314,11 @@ namespace Portalum.Zvt
         /// Using the command Registration the ECR can set up different configurations on the PT and also control the current status of the PT.
         /// </summary>
         /// <param name="registrationConfig"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> RegistrationAsync(RegistrationConfig registrationConfig)
+        public async Task<CommandResponse> RegistrationAsync(
+            RegistrationConfig registrationConfig,
+            CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(RegistrationAsync)} - Execute");
 
@@ -365,7 +374,7 @@ namespace Portalum.Zvt
             }
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x00 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>

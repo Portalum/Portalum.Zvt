@@ -13,7 +13,7 @@ namespace Portalum.Zvt
     {
         private readonly ILogger _logger;
         private readonly IDeviceCommunication _deviceCommunication;
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
         private byte[] _dataBuffer;
         private bool _waitForAcknowledge = false;
 
@@ -57,7 +57,7 @@ namespace Portalum.Zvt
             if (this._waitForAcknowledge)
             {
                 this._dataBuffer = data;
-                this._cancellationTokenSource?.Cancel();
+                this._acknowledgeReceivedCancellationTokenSource?.Cancel();
                 return;
             }
 
@@ -71,12 +71,18 @@ namespace Portalum.Zvt
         /// Send command
         /// </summary>
         /// <param name="data"></param>
-        /// <param name="acknowledgeReceiveTimeout"></param>
+        /// <param name="acknowledgeReceiveTimeout">T3 Timeout in milliseconds, default 5 seconds</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> SendCommandAsync(byte[] data, int acknowledgeReceiveTimeout = 5000)
+        public async Task<bool> SendCommandAsync(
+            byte[] data,
+            int acknowledgeReceiveTimeout = 5000,
+            CancellationToken cancellationToken = default)
         {
-            this._cancellationTokenSource?.Dispose();
-            this._cancellationTokenSource = new CancellationTokenSource();
+            this._acknowledgeReceivedCancellationTokenSource?.Dispose();
+            this._acknowledgeReceivedCancellationTokenSource = new CancellationTokenSource();
+
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, this._acknowledgeReceivedCancellationTokenSource.Token);
 
             this._waitForAcknowledge = true;
             try
@@ -86,11 +92,11 @@ namespace Portalum.Zvt
             catch (Exception exception)
             {
                 this._logger.LogError(exception, $"{nameof(SendCommandAsync)} - Cannot send data");
-                this._cancellationTokenSource.Dispose();
+                this._acknowledgeReceivedCancellationTokenSource.Dispose();
                 return false;
             }
 
-            await Task.Delay(acknowledgeReceiveTimeout, this._cancellationTokenSource.Token).ContinueWith(task =>
+            await Task.Delay(acknowledgeReceiveTimeout, linkedCancellationTokenSource.Token).ContinueWith(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion)
                 {
