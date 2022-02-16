@@ -128,11 +128,11 @@ Then you can still look at our small tool. [Portalum.Zvt.EasyPay](https://github
 
 We have already been able to test the terminals of these payment service providers.
 
-Provider | Terminal | 
---- | --- |
-CardComplete | ingenico iWL250 |
-Hobex | ingenico Desk/3500 |
-Wordline (SIX) | yomani touch family |
+Provider | Country | Terminal | 
+--- | --- | --- |
+CardComplete | Austria | ingenico iWL250 |
+Hobex | Austria | ingenico Desk/3500 |
+Wordline/PAYONE (SIX) | Austria | yomani touch family |
 
 ### Known deviations from the standard ZVT protocol
 
