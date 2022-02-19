@@ -33,12 +33,12 @@ class Program
         {
             Thread.Sleep(500);
 
-            //Send Acknowledge
+            Console.WriteLine("Send Acknowledge");
             _tcpServer.Send(e.IpPort, _acknowledgePackage);
 
             Thread.Sleep(1000);
 
-            //Send Completion
+            Console.WriteLine("Send Completion");
             _tcpServer.Send(e.IpPort, _completionPackage);
         }
     }
