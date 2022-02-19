@@ -1,4 +1,4 @@
-# Portalum.Zvt - ZVT Client for .NET
+# Portalum.Zvt - ZVT Client for .NET (C#)
 
 <img src="https://raw.githubusercontent.com/Portalum/Portalum.Zvt/main/doc/logo.png" width="150" title="Portalum Zvt Client" alt="Portalum Zvt Client" align="left">
 
