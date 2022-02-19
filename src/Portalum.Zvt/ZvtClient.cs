@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 namespace Portalum.Zvt
 {
     /// <summary>
-    /// ZVT Protocol Client
+    /// ZVT Client
+    /// Revision 13.09
     /// </summary>
     public class ZvtClient : IDisposable
     {
@@ -382,8 +383,11 @@ namespace Portalum.Zvt
         /// Payment process and transmits the amount from the ECR to PT.
         /// </summary>
         /// <param name="amount"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> PaymentAsync(decimal amount)
+        public async Task<CommandResponse> PaymentAsync(
+            decimal amount,
+            CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(PaymentAsync)} - Execute with amount of:{amount}");
 
@@ -392,7 +396,7 @@ namespace Portalum.Zvt
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x01 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -401,8 +405,11 @@ namespace Portalum.Zvt
         /// The result of the reversal-process is sent to the ECR after Completion of the booking-process.
         /// </summary>
         /// <param name="receiptNumber">four-digit number</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> ReversalAsync(int receiptNumber)
+        public async Task<CommandResponse> ReversalAsync(
+            int receiptNumber,
+            CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(ReversalAsync)} - Execute");
 
@@ -412,15 +419,19 @@ namespace Portalum.Zvt
             package.AddRange(NumberHelper.IntToBcd(receiptNumber, 2));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x30 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Refund (06 31)
         /// This command starts a Refund on the PT. The result of the Refund is reported to the ECR after completion of the booking-process.
         /// </summary>
+        /// <param name="amount"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> RefundAsync(decimal amount)
+        public async Task<CommandResponse> RefundAsync(
+            decimal amount,
+            CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(RefundAsync)} - Execute");
 
@@ -430,15 +441,16 @@ namespace Portalum.Zvt
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x31 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// End-of-Day (06 50)
         /// ECR induces the PT to transfer the stored turnover to the host.
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> EndOfDayAsync()
+        public async Task<CommandResponse> EndOfDayAsync(CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(EndOfDayAsync)} - Execute");
 
@@ -446,15 +458,16 @@ namespace Portalum.Zvt
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x50 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Send Turnover Totals (06 10)
         /// With this command the ECR causes the PT to send an overview about the stored transactions.
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> SendTurnoverTotalsAsync()
+        public async Task<CommandResponse> SendTurnoverTotalsAsync(CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(SendTurnoverTotalsAsync)} - Execute");
 
@@ -462,15 +475,16 @@ namespace Portalum.Zvt
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x10 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Repeat Receipt (06 20)
         /// This command serves to repeat printing of the last stored payment-receipts or End-of-Day-receipt.
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> RepeatLastReceiptAsync()
+        public async Task<CommandResponse> RepeatLastReceiptAsync(CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(RepeatLastReceiptAsync)} - Execute");
 
@@ -478,63 +492,90 @@ namespace Portalum.Zvt
             package.AddRange(this._passwordData);
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x20 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Log-Off (06 02)
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> LogOffAsync()
+        public async Task<CommandResponse> LogOffAsync(CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(LogOffAsync)} - Execute");
 
             var package = Array.Empty<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x02 }, package);
-            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true);
+            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Abort (06 B0)
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> AbortAsync()
+        public async Task<CommandResponse> AbortAsync(CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(AbortAsync)} - Execute");
 
             var package = Array.Empty<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0xB0 }, package);
-            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true);
+            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Diagnosis (06 70)
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> DiagnosisAsync()
+        public async Task<CommandResponse> DiagnosisAsync(CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(DiagnosisAsync)} - Execute");
 
-            var package = new List<byte>();
+            var package = Array.Empty<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x70 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Software-Update (08 10)
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> SoftwareUpdateAsync()
+        public async Task<CommandResponse> SoftwareUpdateAsync(CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(SoftwareUpdateAsync)} - Execute");
 
-            var package = new List<byte>();
+            var package = Array.Empty<byte>();
 
             var fullPackage = this.CreatePackage(new byte[] { 0x08, 0x10 }, package);
-            return await this.SendCommandAsync(fullPackage);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Custom Command, allows to send unimplemented commands
+        /// </summary>
+        /// <param name="controlFieldData">CCRC and APRC, for example 0x08, 0x01</param>
+        /// <param name="packageData"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<CommandResponse> CustomCommandAsync(
+            byte[] controlFieldData,
+            byte[] packageData = default,
+            CancellationToken cancellationToken = default)
+        {
+            this._logger.LogInformation($"{nameof(CustomCommandAsync)} - Execute");
+
+            if (packageData == null)
+            {
+                packageData = Array.Empty<byte>();
+            }
+
+            var fullPackage = this.CreatePackage(controlFieldData, packageData);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
     }
 }

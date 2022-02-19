@@ -1,8 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
-using SimpleTcp;
+﻿using SuperSimpleTcp;
 
 class Program
 {
+    private static byte[] _acknowledgePackage = new byte[] { 0x80, 0x00, 0x00 };
+    private static byte[] _completionPackage = new byte[] { 0x06, 0x0F, 0x00 };
+
     private static SimpleTcpServer _tcpServer;
 
     static void Main(string[] args)
@@ -32,12 +34,12 @@ class Program
             Thread.Sleep(500);
 
             //Send Acknowledge
-            _tcpServer.Send(e.IpPort, new byte[] { 0x80, 0x00, 0x00 });
+            _tcpServer.Send(e.IpPort, _acknowledgePackage);
 
             Thread.Sleep(1000);
 
             //Send Completion
-            _tcpServer.Send(e.IpPort, new byte[] { 0x06, 0x0F, 0x00 });
+            _tcpServer.Send(e.IpPort, _completionPackage);
         }
     }
 }
