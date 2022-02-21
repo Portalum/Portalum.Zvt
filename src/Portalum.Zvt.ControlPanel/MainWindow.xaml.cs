@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Threading;
 
 namespace Portalum.Zvt.ControlPanel
 {
@@ -26,6 +27,7 @@ namespace Portalum.Zvt.ControlPanel
         private int _outputRowNumber = 0;
         private readonly StringBuilder _printLineCache;
         private readonly DeviceConfiguration _deviceConfiguration;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public MainWindow(DeviceConfiguration deviceConfiguration)
         {
@@ -49,6 +51,9 @@ namespace Portalum.Zvt.ControlPanel
             {
                 disposable.Dispose();
             }
+
+            this._cancellationTokenSource?.Cancel();
+            this._cancellationTokenSource?.Dispose();
 
             this._zvtClient?.Dispose();
         }
@@ -117,11 +122,16 @@ namespace Portalum.Zvt.ControlPanel
 
             this.SetConnectionInfo("Connected", Colors.White, Colors.GreenYellow);
 
+            this._cancellationTokenSource?.Dispose();
+            this._cancellationTokenSource = new CancellationTokenSource();
+
             return true;
         }
 
         private async Task<bool> DisconnectAsync()
         {
+            //this._cancellationTokenSource.Cancel();
+
             if (!await this._deviceCommunication.DisconnectAsync())
             {
                 return false;
@@ -486,7 +496,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("Registration (06 00)");
 
             this.ButtonRegistration.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.RegistrationAsync(registrationConfig);
+            var commandResponse = await this._zvtClient?.RegistrationAsync(registrationConfig, this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonRegistration.IsEnabled = true;
         }
@@ -501,7 +511,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("Payment/Authorization (06 01)");
 
             this.ButtonPay.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.PaymentAsync(amount);
+            var commandResponse = await this._zvtClient?.PaymentAsync(amount, this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonPay.IsEnabled = true;
         }
@@ -516,7 +526,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("EndOfDay (06 50)");
 
             this.ButtonEndOfDay.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.EndOfDayAsync();
+            var commandResponse = await this._zvtClient?.EndOfDayAsync(this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonEndOfDay.IsEnabled = true;
         }
@@ -531,7 +541,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("RepeatLastReceiptAsync (06 20)");
 
             this.ButtonRepeatReceipt.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.RepeatLastReceiptAsync();
+            var commandResponse = await this._zvtClient?.RepeatLastReceiptAsync(this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonRepeatReceipt.IsEnabled = true;
         }
@@ -546,7 +556,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("Refund (06 31)");
 
             this.ButtonRefund.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.RefundAsync(amount);
+            var commandResponse = await this._zvtClient?.RefundAsync(amount, this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonRefund.IsEnabled = true;
         }
@@ -561,7 +571,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("Reversal (06 30)");
 
             this.ButtonReversal.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.ReversalAsync(receiptNumber);
+            var commandResponse = await this._zvtClient?.ReversalAsync(receiptNumber, this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonReversal.IsEnabled = true;
         }
@@ -576,7 +586,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("LogOff (06 02)");
 
             this.ButtonLogOff.IsEnabled = false;
-            var commandResponse = await this._zvtClient.LogOffAsync();
+            var commandResponse = await this._zvtClient.LogOffAsync(this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonLogOff.IsEnabled = true;
         }
@@ -591,7 +601,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("Diagnosis (06 70)");
 
             this.ButtonDiagnosis.IsEnabled = false;
-            var commandResponse = await this._zvtClient.DiagnosisAsync();
+            var commandResponse = await this._zvtClient.DiagnosisAsync(this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonDiagnosis.IsEnabled = true;
         }
@@ -606,7 +616,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("Abort (06 B0)");
 
             this.ButtonDiagnosis.IsEnabled = false;
-            var commandResponse = await this._zvtClient.AbortAsync();
+            var commandResponse = await this._zvtClient.AbortAsync(this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonDiagnosis.IsEnabled = true;
         }
@@ -621,7 +631,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("SoftwareUpdate (08 10)");
 
             this.ButtonSoftwareUpdate.IsEnabled = false;
-            var commandResponse = await this._zvtClient.SoftwareUpdateAsync();
+            var commandResponse = await this._zvtClient.SoftwareUpdateAsync(this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonSoftwareUpdate.IsEnabled = true;
         }
