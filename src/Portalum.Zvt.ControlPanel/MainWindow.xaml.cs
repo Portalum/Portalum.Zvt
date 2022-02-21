@@ -130,7 +130,7 @@ namespace Portalum.Zvt.ControlPanel
 
         private async Task<bool> DisconnectAsync()
         {
-            //this._cancellationTokenSource.Cancel();
+            this._cancellationTokenSource.Cancel();
 
             if (!await this._deviceCommunication.DisconnectAsync())
             {
