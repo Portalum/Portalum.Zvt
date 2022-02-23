@@ -3,10 +3,12 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
+    <RuntimeFrameworkVersion>6.0.0</RuntimeFrameworkVersion>
+
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Application.ico</ApplicationIcon>
 
-    <Version>2.7.0</Version>
+    <Version>2.10.2</Version>
     <Company>Portalum</Company>
   </PropertyGroup>
 
