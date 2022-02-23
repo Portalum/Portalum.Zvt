@@ -114,12 +114,10 @@ namespace Portalum.Zvt
                 this._logger?.LogInformation($"{nameof(ConnectAsync)}");
 
 #if NET6_0_OR_GREATER
-                await this._tcpClient.ConnectAsync(this._ipAddress, this._port, cancellationToken);
+                return await this._tcpClient.ConnectAsync(this._ipAddress, this._port, cancellationToken);
 #else
-                await this._tcpClient.ConnectAsync(this._ipAddress, this._port);
+                return await this._tcpClient.ConnectAsync(this._ipAddress, this._port);
 #endif
-
-                return true;
             }
             catch (Exception exception)
             {
