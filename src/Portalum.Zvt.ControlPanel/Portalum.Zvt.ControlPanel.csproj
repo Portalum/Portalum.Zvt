@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <RuntimeFrameworkVersion>6.0.0</RuntimeFrameworkVersion>
 
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Application.ico</ApplicationIcon>
