@@ -2,8 +2,8 @@
 
 class Program
 {
-    private static byte[] _acknowledgePackage = new byte[] { 0x80, 0x00, 0x00 };
-    private static byte[] _completionPackage = new byte[] { 0x06, 0x0F, 0x00 };
+    private static readonly byte[] _acknowledgePackage = new byte[] { 0x80, 0x00, 0x00 };
+    private static readonly byte[] _completionPackage = new byte[] { 0x06, 0x0F, 0x00 };
 
     private static SimpleTcpServer? _tcpServer;
 
@@ -24,6 +24,11 @@ class Program
 
     private static void Events_DataReceived(object? sender, DataReceivedEventArgs e)
     {
+        if (_tcpServer == null)
+        {
+            return;
+        }
+
         Console.WriteLine(BitConverter.ToString(e.Data));
 
         var data = e.Data.AsSpan();
