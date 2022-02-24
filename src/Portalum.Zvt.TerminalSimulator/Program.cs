@@ -5,7 +5,7 @@ class Program
     private static byte[] _acknowledgePackage = new byte[] { 0x80, 0x00, 0x00 };
     private static byte[] _completionPackage = new byte[] { 0x06, 0x0F, 0x00 };
 
-    private static SimpleTcpServer _tcpServer;
+    private static SimpleTcpServer? _tcpServer;
 
     static void Main(string[] args)
     {
