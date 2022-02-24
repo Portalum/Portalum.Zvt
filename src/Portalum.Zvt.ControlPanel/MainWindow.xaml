@@ -76,7 +76,7 @@
                     </GroupBox>
                     <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Payment" Foreground="White" Margin="0,162,0,0" HorizontalAlignment="Left" Width="307" Height="148" VerticalAlignment="Top">
                         <Grid>
-                            <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,22,0,0" Text="20.4" TextWrapping="Wrap" Width="111" TextAlignment="Right" FontSize="20" Height="29" VerticalAlignment="Top"/>
+                            <TextBox x:Name="TextBoxAmount" HorizontalAlignment="Left" Margin="10,22,0,0" Text="0" TextWrapping="Wrap" Width="111" TextAlignment="Right" FontSize="20" Height="29" VerticalAlignment="Top"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonPay" Content="Pay" HorizontalAlignment="Left" Margin="126,22,0,0" VerticalAlignment="Top" Click="ButtonPay_Click" Height="29" Width="80"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRefund" Content="Refund" HorizontalAlignment="Left" Margin="211,22,0,0" VerticalAlignment="Top" Click="ButtonRefund_Click" Width="80" Height="29"/>
                             <TextBox x:Name="TextBoxReceiptNumber" HorizontalAlignment="Left" Text="0000" TextWrapping="Wrap" VerticalAlignment="Top" Width="111" TextAlignment="Right" FontSize="20" Margin="10,69,0,0"/>
