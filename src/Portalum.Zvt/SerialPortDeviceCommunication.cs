@@ -117,7 +117,7 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public async Task SendAsync(byte[] data)
+        public Task SendAsync(byte[] data)
         {
             var checksum = ChecksumHelper.CalcCrc2(data);
             var cs2 = new byte[] { (byte)(checksum >> 8), (byte)(checksum & 0xFF) };
@@ -141,6 +141,8 @@ namespace Portalum.Zvt
             this._logger?.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(package)}");
 
             this._serialPort.Write(package, 0, package.Length);
+
+            return Task.CompletedTask;
         }
 
         private void Receive(object sender, SerialDataReceivedEventArgs e)
