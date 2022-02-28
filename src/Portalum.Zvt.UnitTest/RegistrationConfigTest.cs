@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Portalum.Zvt;
 
 namespace Portalum.Zvt.UnitTest
 {

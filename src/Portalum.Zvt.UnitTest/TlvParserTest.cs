@@ -26,7 +26,6 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual("1F07", tagFieldInfo.Tag);
         }
 
-
         [TestMethod]
         public void GetTagFieldInfo_UniversalClassPrimitive2_Successful()
         {

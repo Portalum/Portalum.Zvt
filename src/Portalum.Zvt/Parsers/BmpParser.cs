@@ -413,6 +413,11 @@ namespace Portalum.Zvt.Parsers
                     dataLength = tlvLengthInfo.NumberOfBytesThatCanBeSkipped + tlvLengthInfo.Length;
                 }
 
+                if ((currentPosition + dataLength) > data.Length)
+                {
+                    return false;
+                }
+
                 bmpData = data.Slice(currentPosition, dataLength).ToArray();
 
                 if (bmpInfo.TryParse != null)

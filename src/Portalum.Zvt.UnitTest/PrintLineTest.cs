@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Portalum.Zvt;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
 using Portalum.Zvt.Repositories;
@@ -11,6 +10,14 @@ namespace Portalum.Zvt.UnitTest
     [TestClass]
     public class PrintLineTest
     {
+        private bool _lineReceived = false;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            this._lineReceived = false;
+        }
+
         private ReceiveHandler GetReceiveHandler()
         {
             IErrorMessageRepository errorMessageRepository = new EnglishErrorMessageRepository();
@@ -77,10 +84,12 @@ namespace Portalum.Zvt.UnitTest
             foreach (var hexLine in hexLines)
             {
                 var data = ByteHelper.HexToByteArray(hexLine);
-                receiveHandler.ProcessData(data);
+                var canProcess = receiveHandler.ProcessData(data);
             }
 
             receiveHandler.LineReceived -= ReceiveHandlerLineReceived;
+
+            Assert.IsTrue(this._lineReceived, "No lines received");
         }
 
         [TestMethod]
@@ -167,15 +176,16 @@ namespace Portalum.Zvt.UnitTest
             }
 
             receiveHandler.LineReceived -= ReceiveHandlerLineReceived;
+
+            Assert.IsTrue(this._lineReceived, "No lines received");
         }
 
         [TestMethod]
-        public void ProcessData_LineReceived2_Successful()
+        public void ProcessData_CorruptLinesReceivedPackageToLarge_Successful()
         {
             var hexLines = new string[]
             {
-                "06-D1-10-40-2A-2A-20-4B-41-53-53-45-4E-53-43-48-4E-49-54-54-20-2A-2A", //Invalid length, data to large
-                "06-D1-18-40-2A-2A-20-4B-41-53-53-45-4E-53-43-48-4E-49-54-54-20-2A-2A", //Invalid length, data too short
+                "06-D1-10-40-2A-2A-20-4B-41-53-53-45-4E-53-43-48-4E-49-54-54-20-2A-2A" //Invalid length, data to large
             };
 
             var receiveHandler = this.GetReceiveHandler();
@@ -191,11 +201,39 @@ namespace Portalum.Zvt.UnitTest
             }
 
             receiveHandler.LineReceived -= ReceiveHandlerLineReceived;
+
+            Assert.IsFalse(this._lineReceived, "Lines received");
+        }
+
+        [TestMethod]
+        public void ProcessData_CorruptLinesReceivedFragment_Successful()
+        {
+            var hexLines = new string[]
+            {
+                "06-D1-18-40-2A-2A-20-4B-41-53-53-45-4E-53-43-48-4E-49-54-54-20-2A-2A" //Invalid length, data too short
+            };
+
+            var receiveHandler = this.GetReceiveHandler();
+            receiveHandler.LineReceived += ReceiveHandlerLineReceived;
+
+            foreach (var hexLine in hexLines)
+            {
+                var data = ByteHelper.HexToByteArray(hexLine);
+                if (!receiveHandler.ProcessData(data))
+                {
+                    Assert.Fail("Fragment data");
+                }
+            }
+
+            receiveHandler.LineReceived -= ReceiveHandlerLineReceived;
+
+            Assert.IsFalse(this._lineReceived, "Lines received");
         }
 
         private void ReceiveHandlerLineReceived(PrintLineInfo printLineInfo)
         {
             Debug.WriteLine(printLineInfo.Text);
+            this._lineReceived = true;
         }
     }
 }

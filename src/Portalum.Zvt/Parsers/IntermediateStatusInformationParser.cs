@@ -52,25 +52,24 @@ namespace Portalum.Zvt.Parsers
         /// <inheritdoc />
         public string GetMessage(Span<byte> data)
         {
-            if (data.Length <= 3)
+            if (data.Length == 0)
             {
-                this._logger.LogError($"{nameof(GetMessage)} - Invalid data length");
                 return null;
             }
 
-            var id = data[3];
-            //var timeout = data[4];
+            var id = data[0];
+            //var timeout = data[1];
 
             //Detect TLV Text
             if (id == 0xFF)
             {
-                if (data.Length <= 6)
+                if (data.Length <= 3)
                 {
                     this._logger.LogError($"{nameof(GetMessage)} - Invalid tlv data length");
                     return null;
                 }
 
-                var data1 = data.Slice(5);
+                var data1 = data.Slice(2);
                 this._bmpParser.Parse(data1, null);
                 return this._tlvTextContent.ToString();
             }
