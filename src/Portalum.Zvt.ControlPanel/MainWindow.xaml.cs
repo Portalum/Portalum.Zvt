@@ -95,7 +95,12 @@ namespace Portalum.Zvt.ControlPanel
             var loggerCommunication = this._loggerFactory.CreateLogger<TcpNetworkDeviceCommunication>();
             var loggerZvtClient = this._loggerFactory.CreateLogger<ZvtClient>();
 
-            this._deviceCommunication = new TcpNetworkDeviceCommunication(this._deviceConfiguration.IpAddress, logger: loggerCommunication);
+            this._deviceCommunication = new TcpNetworkDeviceCommunication(
+                ipAddress: this._deviceConfiguration.IpAddress,
+                port:this._deviceConfiguration.Port,
+                enableKeepAlive: this._deviceConfiguration.TcpKeepalive,
+                logger: loggerCommunication);
+
             this._deviceCommunication.ConnectionStateChanged += this.ConnectionStateChanged;
 
             this.CommunicationUserControl.SetDeviceCommunication(this._deviceCommunication);

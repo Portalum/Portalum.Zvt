@@ -27,9 +27,17 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
 
         private void CloseDialog()
         {
+            if (!int.TryParse(this.TextBoxPort.Text, out var port))
+            {
+                MessageBox.Show("Cannot parse port", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             this.DeviceConfiguration.IpAddress = this.TextBoxIpAddress.Text.Trim();
+            this.DeviceConfiguration.Port = port;
             this.DeviceConfiguration.Language = (Language)this.ComboBoxLanguage.SelectedItem;
             this.DeviceConfiguration.Encoding = (ZvtEncoding)this.ComboBoxEncoding.SelectedItem;
+            this.DeviceConfiguration.TcpKeepalive = (bool)this.CheckBoxTcpKeepalive.IsChecked;
 
             this.DialogResult = true;
             this.Close();

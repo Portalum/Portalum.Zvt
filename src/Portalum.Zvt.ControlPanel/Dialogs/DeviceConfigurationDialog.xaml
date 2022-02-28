@@ -11,13 +11,16 @@
             <DropShadowEffect BlurRadius="12" Direction="-90" RenderingBias="Quality" ShadowDepth="1"/>
         </Grid.Effect>
         <Button Content="Connect" HorizontalAlignment="Center" Margin="0,392,0,0" VerticalAlignment="Top" Click="ButtonConnect_Click" Width="500" RenderTransformOrigin="0.525,2.063" FontSize="16" Background="White" Height="39"/>
-        <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="214,279,0,0" VerticalAlignment="Top" Width="177" FontSize="16"/>
-        <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="192.168.100.20" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="214,245,0,0" Height="24" FontSize="16" KeyDown="TextBoxIpAddress_KeyDown" GotFocus="TextBoxIpAddress_GotFocus"/>
-        <Label Content="IpAddress:" HorizontalAlignment="Left" Margin="125,242,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
-        <Label Content="Language:" HorizontalAlignment="Left" Margin="126,277,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
-        <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="214,315,0,0" VerticalAlignment="Top" Width="177" FontSize="16" />
-        <Label Content="Encoding:" HorizontalAlignment="Left" Margin="130,313,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+        <ComboBox x:Name="ComboBoxLanguage" HorizontalAlignment="Left" Margin="214,308,0,0" VerticalAlignment="Top" Width="177" FontSize="16"/>
+        <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left"  Text="192.168.100.20" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="214,212,0,0" Height="24" FontSize="16" KeyDown="TextBoxIpAddress_KeyDown" GotFocus="TextBoxIpAddress_GotFocus"/>
+        <Label Content="IpAddress" HorizontalAlignment="Left" Margin="125,208,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+        <Label Content="Language" HorizontalAlignment="Left" Margin="126,306,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+        <ComboBox x:Name="ComboBoxEncoding" HorizontalAlignment="Left" Margin="214,341,0,0" VerticalAlignment="Top" Width="177" FontSize="16"/>
+        <Label Content="Encoding" HorizontalAlignment="Left" Margin="130,339,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
         <Image HorizontalAlignment="Left" Height="220" VerticalAlignment="Top" Width="500" Source="SplashScreen.png"/>
-
+        <TextBox x:Name="TextBoxPort" HorizontalAlignment="Left"  Text="20007" TextWrapping="Wrap" VerticalAlignment="Top" Width="51" Margin="214,245,0,0" Height="24" FontSize="16" TextAlignment="Right"/>
+        <Label Content="Port" HorizontalAlignment="Left" Margin="166,241,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+        <CheckBox x:Name="CheckBoxTcpKeepalive" Content="" HorizontalAlignment="Left" Margin="214,283,0,0" VerticalAlignment="Top"/>
+        <Label Content="TCP Keepalive" HorizontalAlignment="Left" Margin="97,273,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
     </Grid>
 </Window>
