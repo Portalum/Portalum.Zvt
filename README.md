@@ -10,6 +10,13 @@ The aim of this project is to achieve uncomplicated acceptance by payment servic
 <br>
 <br>
 
+## How can I use it?
+
+The package is available via [nuget](https://www.nuget.org/packages/Portalum.Zvt)
+```
+PM> install-package Portalum.Zvt
+```
+
 ## Supported features
 
 The following features of the ZVT protocol were implemented.
@@ -43,13 +50,6 @@ Information sent from the payment terminal to the cash register
 
 - BMP Processing
 - TLV Processing
-
-## How can I use it?
-
-The package is available via [nuget](https://www.nuget.org/packages/Portalum.Zvt)
-```
-PM> install-package Portalum.Zvt
-```
 
 ## Important information for the start
 
