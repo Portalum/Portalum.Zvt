@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Portalum.Zvt.Helpers;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Portalum.Zvt
     {
         private readonly ILogger<SerialPortDeviceCommunication> _logger;
         private readonly string _comPort;
-        private SerialPort _serialPort;
+        private readonly SerialPort _serialPort;
 
         /// <inheritdoc />
         public event Action<byte[]> DataReceived;
@@ -39,6 +40,11 @@ namespace Portalum.Zvt
             ILogger<SerialPortDeviceCommunication> logger = default)
         {
             this._comPort = comPort;
+
+            if (logger == null)
+            {
+                logger = new NullLogger<SerialPortDeviceCommunication>();
+            }
             this._logger = logger;
 
             this._logger.LogInformation($"{nameof(SerialPortDeviceCommunication)} - This is an untested prototype");
