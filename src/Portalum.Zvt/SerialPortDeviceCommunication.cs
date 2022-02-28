@@ -13,7 +13,7 @@ namespace Portalum.Zvt
     /// <summary>
     /// SerialPort DeviceCommunication (Untested prototype)
     /// </summary>
-    public class SerialPortDeviceCommunication : IDeviceCommunication, IDisposable
+    public class SerialPortDeviceCommunication : IDeviceCommunication
     {
         private readonly ILogger<SerialPortDeviceCommunication> _logger;
         private readonly string _comPort;

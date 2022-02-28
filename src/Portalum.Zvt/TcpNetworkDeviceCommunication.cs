@@ -10,7 +10,7 @@ namespace Portalum.Zvt
     /// <summary>
     /// TcpNetwork DeviceCommunication
     /// </summary>
-    public class TcpNetworkDeviceCommunication : IDeviceCommunication, IDisposable
+    public class TcpNetworkDeviceCommunication : IDeviceCommunication
     {
         private readonly string _ipAddress;
         private readonly int _port;

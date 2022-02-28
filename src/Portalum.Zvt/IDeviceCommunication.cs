@@ -7,7 +7,7 @@ namespace Portalum.Zvt
     /// <summary>
     /// Interface DeviceCommunication
     /// </summary>
-    public interface IDeviceCommunication
+    public interface IDeviceCommunication : IDisposable
     {
         /// <summary>
         /// Is the device connected
