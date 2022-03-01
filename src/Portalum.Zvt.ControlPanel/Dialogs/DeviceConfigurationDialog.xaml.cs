@@ -1,7 +1,9 @@
 ﻿using Portalum.Zvt.ControlPanel.Models;
 using System;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Portalum.Zvt.ControlPanel.Dialogs
 {
@@ -10,6 +12,8 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
     /// </summary>
     public partial class DeviceConfigurationDialog : Window
     {
+        private Regex _regexPortNumber = new Regex("[^0-9]{1,5}");
+
         public DeviceConfiguration DeviceConfiguration { get; private set; }
 
         public DeviceConfigurationDialog()
@@ -48,9 +52,9 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
             this.CloseDialog();
         }
 
-        private void TextBoxIpAddress_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void TextBoxIpAddress_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Enter)
+            if (e.Key == Key.Enter)
             {
                 this.CloseDialog();
             }
@@ -59,6 +63,11 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
         private void TextBoxIpAddress_GotFocus(object sender, RoutedEventArgs e)
         {
             (sender as TextBox).SelectAll();
+        }
+
+        private void PortValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = this._regexPortNumber.IsMatch(e.Text);
         }
     }
 }
