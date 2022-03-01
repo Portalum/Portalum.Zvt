@@ -85,9 +85,7 @@ namespace Portalum.Zvt
             this._zvtCommunication.DataReceived += this.DataReceived;
         }
 
-        /// <summary>
-        /// Dispose
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             this.Dispose(true);

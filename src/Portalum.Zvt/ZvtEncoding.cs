@@ -6,8 +6,9 @@
     public enum ZvtEncoding
     {
         /// <summary>
-        /// Default ZVT Encoding
+        /// Codepage 437
         /// </summary>
+        /// <remarks>Default ZVT Encoding</remarks>
         CodePage437,
         /// <summary>
         /// UTF-8
