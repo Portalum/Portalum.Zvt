@@ -28,15 +28,23 @@ namespace Portalum.Zvt
         /// <inheritdoc />
         public event Action<ConnectionState> ConnectionStateChanged;
 
-        public const byte DLE = 0x10;
+        private const byte DLE = 0x10;
 
         /// <summary>
         /// SerialPort DeviceCommunication
         /// </summary>
         /// <param name="comPort"></param>
+        /// <param name="baudRate"></param>
+        /// <param name="parity"></param>
+        /// <param name="dataBits"></param>
+        /// <param name="stopBits"></param>
         /// <param name="logger"></param>
         public SerialPortDeviceCommunication(
             string comPort,
+            int baudRate,
+            Parity parity,
+            int dataBits,
+            StopBits stopBits,
             ILogger<SerialPortDeviceCommunication> logger = default)
         {
             this._comPort = comPort;
@@ -49,7 +57,7 @@ namespace Portalum.Zvt
 
             this._logger.LogInformation($"{nameof(SerialPortDeviceCommunication)} - This is an untested prototype");
 
-            this._serialPort = new SerialPort(comPort);
+            this._serialPort = new SerialPort(comPort, baudRate, parity, dataBits, stopBits);
             this._serialPort.DataReceived += this.Receive;
         }
 
