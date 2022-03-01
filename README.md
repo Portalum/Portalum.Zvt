@@ -62,7 +62,10 @@ Here you can find some code examples how to use this library
 ### Start Payment
 ```cs
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
-await deviceCommunication.ConnectAsync();
+if (!await deviceCommunication.ConnectAsync())
+{
+    return;
+}
 
 using var zvtClient = new ZvtClient(deviceCommunication);
 zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
@@ -72,7 +75,10 @@ await zvtClient.PaymentAsync(10.5M);
 ### Start End-of-day
 ```cs
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
-await deviceCommunication.ConnectAsync();
+if (!await deviceCommunication.ConnectAsync())
+{
+    return;
+}
 
 using var zvtClient = new ZvtClient(deviceCommunication);
 zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
@@ -82,6 +88,10 @@ await zvtClient.EndOfDayAsync();
 ### Set a custom configuration
 ```cs
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
+if (!await deviceCommunication.ConnectAsync())
+{
+    return;
+}
 
 var clientConfig = new ZvtClientConfig
 {
@@ -107,6 +117,10 @@ var deviceCommunicationLogger = loggerFactory.CreateLogger<TcpNetworkDeviceCommu
 var zvtClientLogger = loggerFactory.CreateLogger<ZvtClient>();
 
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", logger: deviceCommunicationLogger);
+if (!await deviceCommunication.ConnectAsync())
+{
+    return;
+}
 
 var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger);
 ```
