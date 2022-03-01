@@ -42,56 +42,13 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="deviceCommunication"></param>
         /// <param name="logger"></param>
-        /// <param name="password">The password of the PT device</param>
-        /// <param name="receiveHandler">The password of the PT device</param>
-        /// <param name="language"></param>
-        public ZvtClient(
-            IDeviceCommunication deviceCommunication,
-            ILogger<ZvtClient> logger = default,
-            int password = 000000,
-            IReceiveHandler receiveHandler = default,
-            Language language = Language.English)
-        {
-            this._commandCompletionTimeout = TimeSpan.FromSeconds(120);
-
-            if (logger == null)
-            {
-                logger = new NullLogger<ZvtClient>();
-            }
-            this._logger = logger;
-
-            this._passwordData = NumberHelper.IntToBcd(password);
-
-            #region ReceiveHandler
-
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            if (receiveHandler == default)
-            {
-                this.InitializeReceiveHandler(language, Encoding.GetEncoding(437));
-            }
-            else
-            {
-                this._receiveHandler = receiveHandler;
-                this.RegisterReceiveHandlerEvents();
-            }
-
-            #endregion
-
-            this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
-            this._zvtCommunication.DataReceived += this.DataReceived;
-        }
-
-        /// <summary>
-        /// ZvtClient
-        /// </summary>
-        /// <param name="deviceCommunication"></param>
-        /// <param name="logger"></param>
         /// <param name="clientConfig">ZVT Configuration</param>
+        /// <param name="receiveHandler">Inject own receive handler</param>
         public ZvtClient(
             IDeviceCommunication deviceCommunication,
             ILogger<ZvtClient> logger = default,
-            ZvtClientConfig clientConfig = default)
+            ZvtClientConfig clientConfig = default,
+            IReceiveHandler receiveHandler = default)
         {
             if (logger == null)
             {
@@ -109,7 +66,20 @@ namespace Portalum.Zvt
             this._passwordData = NumberHelper.IntToBcd(clientConfig.Password);
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            this.InitializeReceiveHandler(clientConfig.Language, this.GetEncoding(clientConfig.Encoding));
+
+            #region ReceiveHandler
+
+            if (receiveHandler == default)
+            {
+                this.InitializeReceiveHandler(clientConfig.Language, this.GetEncoding(clientConfig.Encoding));
+            }
+            else
+            {
+                this._receiveHandler = receiveHandler;
+                this.RegisterReceiveHandlerEvents();
+            }
+
+            #endregion
 
             this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
             this._zvtCommunication.DataReceived += this.DataReceived;
