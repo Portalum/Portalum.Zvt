@@ -59,6 +59,39 @@ Before sending a payment to the terminal, you should consider how to configure t
 
 Here you can find some code examples how to use this library
 
+### Start Payment
+```cs
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
+await deviceCommunication.ConnectAsync();
+
+using var zvtClient = new ZvtClient(deviceCommunication);
+zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
+await zvtClient.PaymentAsync(10.5M);
+```
+
+### Start End-of-day
+```cs
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
+await deviceCommunication.ConnectAsync();
+
+using var zvtClient = new ZvtClient(deviceCommunication);
+zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
+await zvtClient.EndOfDayAsync();
+```
+
+### Set a custom configuration
+```cs
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
+
+var clientConfig = new ZvtClientConfig
+{
+    Encoding = ZvtEncoding.CodePage437,
+    Language = Language.German,
+    Password = 000000
+};
+var zvtClient = new ZvtClient(deviceCommunication, clientConfig: clientConfig);
+```
+
 ### Activate logging
 
 This library uses the `Microsoft.Extensions.Logging` package so you can easily decide where to write the log files, to a file or directly to the console output for example.
@@ -74,40 +107,14 @@ var deviceCommunicationLogger = loggerFactory.CreateLogger<TcpNetworkDeviceCommu
 var zvtClientLogger = loggerFactory.CreateLogger<ZvtClient>();
 
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", logger: deviceCommunicationLogger);
+
 var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger);
 ```
 
-### Set a custom terminal password
-
-```
-var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
-var zvtClient = new ZvtClient(deviceCommunication, password: 123456);
-```
-
-### Set a custom network device port
+### Set a custom network terminal device port
 
 ```
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", port: 20007);
-```
-
-### Start payment prcocess
-```cs
-var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
-await deviceCommunication.ConnectAsync();
-
-using var zvtClient = new ZvtClient(deviceCommunication);
-zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
-await zvtClient.PaymentAsync(10.5M);
-```
-
-### End-of-day
-```cs
-var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
-await deviceCommunication.ConnectAsync();
-
-using var zvtClient = new ZvtClient(deviceCommunication);
-zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(statusInformation.ErrorMessage);
-await zvtClient.EndOfDayAsync();
 ```
 
 ## ControlPanel
