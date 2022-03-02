@@ -101,7 +101,7 @@ namespace Portalum.Zvt
             }
             catch (Exception exception)
             {
-                this._logger?.LogError($"{nameof(ConnectAsync)} - {exception}");
+                this._logger.LogError($"{nameof(ConnectAsync)} - {exception}");
             }
 
             return Task.FromResult(false);
@@ -117,7 +117,7 @@ namespace Portalum.Zvt
             }
             catch (Exception exception)
             {
-                this._logger?.LogError($"{nameof(DisconnectAsync)} - {exception}");
+                this._logger.LogError($"{nameof(DisconnectAsync)} - {exception}");
             }
 
             return Task.FromResult(false);
@@ -125,7 +125,7 @@ namespace Portalum.Zvt
 
         private void Disconnected()
         {
-            this._logger?.LogInformation($"{nameof(Disconnected)}");
+            this._logger.LogInformation($"{nameof(Disconnected)}");
 
             this.ConnectionStateChanged?.Invoke(ConnectionState.Disconnected);
         }
@@ -152,7 +152,7 @@ namespace Portalum.Zvt
             var package = data.ToArray();
             this.DataSent?.Invoke(package);
 
-            this._logger?.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(package)}");
+            this._logger.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(package)}");
 
             this._serialPort.Write(package, 0, package.Length);
 
@@ -165,7 +165,7 @@ namespace Portalum.Zvt
 
             this._serialPort.Read(buffer, 0, buffer.Length);
 
-            this._logger?.LogDebug($"{nameof(Receive)} - {BitConverter.ToString(buffer)}");
+            this._logger.LogDebug($"{nameof(Receive)} - {BitConverter.ToString(buffer)}");
             this.DataReceived?.Invoke(buffer);
         }
     }
