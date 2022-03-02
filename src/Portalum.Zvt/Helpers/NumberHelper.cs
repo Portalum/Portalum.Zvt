@@ -99,7 +99,7 @@ namespace Portalum.Zvt.Helpers
         {
             if (boolArray.Length > 31)
             {
-                throw new ApplicationException("Too many elements to be converted to a single int");
+                throw new ArgumentException("Too many elements to be converted to a single int", nameof(boolArray));
             }
 
             var val = 0;

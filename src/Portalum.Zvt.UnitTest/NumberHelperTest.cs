@@ -87,5 +87,32 @@ namespace Portalum.Zvt.UnitTest
             var result = NumberHelper.IntToBcd(number, 2);
             Assert.IsTrue(result.SequenceEqual(expected));
         }
+
+        [TestMethod]
+        public void BcdToInt_ValidBcdNumber_Successful()
+        {
+            var bcdNumber = new byte[] { 0x09, 0x78 };
+            var expectedNumber = 978;
+
+            var number = NumberHelper.BcdToInt(bcdNumber);
+            Assert.AreEqual(expectedNumber, number);
+        }
+
+        [TestMethod]
+        public void BcdToInt_InvalidBcdNumber_Failure()
+        {
+            var bcdNumber = new byte[] { 0x09, 0x78, 0x09, 0x78, 0x09, 0x78 };
+            var expectedNumber = 0;
+
+            var number = NumberHelper.BcdToInt(bcdNumber);
+            Assert.AreEqual(expectedNumber, number);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void BoolArrayToInt_ToManyElements_Failure()
+        {
+            var result = NumberHelper.BoolArrayToInt(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
+        }
     }
 }
