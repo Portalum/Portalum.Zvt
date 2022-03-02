@@ -9,6 +9,7 @@
         /// State
         /// </summary>
         public CommandResponseState State { get; set; }
+
         /// <summary>
         /// Error Message
         /// </summary>
