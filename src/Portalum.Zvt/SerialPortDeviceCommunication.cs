@@ -81,7 +81,7 @@ namespace Portalum.Zvt
         /// <inheritdoc />
         public bool IsConnected
         {
-            get { return false; }
+            get { return this._serialPort.IsOpen; }
         }
 
         /// <inheritdoc />
