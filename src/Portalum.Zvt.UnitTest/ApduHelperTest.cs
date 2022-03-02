@@ -76,7 +76,7 @@ namespace Portalum.Zvt.UnitTest
 
             var apduInfo = ApduHelper.GetApduInfo(data);
             Assert.IsTrue(apduInfo.ControlField.SequenceEqual(new byte[] { 0x04, 0x0F }));
-            Assert.AreEqual(65535, apduInfo.DataLength);
+            Assert.AreEqual(ushort.MaxValue, apduInfo.DataLength);
 
             var apduData = data.AsSpan().Slice(apduInfo.DataStartIndex);
             Assert.AreEqual(0x6C, apduData[0]);

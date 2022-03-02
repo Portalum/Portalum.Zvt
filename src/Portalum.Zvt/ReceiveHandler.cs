@@ -25,7 +25,7 @@ namespace Portalum.Zvt
         private readonly IIntermediateStatusInformationParser _intermediateStatusInformationParser;
         private readonly List<byte[]> _availableControlFields;
 
-        private byte[] _receiveBuffer = new byte[10000];
+        private readonly byte[] _receiveBuffer = new byte[ushort.MaxValue];
         private int _receiveBufferEndPosition = 0;
         private int _missingDataOfExpectedPackage = 0;
 
