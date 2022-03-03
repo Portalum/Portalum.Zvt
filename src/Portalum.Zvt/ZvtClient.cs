@@ -239,10 +239,13 @@ namespace Portalum.Zvt
 
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
-                if (!await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken))
+                var sendCommandResult = await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken);
+                if (sendCommandResult != SendCommandResult.AcknowledgeReceived)
                 {
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command");
                     commandResponse.State = CommandResponseState.Error;
+                    commandResponse.ErrorMessage = sendCommandResult.ToString();
+
                     return commandResponse;
                 }
 

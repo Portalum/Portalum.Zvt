@@ -14,5 +14,16 @@
         /// Error Message
         /// </summary>
         public string ErrorMessage { get; set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(this.ErrorMessage))
+            {
+                return $"State:{this.State}";
+            }
+
+            return $"State:{this.State} ErrorMessage:{this.ErrorMessage}";
+        }
     }
 }
