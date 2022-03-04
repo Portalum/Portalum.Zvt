@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Application.ico</ApplicationIcon>
 
-    <Version>2.10.3</Version>
+    <Version>2.13.0</Version>
     <Company>Portalum</Company>
   </PropertyGroup>
 
