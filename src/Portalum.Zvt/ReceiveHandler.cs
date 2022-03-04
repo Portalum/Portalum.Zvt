@@ -262,8 +262,17 @@ namespace Portalum.Zvt
             //Abort (3.3 Abort)
             if (apduInfo.CanHandle(this._abortCommandControlField))
             {
-                var errorCode = apduData[0];
-                var errorMessage = this._errorMessageRepository.GetMessage(errorCode);
+                var errorMessage = string.Empty;
+
+                if (apduData.Length > 0)
+                {
+                    var errorCode = apduData[0];
+                    errorMessage = this._errorMessageRepository.GetMessage(errorCode);
+                }
+                else
+                {
+                    errorMessage = "Cannot detect error code";
+                }
 
                 this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Abort' received with message:{errorMessage}");
                 this.AbortReceived?.Invoke(errorMessage);

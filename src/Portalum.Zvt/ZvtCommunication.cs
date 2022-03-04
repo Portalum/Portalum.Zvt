@@ -106,7 +106,7 @@ namespace Portalum.Zvt
             {
                 if (task.Status == TaskStatus.RanToCompletion)
                 {
-                    this._logger.LogError($"{nameof(SendCommandAsync)} - Wait for acknowledge is aborted");
+                    this._logger.LogError($"{nameof(SendCommandAsync)} - Wait task for acknowledge was aborted");
                 }
 
                 this._waitForAcknowledge = false;
