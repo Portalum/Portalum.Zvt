@@ -154,7 +154,7 @@ Provider | Country | Terminal |
 CardComplete | Austria | ingenico iWL250 |
 Hobex | Austria | ingenico Desk/3500 |
 Wordline/PAYONE (SIX) | Austria | yomani touch family |
-TSS Telco Sales Services | Austria | PAX A80 |
+Global Payments | Austria | PAX A80 |
 
 ### Known deviations from the standard ZVT protocol
 
