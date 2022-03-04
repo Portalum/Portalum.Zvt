@@ -16,7 +16,14 @@ namespace Portalum.Zvt.UnitTest
             var loggerDeviceCommunication = LoggerHelper.GetLogger<SerialPortDeviceCommunication>();
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
 
-            using var communication = new SerialPortDeviceCommunication(this._comPort, 9600, Parity.None, 8, StopBits.One, loggerDeviceCommunication.Object);
+            using var communication = new SerialPortDeviceCommunication(
+                comPort: this._comPort,
+                baudRate: 115200,
+                parity: Parity.None,
+                dataBits: 8,
+                stopBits: StopBits.One,
+                logger: loggerDeviceCommunication.Object);
+
             var isConnected = await communication.ConnectAsync();
             Assert.IsTrue(isConnected);
 

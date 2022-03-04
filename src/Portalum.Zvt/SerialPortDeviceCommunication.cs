@@ -149,7 +149,7 @@ namespace Portalum.Zvt
 
             tempData.AddRange(cs2);
 
-            var package = data.ToArray();
+            var package = tempData.ToArray();
             this.DataSent?.Invoke(package);
 
             this._logger.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(package)}");
