@@ -29,6 +29,7 @@ namespace Portalum.Zvt
         public event Action<ConnectionState> ConnectionStateChanged;
 
         private const byte DLE = 0x10;
+        private const byte STX = 0x02;
 
         /// <summary>
         /// SerialPort DeviceCommunication
@@ -58,6 +59,7 @@ namespace Portalum.Zvt
             this._logger.LogInformation($"{nameof(SerialPortDeviceCommunication)} - This is an untested prototype");
 
             this._serialPort = new SerialPort(comPort, baudRate, parity, dataBits, stopBits);
+
             this._serialPort.DataReceived += this.Receive;
         }
 
@@ -137,6 +139,10 @@ namespace Portalum.Zvt
             var cs2 = new byte[] { (byte)(checksum >> 8), (byte)(checksum & 0xFF) };
 
             var tempData = new List<byte>();
+
+            tempData.Add(DLE);
+            tempData.Add(STX);
+
             foreach (var b in data)
             {
                 tempData.Add(b);
@@ -146,6 +152,9 @@ namespace Portalum.Zvt
                     tempData.Add(b);
                 }
             }
+
+            tempData.Add(DLE);
+            tempData.Add(STX);
 
             tempData.AddRange(cs2);
 
