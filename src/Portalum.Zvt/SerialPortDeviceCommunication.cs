@@ -4,7 +4,6 @@ using Portalum.Zvt.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,8 +27,9 @@ namespace Portalum.Zvt
         /// <inheritdoc />
         public event Action<ConnectionState> ConnectionStateChanged;
 
-        private const byte DLE = 0x10;
-        private const byte STX = 0x02;
+        private const byte DLE = 0x10; //Data line escape
+        private const byte STX = 0x02; //Start of text
+        private const byte ETX = 0x03; //End of text
 
         /// <summary>
         /// SerialPort DeviceCommunication
@@ -59,7 +59,7 @@ namespace Portalum.Zvt
             this._logger.LogInformation($"{nameof(SerialPortDeviceCommunication)} - This is an untested prototype");
 
             this._serialPort = new SerialPort(comPort, baudRate, parity, dataBits, stopBits);
-
+            this._serialPort.ReceivedBytesThreshold = 2;
             this._serialPort.DataReceived += this.Receive;
         }
 
@@ -154,7 +154,7 @@ namespace Portalum.Zvt
             }
 
             tempData.Add(DLE);
-            tempData.Add(STX);
+            tempData.Add(ETX);
 
             tempData.AddRange(cs2);
 
