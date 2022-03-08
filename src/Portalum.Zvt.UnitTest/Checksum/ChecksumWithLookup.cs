@@ -1,9 +1,14 @@
-﻿namespace Portalum.Zvt.UnitTest
+﻿using System;
+
+namespace Portalum.Zvt.UnitTest
 {
     public static class ChecksumWithLookup
     {
         private static ushort[] LookupTable;
 
+        /// <summary>
+        /// Create LookupTable
+        /// </summary>
         public static void CreateLookupTable()
         {
             LookupTable = new ushort[256];
@@ -27,12 +32,18 @@
             }
         }
 
-        public static byte[] ComputeHash(byte[] data)
+        /// <summary>
+        /// Calculate Checksum
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] ComputeHash(Span<byte> data)
         {
             var max = 256;
             var temp = 0;
-            var lowByte = 0;
-            var highByte = 0;
+
+            int lowByte;
+            int highByte;
 
             for (var i = 0; i < data.Length; i++)
             {
