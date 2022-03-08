@@ -174,7 +174,7 @@ Common `Ports` of the device are 20007, 20008
 
 ### Serial
 
-Common `BaudRates` are 9600, 115200, the default `Parity` is none, defaul `DataBits` are 8, default `StopBits` 2
+Common `BaudRates` is *9600* or *115200*, default `Parity` is *None*, default `DataBits` is *8*, default `StopBits` is *2*
 
 ## ZVT Documentation
 
