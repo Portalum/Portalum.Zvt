@@ -166,6 +166,16 @@ Global Payments | Austria | PAX A80 |
 - No `Print Line` support
 - Sends TLV data even without `TLV-activation`
 
+## General info on the connection of payment terminals
+
+### TCP
+
+Common `Ports` of the device are 20007, 20008
+
+### Serial
+
+Common `BaudRates` are 9600, 115200, the default `Parity` is none, defaul `DataBits` are 8, default `StopBits` 2
+
 ## ZVT Documentation
 
 The official documentation of the ZVT protocol is available here
