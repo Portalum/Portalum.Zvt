@@ -32,7 +32,7 @@ namespace Portalum.Zvt.UnitTest
 
             Assert.AreEqual("Abbruch durch Kunde", statusInformation.AdditionalText);
             Assert.AreEqual("abort via timeout or abort-key", statusInformation.ErrorMessage);
-            Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
+            Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
         }
 
         [TestMethod]
@@ -48,7 +48,7 @@ namespace Portalum.Zvt.UnitTest
 
             Assert.AreEqual("Betrag falsch", statusInformation.AdditionalText);
             Assert.AreEqual("system error (= other/unknown error), See TLV tags 1F16 and 1F17", statusInformation.ErrorMessage);
-            Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
+            Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(470, statusInformation.TurnoverRecordNumber);
             Assert.AreEqual(1, statusInformation.CardSequenceNumber);
             Assert.AreEqual(new TimeSpan(22, 39, 53), statusInformation.Time);
-            Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
+            Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
         }
 
         [TestMethod]
@@ -89,7 +89,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual("GEN.NR.:978539", statusInformation.AdditionalText);
             Assert.AreEqual("Debit Mastercard", statusInformation.CardName);
             Assert.AreEqual(20.4M, statusInformation.Amount);
-            Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
+            Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
         }
 
         [TestMethod]
@@ -106,7 +106,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual("GEN.NR.:715691", statusInformation.AdditionalText);
             Assert.AreEqual("Debit Mastercard", statusInformation.CardName);
             Assert.AreEqual(1M, statusInformation.Amount);
-            Assert.AreEqual(671107177, statusInformation.TerminalIdentifier);
+            Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
             Assert.AreEqual("NFC", statusInformation.CardTechnology);
             Assert.AreEqual(607, statusInformation.TraceNumber);
         }
