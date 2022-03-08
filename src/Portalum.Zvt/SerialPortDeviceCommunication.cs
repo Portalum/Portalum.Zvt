@@ -32,7 +32,8 @@ namespace Portalum.Zvt
         private const byte DLE = 0x10; //Data line escape
         private const byte STX = 0x02; //Start of text
         private const byte ETX = 0x03; //End of text
-        private const byte ACK = 0x06; //Acknowledge
+        private const byte ACK = 0x06; //Acknowledged
+        private const byte NAK = 0x15; //Not acknowledged
 
         /// <summary>
         /// SerialPort DeviceCommunication
@@ -216,10 +217,6 @@ namespace Portalum.Zvt
 
             this._logger.LogDebug($"{nameof(Receive)} - Process buffer {BitConverter.ToString(rawBufferData)}");
 
-            //TODO: Send acknowledge only if checksum valid
-            var acknowledge = new byte[] { ACK };
-            this.SendInternal(acknowledge, checkAcknowlege: false);
-
             var cleanData = new List<byte>();
             for (var i = 0; i < rawBufferData.Length; i++)
             {
@@ -248,6 +245,26 @@ namespace Portalum.Zvt
                 }
 
                 cleanData.Add(b);
+            }
+
+            var receiveChecksum = cleanData.Skip(cleanData.Count - 2);
+            var checksum1 = ChecksumHelper.CalcCrc2(cleanData.Take(cleanData.Count - 2));
+            var cs2 = new byte[] { (byte)(checksum1 >> 8), (byte)(checksum1 & 0xFF) };
+
+            if (Enumerable.SequenceEqual(cs2, receiveChecksum))
+            {
+                var acknowledged = new byte[] { ACK };
+                this.SendInternal(acknowledged, checkAcknowlege: false);
+            }
+            else
+            {
+                this._logger.LogWarning("Checksum invalid");
+
+                var notAcknowledged = new byte[] { NAK };
+                this.SendInternal(notAcknowledged, checkAcknowlege: false);
+
+                this._buffer.Clear();
+                return;
             }
 
             this.DataReceived?.Invoke(cleanData.Take(cleanData.Count - 2).ToArray());
