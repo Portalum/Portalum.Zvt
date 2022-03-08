@@ -44,12 +44,18 @@ namespace Portalum.Zvt.Helpers
             {
                 item.DataLength = packageData[0];
                 item.DataStartIndex = startIndex;
+
+                return item;
             }
-            else
+
+            if (startIndex + ExtendedLengthFieldByteCount > data.Length)
             {
-                item.DataLength = BitConverter.ToUInt16(data.Slice(startIndex, ExtendedLengthFieldByteCount).ToArray(), 0);
-                item.DataStartIndex = startIndex + ExtendedLengthFieldByteCount;
+                //Corrupt apdu data
+                return new ApduResponseInfo();
             }
+
+            item.DataLength = BitConverter.ToUInt16(data.Slice(startIndex, ExtendedLengthFieldByteCount).ToArray(), 0);
+            item.DataStartIndex = startIndex + ExtendedLengthFieldByteCount;
 
             return item;
         }

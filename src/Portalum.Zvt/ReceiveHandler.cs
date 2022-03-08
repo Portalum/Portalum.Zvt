@@ -113,6 +113,11 @@ namespace Portalum.Zvt
         /// <inheritdoc />
         public bool ProcessData(Span<byte> data)
         {
+            if (data.Length == 0)
+            {
+                return false;
+            }
+
             var apduInfo = ApduHelper.GetApduInfo(data);
 
             Span<byte> apduData = null;

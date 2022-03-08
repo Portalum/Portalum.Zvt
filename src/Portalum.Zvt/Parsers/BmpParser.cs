@@ -721,8 +721,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseTerminalIdentifier typedResponse)
             {
-                Array.Reverse(data);
-                var terminalIdentifier = BitConverter.ToInt32(data, 0);
+                var terminalIdentifier = NumberHelper.BcdToInt(data);
 
                 typedResponse.TerminalIdentifier = terminalIdentifier;
 

@@ -31,6 +31,17 @@ namespace Portalum.Zvt.UnitTest
         }
 
         [TestMethod]
+        public void GetApduInfo_CorruptData3_Successful()
+        {
+            var data = new byte[3] { 0x1E, 0x01, 0xFF };
+
+            var apduInfo = ApduHelper.GetApduInfo(data);
+            Assert.IsNull(apduInfo.ControlField);
+            Assert.AreEqual(0, apduInfo.DataLength);
+            Assert.AreEqual(0, apduInfo.DataStartIndex);
+        }
+
+        [TestMethod]
         public void GetApduInfo_DefaultLengthField_Successful()
         {
             var data = new byte[] { 0x04, 0x0F, 0x01, 0x6C };

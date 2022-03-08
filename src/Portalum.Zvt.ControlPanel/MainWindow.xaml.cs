@@ -357,6 +357,11 @@ namespace Portalum.Zvt.ControlPanel
 
         private void StatusInformationReceived(StatusInformation statusInformation)
         {
+            if (statusInformation == null)
+            {
+                return;
+            }
+
             this.IntermediateStatusInformationReceived(string.Empty);
 
             var lines = new List<string>();
