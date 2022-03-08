@@ -93,7 +93,7 @@ namespace Portalum.Zvt
             this._waitForAcknowledge = true;
             try
             {
-                await this._deviceCommunication.SendAsync(data);
+                await this._deviceCommunication.SendAsync(data, linkedCancellationTokenSource.Token).ContinueWith(task => { });
             }
             catch (Exception exception)
             {

@@ -52,7 +52,8 @@ namespace Portalum.Zvt
         /// Send data to the device
         /// </summary>
         /// <param name="data"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task SendAsync(byte[] data);
+        Task SendAsync(byte[] data, CancellationToken cancellationToken = default);
     }
 }

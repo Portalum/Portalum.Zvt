@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Portalum.Zvt.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading;
@@ -18,7 +19,7 @@ namespace Portalum.Zvt
         private readonly ILogger<SerialPortDeviceCommunication> _logger;
         private readonly string _comPort;
         private readonly SerialPort _serialPort;
-        private readonly List<byte> _buffer = new List<byte>();
+        private readonly List<byte> _receiveBuffer = new List<byte>();
 
         /// <inheritdoc />
         public event Action<byte[]> DataReceived;
@@ -34,6 +35,9 @@ namespace Portalum.Zvt
         private const byte ETX = 0x03; //End of text
         private const byte ACK = 0x06; //Acknowledged
         private const byte NAK = 0x15; //Not acknowledged
+        private const int MINIMUM_MESSAGE_SIZE = 7; //DLE + STX + APDU + DLE + ETX + CRC Checksum (2 bytes)
+        private const int ETX_POSITION_INSIDE_MESSAGE = 3; //The third last byte
+        private const int CHECKSUM_LENGTH = 2;
 
         /// <summary>
         /// SerialPort DeviceCommunication
@@ -63,7 +67,6 @@ namespace Portalum.Zvt
             this._logger.LogInformation($"{nameof(SerialPortDeviceCommunication)} - This is an untested prototype");
 
             this._serialPort = new SerialPort(comPort, baudRate, parity, dataBits, stopBits);
-            this._serialPort.ReceivedBytesThreshold = 2;
             this._serialPort.DataReceived += this.Receive;
         }
 
@@ -137,64 +140,71 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public Task SendAsync(byte[] data)
+        public Task SendAsync(
+            byte[] data,
+            CancellationToken cancellationToken = default)
         {
             var checksum = ChecksumHelper.CalcCrc2(data);
             var cs2 = new byte[] { (byte)(checksum >> 8), (byte)(checksum & 0xFF) };
 
-            var tempData = new List<byte>();
-
-            tempData.Add(DLE);
-            tempData.Add(STX);
-
-            foreach (var b in data)
+            using (var memoryStream = new MemoryStream())
             {
-                tempData.Add(b);
+                #region Prepare data package
 
-                if (b == DLE)
+                memoryStream.WriteByte(DLE);
+                memoryStream.WriteByte(STX);
+
+                foreach (var b in data)
                 {
-                    tempData.Add(b);
+                    memoryStream.WriteByte(b);
+
+                    if (b == DLE)
+                    {
+                        memoryStream.WriteByte(b);
+                    }
                 }
-            }
 
-            tempData.Add(DLE);
-            tempData.Add(ETX);
+                memoryStream.WriteByte(DLE);
+                memoryStream.WriteByte(ETX);
 
-            tempData.AddRange(cs2);
+                memoryStream.Write(cs2, 0, cs2.Length);
 
-            var package = tempData.ToArray();
+                #endregion
 
-            this.SendInternal(package);
+                var package = memoryStream.ToArray();
 
-            return Task.CompletedTask;
-        }
+                #region Send and wait for Acknowledge
 
-        private void SendInternal(byte[] data, bool checkAcknowlege = true)
-        {
-            this.DataSent?.Invoke(data);
-
-            this._logger.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(data)}");
-
-            if (checkAcknowlege)
-            {
                 this._serialPort.DataReceived -= this.Receive;
-                this._serialPort.Write(data, 0, data.Length);
-                while (true)
+                this.SendRaw(package);
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    //After a command always an acknowledge is send from the pt device
+                    //After a command always an acknowledge is send from the payment terminal device
                     var byte1 = (byte)this._serialPort.ReadByte();
                     if (byte1 == ACK)
                     {
-                        this._logger.LogInformation("Acknowledge received");
+                        this._logger.LogInformation($"{nameof(SendAsync)} - Acknowledge received");
                         break;
                     }
                 }
                 this._serialPort.DataReceived += this.Receive;
+
+                #endregion
             }
-            else
+
+            return Task.CompletedTask;
+        }
+
+        private void SendRaw(params byte[] data)
+        {
+            this.DataSent?.Invoke(data);
+
+            if (this._logger.IsEnabled(LogLevel.Debug))
             {
-                this._serialPort.Write(data, 0, data.Length);
-            }           
+                this._logger.LogDebug($"{nameof(SendRaw)} - {BitConverter.ToString(data)}");
+            }
+
+            this._serialPort.Write(data, 0, data.Length);         
         }
 
         private void Receive(object sender, SerialDataReceivedEventArgs e)
@@ -205,70 +215,75 @@ namespace Portalum.Zvt
 
             this._logger.LogDebug($"{nameof(Receive)} - {BitConverter.ToString(buffer)}");
 
-            this._buffer.AddRange(buffer);
+            this._receiveBuffer.AddRange(buffer);
 
-            if (this._buffer.Count < 3 || this._buffer[this._buffer.Count - 3] != ETX)
+            if (this._receiveBuffer.Count < MINIMUM_MESSAGE_SIZE ||
+                this._receiveBuffer[this._receiveBuffer.Count - ETX_POSITION_INSIDE_MESSAGE] != ETX)
             {
                 this._logger.LogDebug($"{nameof(Receive)} - Add to buffer");
                 return;
             }
 
-            var rawBufferData = this._buffer.ToArray();
+            var rawBufferData = this._receiveBuffer.ToArray();
 
             this._logger.LogDebug($"{nameof(Receive)} - Process buffer {BitConverter.ToString(rawBufferData)}");
 
-            var cleanData = new List<byte>();
+            var cleanedData = new List<byte>();
             for (var i = 0; i < rawBufferData.Length; i++)
             {
                 var b = rawBufferData[i];
 
+                //Remove DLE STX start sequence
                 if (i == 0)
                 {
-                    if (rawBufferData[0] == DLE && rawBufferData[1] == STX)
+                    if (rawBufferData[i] == DLE && rawBufferData[i + 1] == STX)
                     {
                         i++;
                         continue;
                     }
                 }
 
-                if (rawBufferData[i] == DLE && rawBufferData[i+1] == ETX)
+                //Check a next byte is available
+                if ((i + 1) < rawBufferData.Length)
                 {
-                    i++;
-                    continue;
+                    //Remove DLE ETX sequence before checksum
+                    if (rawBufferData[i] == DLE && rawBufferData[i + 1] == ETX)
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    //Remove second DLE
+                    if (rawBufferData[i] == DLE && rawBufferData[i + 1] == DLE)
+                    {
+                        cleanedData.Add(b);
+                        i++;
+                        continue;
+                    }
                 }
 
-                if (rawBufferData[i] == DLE && rawBufferData[i + 1] == DLE)
-                {
-                    cleanData.Add(b);
-                    i++;
-                    continue;
-                }
-
-                cleanData.Add(b);
+                cleanedData.Add(b);
             }
 
-            var receiveChecksum = cleanData.Skip(cleanData.Count - 2);
-            var checksum1 = ChecksumHelper.CalcCrc2(cleanData.Take(cleanData.Count - 2));
-            var cs2 = new byte[] { (byte)(checksum1 >> 8), (byte)(checksum1 & 0xFF) };
+            var receiveChecksum = cleanedData.Skip(cleanedData.Count - CHECKSUM_LENGTH);
+            var receiveDataWithoutChecksum = cleanedData.Take(cleanedData.Count - CHECKSUM_LENGTH);
+
+            var calculatedChecksum = ChecksumHelper.CalcCrc2(receiveDataWithoutChecksum);
+            var cs2 = new byte[] { (byte)(calculatedChecksum >> 8), (byte)(calculatedChecksum & 0xFF) };
 
             if (Enumerable.SequenceEqual(cs2, receiveChecksum))
             {
-                var acknowledged = new byte[] { ACK };
-                this.SendInternal(acknowledged, checkAcknowlege: false);
-            }
-            else
-            {
-                this._logger.LogWarning("Checksum invalid");
+                this.SendRaw(ACK);
+                this._receiveBuffer.Clear();
 
-                var notAcknowledged = new byte[] { NAK };
-                this.SendInternal(notAcknowledged, checkAcknowlege: false);
-
-                this._buffer.Clear();
+                this.DataReceived?.Invoke(receiveDataWithoutChecksum.ToArray());
                 return;
             }
 
-            this.DataReceived?.Invoke(cleanData.Take(cleanData.Count - 2).ToArray());
-            this._buffer.Clear();
+            this._logger.LogWarning($"{nameof(Receive)} - Checksum invalid");
+
+            this.SendRaw(NAK);
+            this._receiveBuffer.Clear();
         }
     }
 }

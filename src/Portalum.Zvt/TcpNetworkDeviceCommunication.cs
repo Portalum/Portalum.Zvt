@@ -202,12 +202,14 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public async Task SendAsync(byte[] data)
+        public async Task SendAsync(
+            byte[] data,
+            CancellationToken cancellationToken = default)
         {
             this.DataSent?.Invoke(data);
 
             this._logger.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(data)}");
-            await this._tcpClient.SendAsync(data);
+            await this._tcpClient.SendAsync(data, cancellationToken);
         }
     }
 }
