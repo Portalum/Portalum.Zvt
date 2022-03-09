@@ -8,8 +8,11 @@ namespace Portalum.Zvt.UnitTest
         [TestMethod]
         public void GetServiceByte_CheckServiceByte1_Successful()
         {
-            var registrationConfig = new RegistrationConfig();
-            registrationConfig.ServiceMenuIsDisabledOnTheFunctionKeyOfThePaymentTerminal = true;
+            var registrationConfig = new RegistrationConfig
+            {
+                ServiceMenuIsDisabledOnTheFunctionKeyOfThePaymentTerminal = true
+            };
+
             var serviceByte = registrationConfig.GetServiceByte();
 
             Assert.AreEqual(0x01, serviceByte);
@@ -18,9 +21,12 @@ namespace Portalum.Zvt.UnitTest
         [TestMethod]
         public void GetServiceByte_CheckServiceByte2_Successful()
         {
-            var registrationConfig = new RegistrationConfig();
-            registrationConfig.ServiceMenuIsDisabledOnTheFunctionKeyOfThePaymentTerminal = true;
-            registrationConfig.TextAtDisplayInCapitalLettersAtThePaymentTerminal = true;
+            var registrationConfig = new RegistrationConfig
+            {
+                ServiceMenuIsDisabledOnTheFunctionKeyOfThePaymentTerminal = true,
+                TextAtDisplayInCapitalLettersAtThePaymentTerminal = true
+            };
+
             var serviceByte = registrationConfig.GetServiceByte();
 
             Assert.AreEqual(0x03, serviceByte);
