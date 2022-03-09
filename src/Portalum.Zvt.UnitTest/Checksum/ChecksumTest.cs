@@ -33,7 +33,7 @@ namespace Portalum.Zvt.UnitTest
                 var checksum = ChecksumHelper.CalcCrc2(data);
                 var expected = new byte[] { (byte)(checksum >> 8), (byte)(checksum & 0xFF) };
                 sw.Stop();
-                Debug.WriteLine($"A - {sw.Elapsed.TotalMilliseconds}ms");
+                Trace.WriteLine($"A - {sw.Elapsed.TotalMilliseconds}ms");
 
                 //Current Checksum calculator add automatic 0x03 byte on the end
 
@@ -46,14 +46,14 @@ namespace Portalum.Zvt.UnitTest
                 var calculator = new CRC16(CRC16.Definition.Ccitt);
                 var crc16Checksum = calculator.ComputeHash(data2);
                 sw.Stop();
-                Debug.WriteLine($"B - {sw.Elapsed.TotalMilliseconds}ms");
+                Trace.WriteLine($"B - {sw.Elapsed.TotalMilliseconds}ms");
 
                 Assert.IsTrue(expected.SequenceEqual(crc16Checksum));
 
                 sw.Restart();
                 var easyChecksum1 = ChecksumWithLookup.ComputeHash(data2);
                 sw.Stop();
-                Debug.WriteLine($"C - {sw.Elapsed.TotalMilliseconds}ms");
+                Trace.WriteLine($"C - {sw.Elapsed.TotalMilliseconds}ms");
 
                 Assert.IsTrue(expected.SequenceEqual(easyChecksum1));
             }

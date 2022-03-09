@@ -232,7 +232,7 @@ namespace Portalum.Zvt.UnitTest
 
         private void ReceiveHandlerLineReceived(PrintLineInfo printLineInfo)
         {
-            Debug.WriteLine(printLineInfo.Text);
+            Trace.WriteLine(printLineInfo.Text);
             this._lineReceived = true;
         }
     }
