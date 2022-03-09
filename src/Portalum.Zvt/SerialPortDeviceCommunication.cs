@@ -64,8 +64,6 @@ namespace Portalum.Zvt
             }
             this._logger = logger;
 
-            this._logger.LogInformation($"{nameof(SerialPortDeviceCommunication)} - This is an untested prototype");
-
             this._serialPort = new SerialPort(comPort, baudRate, parity, dataBits, stopBits);
             this._serialPort.DataReceived += this.Receive;
         }
