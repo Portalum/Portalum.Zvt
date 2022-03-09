@@ -9,6 +9,7 @@
         /// Connected
         /// </summary>
         Connected,
+
         /// <summary>
         /// Disconnected
         /// </summary>
