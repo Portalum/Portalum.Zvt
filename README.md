@@ -136,7 +136,7 @@ With the Portalum.Zvt.ControlPanel you can test the different ZVT functions.
 
 **To use the tool, the following steps must be performed**
 
-- Install at least [.NET Desktop Runtime 6.0.2](https://dotnet.microsoft.com/download/dotnet/6.0)
+- Install at least [.NET Desktop Runtime 6.0.3](https://dotnet.microsoft.com/download/dotnet/6.0)
 - Download and extract the ControlPanel ([download](https://github.com/Portalum/Portalum.Zvt/releases/latest/download/Portalum.Zvt.ControlPanel.zip))
 
 ![Portalum.Zvt.ControlPanel](/doc/ControlPanel.png)
