@@ -42,7 +42,7 @@ namespace Portalum.Zvt.UnitTest
         public void DecimalToBcd_MaximumNumberOfDigits1_Successful()
         {
             var amount = 91_234_567_890M;
-            var expected = new byte[0];
+            var expected = Array.Empty<byte>();
 
             var result = NumberHelper.DecimalToBcd(amount);
             Assert.IsTrue(result.SequenceEqual(expected));
