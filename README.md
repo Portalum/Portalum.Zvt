@@ -166,6 +166,9 @@ Global Payments | Austria | PAX A80 |
 - No `Print Line` support
 - Sends TLV data even without `TLV-activation`
 
+#### Global Payments
+- Abort from ECR not possible 
+
 ## General info on the connection of payment terminals
 
 ### TCP
