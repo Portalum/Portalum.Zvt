@@ -21,7 +21,7 @@ namespace Portalum.Zvt.UnitTest
                 baudRate: 115200,
                 parity: Parity.None,
                 dataBits: 8,
-                stopBits: StopBits.One,
+                stopBits: StopBits.Two,
                 logger: loggerDeviceCommunication.Object);
 
             var isConnected = await communication.ConnectAsync();

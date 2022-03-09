@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Portalum.Zvt
 {
     /// <summary>
-    /// SerialPort DeviceCommunication (Untested prototype)
+    /// SerialPort DeviceCommunication
     /// </summary>
     public class SerialPortDeviceCommunication : IDeviceCommunication
     {
@@ -50,10 +50,10 @@ namespace Portalum.Zvt
         /// <param name="logger"></param>
         public SerialPortDeviceCommunication(
             string comPort,
-            int baudRate,
-            Parity parity,
-            int dataBits,
-            StopBits stopBits,
+            int baudRate = 9600,
+            Parity parity = Parity.None,
+            int dataBits = 8,
+            StopBits stopBits = StopBits.Two,
             ILogger<SerialPortDeviceCommunication> logger = default)
         {
             this._comPort = comPort;
