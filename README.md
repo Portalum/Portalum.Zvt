@@ -4,7 +4,7 @@
 
 Portalum.Zvt is a library designed to simplify communication with payment terminals via the **ZVT Protocol**. The library is based on Microsoft .NET.
 
-Communication via Network (TCP) is supported and communication via a serial connection is also provided. The most important commands for processing a payment transaction with an electronic POS system are also already integrated.
+Communication via Network (TCP) is supported and communication via a serial connection. The most important commands for processing a payment transaction with an electronic POS system are also already integrated.
 
 The aim of this project is to achieve uncomplicated acceptance by payment service providers. The more often this project is referred to, the better it should work. Please help us to achieve this.
 <br>
