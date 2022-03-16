@@ -8,7 +8,7 @@
         /// <summary>
         /// Acknowledge received
         /// </summary>
-        AcknowledgeReceived,
+        PositiveCompletionReceived,
 
         /// <summary>
         /// Negative completion received

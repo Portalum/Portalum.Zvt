@@ -14,13 +14,12 @@ namespace Portalum.Zvt
 {
     /// <summary>
     /// ZVT Client
-    /// Revision 13.09
     /// </summary>
     public class ZvtClient : IDisposable
     {
         /*
          * The implementation of this client is based on the following documents
-         * ZVT Revision 13.09 (2020-11-20)
+         * ZVT Revision 13.09 of terminalhersteller.de (2020-11-20)
          * - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
          * - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
         */
@@ -32,10 +31,29 @@ namespace Portalum.Zvt
         private IReceiveHandler _receiveHandler;
         private readonly TimeSpan _commandCompletionTimeout;
 
+        #region Events
+
+        /// <summary>
+        /// Receive detailed Information about a transaction
+        /// </summary>
         public event Action<StatusInformation> StatusInformationReceived;
+
+        /// <summary>
+        /// Receive the current transaction status for example 'waiting for card'
+        /// </summary>
         public event Action<string> IntermediateStatusInformationReceived;
+
+        /// <summary>
+        /// Receive single lines of a receipt
+        /// </summary>
         public event Action<PrintLineInfo> LineReceived;
+
+        /// <summary>
+        /// Receive a full receipt at once
+        /// </summary>
         public event Action<ReceiptInfo> ReceiptReceived;
+
+        #endregion
 
         /// <summary>
         /// ZvtClient
@@ -196,6 +214,13 @@ namespace Portalum.Zvt
             }
         }
 
+        /// <summary>
+        /// SendCommandAsync
+        /// </summary>
+        /// <param name="commandData">The data of the command</param>
+        /// <param name="endAfterAcknowledge">After receive an acknowledge the command is successful</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         private async Task<CommandResponse> SendCommandAsync(
             byte[] commandData,
             bool endAfterAcknowledge = false,
@@ -240,7 +265,7 @@ namespace Portalum.Zvt
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
                 var sendCommandResult = await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken);
-                if (sendCommandResult != SendCommandResult.AcknowledgeReceived)
+                if (sendCommandResult != SendCommandResult.PositiveCompletionReceived)
                 {
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command");
                     commandResponse.State = CommandResponseState.Error;
@@ -390,7 +415,7 @@ namespace Portalum.Zvt
 
             var package = new List<byte>();
             package.AddRange(this._passwordData);
-            package.Add(0x87); //Receipt-no prefix
+            package.Add(0x87); //ReceiptNumber prefix
             package.AddRange(NumberHelper.IntToBcd(receiptNumber, 2));
 
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x30 }, package);

@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 namespace Portalum.Zvt
 {
     /// <summary>
-    /// ZvtCommunication, automatic acknowledge processing
+    /// ZvtCommunication, automatic completion processing
+    /// This middle layer filters out completion packages and forwards the other data
     /// </summary>
     public class ZvtCommunication : IDisposable
     {
         private readonly ILogger _logger;
         private readonly IDeviceCommunication _deviceCommunication;
+
         private CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
         private byte[] _dataBuffer;
         private bool _waitForAcknowledge = false;
@@ -23,7 +25,10 @@ namespace Portalum.Zvt
         /// </summary>
         public event Action<byte[]> DataReceived;
 
-        private readonly byte[] _acknowledge = new byte[] { 0x80, 0x00, 0x00 };
+        private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
+        private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
+        private readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
+        private readonly byte _negativeCompletionPrefix = 0x84;
 
         /// <summary>
         /// ZvtCommunication
@@ -58,6 +63,10 @@ namespace Portalum.Zvt
             }
         }
 
+        /// <summary>
+        /// Switch for incoming data
+        /// </summary>
+        /// <param name="data"></param>
         private void ProcessDataReceived(byte[] data)
         {
             if (this._waitForAcknowledge)
@@ -67,22 +76,24 @@ namespace Portalum.Zvt
                 return;
             }
 
+            //TODO: Send only one completion for fragmented data
             //Send acknowledge before process the data
-            this._deviceCommunication.SendAsync(this._acknowledge);
+            this._deviceCommunication.SendAsync(this._positiveCompletionData1);
 
+            //TODO: Connect receive handler with a response
             this.DataReceived?.Invoke(data);
         }
 
         /// <summary>
         /// Send command
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="acknowledgeReceiveTimeout">T3 Timeout in milliseconds, default 5 seconds</param>
+        /// <param name="commandData">The data of the command</param>
+        /// <param name="acknowledgeReceiveTimeoutMilliseconds">Maximum waiting time for the acknowledge package, default is 5 seconds, T3 Timeout</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<SendCommandResult> SendCommandAsync(
-            byte[] data,
-            int acknowledgeReceiveTimeout = 5000,
+            byte[] commandData,
+            int acknowledgeReceiveTimeoutMilliseconds = 5000,
             CancellationToken cancellationToken = default)
         {
             this._acknowledgeReceivedCancellationTokenSource?.Dispose();
@@ -93,7 +104,7 @@ namespace Portalum.Zvt
             this._waitForAcknowledge = true;
             try
             {
-                await this._deviceCommunication.SendAsync(data, linkedCancellationTokenSource.Token).ContinueWith(task => { });
+                await this._deviceCommunication.SendAsync(commandData, linkedCancellationTokenSource.Token).ContinueWith(task => { });
             }
             catch (Exception exception)
             {
@@ -102,7 +113,7 @@ namespace Portalum.Zvt
                 return SendCommandResult.SendFailure;
             }
 
-            await Task.Delay(acknowledgeReceiveTimeout, linkedCancellationTokenSource.Token).ContinueWith(task =>
+            await Task.Delay(acknowledgeReceiveTimeoutMilliseconds, linkedCancellationTokenSource.Token).ContinueWith(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion)
                 {
@@ -119,18 +130,75 @@ namespace Portalum.Zvt
                 return SendCommandResult.NoDataReceived;
             }
 
-            if (this._dataBuffer.SequenceEqual(this._acknowledge))
+            if (this.CheckIsPositiveCompletion())
             {
-                return SendCommandResult.AcknowledgeReceived;
+                return SendCommandResult.PositiveCompletionReceived;
             }
 
-            if (this._dataBuffer.Length > 2 && this._dataBuffer[0] == 0x84 && this._dataBuffer[1] != 0x00)
+            if (this.CheckIsNegativeCompletion())
             {
                 this._logger.LogError($"{nameof(SendCommandAsync)} - 'Negative completion' received");
                 return SendCommandResult.NegativeCompletionReceived;
             }
 
             return SendCommandResult.UnknownFailure;
+        }
+
+        private bool CheckIsPositiveCompletion()
+        {
+            if (this._dataBuffer.Length < 3)
+            {
+                return false;
+            }
+
+            var buffer = this._dataBuffer.AsSpan().Slice(0, 3);
+
+            if (buffer.SequenceEqual(this._positiveCompletionData1))
+            {
+                return true;
+            }
+
+            if (buffer.SequenceEqual(this._positiveCompletionData2))
+            {
+                return true;
+            }
+
+            if (buffer.SequenceEqual(this._positiveCompletionData3))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool CheckIsNegativeCompletion()
+        {
+            if (this._dataBuffer.Length < 3)
+            {
+                return false;
+            }
+
+            if (this._dataBuffer[0] == this._negativeCompletionPrefix)
+            {
+                var errorByte = this._dataBuffer[1];
+                this._logger.LogDebug($"{nameof(CheckIsNegativeCompletion)} - ErrorCode:{errorByte:X2}");
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ForwardUnusedBufferData()
+        {
+            if (this._dataBuffer.Length == 3)
+            {
+                this._dataBuffer = null;
+                return;
+            }
+
+            this._dataBuffer.AsSpan().Slice(3).ToArray();
+            //TODO: Forward the unused data to ReceiveHandler
         }
     }
 }

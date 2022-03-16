@@ -16,13 +16,13 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtCommunication = new ZvtCommunication(loggerZvtCommunication.Object, mockDeviceCommunication.Object);
 
-            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeout: 1000);
+            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeoutMilliseconds: 1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
             var sendCommandResult = await sendCommandTask;
 
             zvtCommunication.Dispose();
 
-            Assert.AreEqual(SendCommandResult.AcknowledgeReceived, sendCommandResult);
+            Assert.AreEqual(SendCommandResult.PositiveCompletionReceived, sendCommandResult);
         }
 
         [TestMethod]
@@ -35,7 +35,7 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtCommunication = new ZvtCommunication(loggerZvtCommunication.Object, mockDeviceCommunication.Object);
 
-            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeout: timeout);
+            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeoutMilliseconds: timeout);
             await Task.Delay(timeout + 100);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
             var sendCommandResult = await sendCommandTask;
@@ -53,7 +53,7 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtCommunication = new ZvtCommunication(loggerZvtCommunication.Object, mockDeviceCommunication.Object);
 
-            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeout: 1000);
+            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeoutMilliseconds: 1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x84, 0x01, 0x00 });
             var sendCommandResult = await sendCommandTask;
 
@@ -70,7 +70,7 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtCommunication = new ZvtCommunication(loggerZvtCommunication.Object, mockDeviceCommunication.Object);
 
-            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeout: 1000);
+            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeoutMilliseconds: 1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x01, 0x02, 0x03 });
             var sendCommandResult = await sendCommandTask;
 
@@ -87,7 +87,7 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtCommunication = new ZvtCommunication(loggerZvtCommunication.Object, mockDeviceCommunication.Object);
 
-            var sendCommandResult = await zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeout: 1000);
+            var sendCommandResult = await zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeoutMilliseconds: 1000);
 
             zvtCommunication.Dispose();
 
