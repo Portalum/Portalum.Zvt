@@ -194,10 +194,8 @@ namespace Portalum.Zvt.UnitTest
             foreach (var hexLine in hexLines)
             {
                 var data = ByteHelper.HexToByteArray(hexLine);
-                if (receiveHandler.ProcessData(data))
-                {
-                    Assert.Fail("Corrupt data");
-                }
+                var processDataState = receiveHandler.ProcessData(data);
+                Assert.AreEqual(processDataState, ProcessDataState.CannotProcess);
             }
 
             receiveHandler.LineReceived -= ReceiveHandlerLineReceived;
@@ -219,10 +217,8 @@ namespace Portalum.Zvt.UnitTest
             foreach (var hexLine in hexLines)
             {
                 var data = ByteHelper.HexToByteArray(hexLine);
-                if (!receiveHandler.ProcessData(data))
-                {
-                    Assert.Fail("Fragment data");
-                }
+                var processDataState = receiveHandler.ProcessData(data);
+                Assert.AreEqual(processDataState, ProcessDataState.WaitForMoreData);
             }
 
             receiveHandler.LineReceived -= ReceiveHandlerLineReceived;

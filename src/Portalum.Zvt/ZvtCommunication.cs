@@ -23,7 +23,7 @@ namespace Portalum.Zvt
         /// <summary>
         /// New data received from the pt device
         /// </summary>
-        public event Action<byte[]> DataReceived;
+        public event Func<byte[], bool> DataReceived;
 
         private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
         private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
@@ -41,7 +41,7 @@ namespace Portalum.Zvt
         {
             this._logger = logger;
             this._deviceCommunication = deviceCommunication;
-            this._deviceCommunication.DataReceived += this.ProcessDataReceived;
+            this._deviceCommunication.DataReceived += this.DataReceiveSwitch;
         }
 
         /// <inheritdoc />
@@ -59,7 +59,7 @@ namespace Portalum.Zvt
         {
             if (disposing)
             {
-                this._deviceCommunication.DataReceived -= this.ProcessDataReceived;
+                this._deviceCommunication.DataReceived -= this.DataReceiveSwitch;
             }
         }
 
@@ -67,21 +67,31 @@ namespace Portalum.Zvt
         /// Switch for incoming data
         /// </summary>
         /// <param name="data"></param>
-        private void ProcessDataReceived(byte[] data)
+        private void DataReceiveSwitch(byte[] data)
         {
             if (this._waitForAcknowledge)
             {
-                this._dataBuffer = data;
-                this._acknowledgeReceivedCancellationTokenSource?.Cancel();
+                this.AddDataToBuffer(data);
                 return;
             }
 
-            //TODO: Send only one completion for fragmented data
-            //Send acknowledge before process the data
-            this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+            this.ProcessData(data);
+        }
 
-            //TODO: Connect receive handler with a response
-            this.DataReceived?.Invoke(data);
+        private void AddDataToBuffer(byte[] data)
+        {
+            this._dataBuffer = data;
+            this._acknowledgeReceivedCancellationTokenSource?.Cancel();
+        }
+
+        private void ProcessData(byte[] data)
+        {
+            var dataProcessed = this.DataReceived?.Invoke(data);
+            if (dataProcessed.HasValue && dataProcessed.Value)
+            {
+                //Send acknowledge before process the data
+                this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+            }
         }
 
         /// <summary>
@@ -132,8 +142,12 @@ namespace Portalum.Zvt
 
             if (this.CheckIsPositiveCompletion())
             {
+                this.ForwardUnusedBufferData();
+
                 return SendCommandResult.PositiveCompletionReceived;
             }
+
+            //TODO: _otherCommandControlField move away from ReceiveHandler
 
             if (this.CheckIsNegativeCompletion())
             {
@@ -197,8 +211,8 @@ namespace Portalum.Zvt
                 return;
             }
 
-            this._dataBuffer.AsSpan().Slice(3).ToArray();
-            //TODO: Forward the unused data to ReceiveHandler
+            var unusedData = this._dataBuffer.AsSpan().Slice(3).ToArray();
+            this.ProcessData(unusedData);
         }
     }
 }

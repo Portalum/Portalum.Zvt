@@ -206,12 +206,23 @@ namespace Portalum.Zvt
             this.ReceiptReceived?.Invoke(receiptInfo);
         }
 
-        private void DataReceived(byte[] data)
+        private bool DataReceived(byte[] data)
         {
-            if (!this._receiveHandler.ProcessData(data))
+            var processDataState = this._receiveHandler.ProcessData(data);
+            switch (processDataState)
             {
-                this._logger.LogError($"{nameof(DataReceived)} - Unprocessable data received {BitConverter.ToString(data)}");
+                case ProcessDataState.CannotProcess:
+                case ProcessDataState.ParseFailure:
+                    this._logger.LogError($"{nameof(DataReceived)} - Unprocessable data received {BitConverter.ToString(data)}");
+                    return false;
+                case ProcessDataState.WaitForMoreData:
+                    return false;
+                case ProcessDataState.Processed:
+                    return true;
             }
+
+            this._logger.LogCritical($"{nameof(DataReceived)} - Invalid state {processDataState}");
+            return false;
         }
 
         /// <summary>

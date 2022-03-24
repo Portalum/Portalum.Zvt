@@ -48,6 +48,6 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        bool ProcessData(Span<byte> data);
+        ProcessDataState ProcessData(Span<byte> data);
     }
 }
