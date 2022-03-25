@@ -209,10 +209,10 @@ namespace Portalum.Zvt
                 State = CommandResponseState.Unknown
             };
 
-            void completionReceived()
+            void completionReceived(byte[] CompletionBytes)
             {
                 commandResponse.State = CommandResponseState.Successful;
-
+                commandResponse.CompletionBytes = CompletionBytes;
                 dataReceivcedCancellationTokenSource.Cancel();
             }
 

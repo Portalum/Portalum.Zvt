@@ -15,6 +15,8 @@
         /// </summary>
         public string ErrorMessage { get; set; }
 
+        public byte[] CompletionBytes { get; set; }
+
         /// <inheritdoc />
         public override string ToString()
         {

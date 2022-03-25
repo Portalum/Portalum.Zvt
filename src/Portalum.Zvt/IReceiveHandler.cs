@@ -11,7 +11,7 @@ namespace Portalum.Zvt
         /// <summary>
         /// Command Completion received
         /// </summary>
-        event Action CompletionReceived;
+        event Action<Byte[]> CompletionReceived;
 
         /// <summary>
         /// Command Abort received

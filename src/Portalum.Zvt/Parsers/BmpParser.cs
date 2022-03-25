@@ -609,6 +609,7 @@ namespace Portalum.Zvt.Parsers
                 }
 
                 typedResponse.CardType = cardType;
+                typedResponse.CardTypeId = data[0];
 
                 return true;
             }

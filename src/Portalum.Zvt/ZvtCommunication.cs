@@ -62,16 +62,30 @@ namespace Portalum.Zvt
         {
             if (this._waitForAcknowledge)
             {
-                this._dataBuffer = data;
-                this._acknowledgeReceivedCancellationTokenSource?.Cancel();
+                if ((data.Length > 3) && (data.Take(3).SequenceEqual(_acknowledge)))
+                {
+                    this._dataBuffer = data.Take(3).ToArray();
+                    this._acknowledgeReceivedCancellationTokenSource?.Cancel();                    
+                    SendAcknowledgeAndProcessReceived(data.Skip(3).ToArray());
+                }
+                else
+                {
+                    this._dataBuffer = data;
+                    this._acknowledgeReceivedCancellationTokenSource?.Cancel();
+                }
                 return;
             }
-
             //Send acknowledge before process the data
-            this._deviceCommunication.SendAsync(this._acknowledge);
+            SendAcknowledgeAndProcessReceived(data);
+        }
 
+        private void SendAcknowledgeAndProcessReceived(byte[] data)
+        {
+            this._deviceCommunication.SendAsync(this._acknowledge);
             this.DataReceived?.Invoke(data);
         }
+
+
 
         /// <summary>
         /// Send command
@@ -119,7 +133,7 @@ namespace Portalum.Zvt
                 return SendCommandResult.NoDataReceived;
             }
 
-            if (this._dataBuffer.SequenceEqual(this._acknowledge))
+            if (this._dataBuffer.SequenceEqual(this._acknowledge))            
             {
                 return SendCommandResult.AcknowledgeReceived;
             }

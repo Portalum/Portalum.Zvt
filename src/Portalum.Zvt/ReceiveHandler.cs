@@ -50,7 +50,7 @@ namespace Portalum.Zvt
         public event Action<string> IntermediateStatusInformationReceived;
 
         /// <inheritdoc />
-        public event Action CompletionReceived;
+        public event Action<byte[]> CompletionReceived;
 
         /// <inheritdoc />
         public event Action<string> AbortReceived;
@@ -260,7 +260,7 @@ namespace Portalum.Zvt
             if (apduInfo.CanHandle(this._completionCommandControlField))
             {
                 this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Completion' received");
-                this.CompletionReceived?.Invoke();
+                this.CompletionReceived?.Invoke(apduData.ToArray());
                 return true;
             }
 
