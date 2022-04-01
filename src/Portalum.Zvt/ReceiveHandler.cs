@@ -33,8 +33,6 @@ namespace Portalum.Zvt
         private readonly byte[] _intermediateStatusInformationControlField = new byte[] { 0x04, 0xFF };
         private readonly byte[] _printLineControlField = new byte[] { 0x06, 0xD1 };
         private readonly byte[] _printTextBlockControlField = new byte[] { 0x06, 0xD3 };
-        //TODO: Move to ZvtCommunication
-        private readonly byte[] _otherCommandControlField = new byte[] { 0x84, 0x83 };
         private readonly byte[] _completionCommandControlField = new byte[] { 0x06, 0x0F };
         private readonly byte[] _abortCommandControlField = new byte[] { 0x06, 0x1E };
 
@@ -55,9 +53,6 @@ namespace Portalum.Zvt
 
         /// <inheritdoc />
         public event Action<string> AbortReceived;
-
-        /// <inheritdoc />
-        public event Action NotSupportedReceived;
 
         /// <summary>
         /// ReceiveHandler
@@ -105,7 +100,6 @@ namespace Portalum.Zvt
                 this._intermediateStatusInformationControlField,
                 this._printLineControlField,
                 this._printTextBlockControlField,
-                this._otherCommandControlField,
                 this._completionCommandControlField,
                 this._abortCommandControlField
             };
@@ -155,8 +149,7 @@ namespace Portalum.Zvt
 
                 if (data.Length > apduInfo.PackageSize)
                 {
-                    //TODO: Failure infinite loop no reset fragment
-
+                    this.ResetFragmentInfo();
                     this._logger.LogError($"{nameof(ProcessData)} - Apdu data part corrupt");
                     return ProcessDataState.CannotProcess;
                 }
@@ -263,14 +256,6 @@ namespace Portalum.Zvt
                 }
 
                 this.ReceiptReceived?.Invoke(receipt);
-                return ProcessDataState.Processed;
-            }
-
-            //Command not supported (2.67 Other Commands)
-            if (apduInfo.CanHandle(this._otherCommandControlField))
-            {
-                this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Command not supported' received");
-                this.NotSupportedReceived?.Invoke();
                 return ProcessDataState.Processed;
             }
 

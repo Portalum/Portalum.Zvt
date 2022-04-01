@@ -123,6 +123,23 @@ namespace Portalum.Zvt.UnitTest
         }
 
         [TestMethod]
+        public async Task SendCommandAsync_NotSupported_Successful()
+        {
+            var loggerZvtCommunication = LoggerHelper.GetLogger<ZvtCommunication>();
+            var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+
+            var zvtCommunication = new ZvtCommunication(loggerZvtCommunication.Object, mockDeviceCommunication.Object);
+
+            var sendCommandTask = zvtCommunication.SendCommandAsync(new byte[] { 0x01 }, acknowledgeReceiveTimeoutMilliseconds: 1000);
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x84, 0x83, 0x00 });
+            var sendCommandResult = await sendCommandTask;
+
+            zvtCommunication.Dispose();
+
+            Assert.AreEqual(SendCommandResult.NotSupported, sendCommandResult);
+        }
+
+        [TestMethod]
         public async Task SendCommandAsync_NoDataReceived_Successful()
         {
             var loggerZvtCommunication = LoggerHelper.GetLogger<ZvtCommunication>();

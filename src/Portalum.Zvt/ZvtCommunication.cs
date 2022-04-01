@@ -28,6 +28,7 @@ namespace Portalum.Zvt
         private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
         private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
         private readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
+        private readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
         private readonly byte _negativeCompletionPrefix = 0x84;
 
         /// <summary>
@@ -147,7 +148,10 @@ namespace Portalum.Zvt
                 return SendCommandResult.PositiveCompletionReceived;
             }
 
-            //TODO: _otherCommandControlField move away from ReceiveHandler
+            if (this.CheckIsNotSupported())
+            {
+                return SendCommandResult.NotSupported;
+            }
 
             if (this.CheckIsNegativeCompletion())
             {
@@ -197,6 +201,23 @@ namespace Portalum.Zvt
                 var errorByte = this._dataBuffer[1];
                 this._logger.LogDebug($"{nameof(CheckIsNegativeCompletion)} - ErrorCode:{errorByte:X2}");
 
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool CheckIsNotSupported()
+        {
+            if (this._dataBuffer.Length < 3)
+            {
+                return false;
+            }
+
+            var buffer = this._dataBuffer.AsSpan().Slice(0, 3);
+
+            if (buffer.SequenceEqual(this._otherCommandData))
+            {
                 return true;
             }
 

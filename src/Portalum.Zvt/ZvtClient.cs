@@ -260,22 +260,20 @@ namespace Portalum.Zvt
                 dataReceivcedCancellationTokenSource.Cancel();
             }
 
-            void notSupportedReceived()
-            {
-                commandResponse.State = CommandResponseState.NotSupported;
-
-                dataReceivcedCancellationTokenSource.Cancel();
-            }
-
             try
             {
                 this._receiveHandler.CompletionReceived += completionReceived;
                 this._receiveHandler.AbortReceived += abortReceived;
-                this._receiveHandler.NotSupportedReceived += notSupportedReceived;
 
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
                 var sendCommandResult = await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken);
+                if (sendCommandResult == SendCommandResult.NotSupported)
+                {
+                    this._logger.LogError($"{nameof(SendCommandAsync)} - NotSupported");
+                    commandResponse.State = CommandResponseState.NotSupported;
+                    return commandResponse;
+                }
                 if (sendCommandResult != SendCommandResult.PositiveCompletionReceived)
                 {
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command");
@@ -302,7 +300,6 @@ namespace Portalum.Zvt
             }
             finally
             {
-                this._receiveHandler.NotSupportedReceived -= notSupportedReceived;
                 this._receiveHandler.AbortReceived -= abortReceived;
                 this._receiveHandler.CompletionReceived -= completionReceived;
             }

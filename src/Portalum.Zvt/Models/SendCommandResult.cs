@@ -26,6 +26,11 @@
         SendFailure,
 
         /// <summary>
+        /// Not supported (other commands, not supported by the PT)
+        /// </summary>
+        NotSupported,
+
+        /// <summary>
         /// Unknown failure
         /// </summary>
         UnknownFailure
