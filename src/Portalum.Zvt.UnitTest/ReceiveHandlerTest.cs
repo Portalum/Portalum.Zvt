@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Portalum.Zvt.Helpers;
+using Portalum.Zvt.Models;
 using Portalum.Zvt.Repositories;
 using System.Text;
 
@@ -38,11 +39,18 @@ namespace Portalum.Zvt.UnitTest
 
             var receiveHandler = this.GetReceiveHandler();
 
-            foreach (var hexLine in hexLines)
+            for (var i = 0; i < hexLines.Length; i++)
             {
-                var data = ByteHelper.HexToByteArray(hexLine);
-                var canProcess = receiveHandler.ProcessData(data);
-                Assert.IsTrue(canProcess);
+                var data = ByteHelper.HexToByteArray(hexLines[i]);
+                var processDataState = receiveHandler.ProcessData(data);
+
+                if (i == hexLines.Length - 1)
+                {
+                    Assert.AreEqual(processDataState, ProcessDataState.Processed);
+                    continue;
+                }
+
+                Assert.AreEqual(processDataState, ProcessDataState.WaitForMoreData);
             }
         }
 
@@ -57,11 +65,18 @@ namespace Portalum.Zvt.UnitTest
 
             var receiveHandler = this.GetReceiveHandler();
 
-            foreach (var hexLine in hexLines)
+            for (var i = 0; i < hexLines.Length; i++)
             {
-                var data = ByteHelper.HexToByteArray(hexLine);
-                var canProcess = receiveHandler.ProcessData(data);
-                Assert.IsTrue(canProcess);
+                var data = ByteHelper.HexToByteArray(hexLines[i]);
+                var processDataState = receiveHandler.ProcessData(data);
+
+                if (i == hexLines.Length - 1)
+                {
+                    Assert.AreEqual(processDataState, ProcessDataState.Processed);
+                    continue;
+                }
+
+                Assert.AreEqual(processDataState, ProcessDataState.WaitForMoreData);
             }
         }
 
@@ -78,8 +93,8 @@ namespace Portalum.Zvt.UnitTest
             foreach (var hexLine in hexLines)
             {
                 var data = ByteHelper.HexToByteArray(hexLine);
-                var canProcess = receiveHandler.ProcessData(data);
-                Assert.IsTrue(canProcess);
+                var processDataState = receiveHandler.ProcessData(data);
+                Assert.AreEqual(processDataState, ProcessDataState.Processed);
             }
         }
     }

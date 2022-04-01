@@ -19,11 +19,6 @@ namespace Portalum.Zvt
         event Action<string> AbortReceived;
 
         /// <summary>
-        /// Command NotSupported received
-        /// </summary>
-        event Action NotSupportedReceived;
-
-        /// <summary>
         /// StatusInformation received
         /// </summary>
         event Action<StatusInformation> StatusInformationReceived;
@@ -48,6 +43,6 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        bool ProcessData(Span<byte> data);
+        ProcessDataState ProcessData(Span<byte> data);
     }
 }
