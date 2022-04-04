@@ -95,8 +95,6 @@ namespace Portalum.Zvt
             }
         }
 
-
-
         /// <summary>
         /// Send command
         /// </summary>
