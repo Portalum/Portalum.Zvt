@@ -8,7 +8,7 @@
         /// <summary>
         /// Acknowledge received
         /// </summary>
-        AcknowledgeReceived,
+        PositiveCompletionReceived,
 
         /// <summary>
         /// Negative completion received
@@ -24,6 +24,11 @@
         /// Send failure
         /// </summary>
         SendFailure,
+
+        /// <summary>
+        /// Not supported (other commands, not supported by the PT)
+        /// </summary>
+        NotSupported,
 
         /// <summary>
         /// Unknown failure
