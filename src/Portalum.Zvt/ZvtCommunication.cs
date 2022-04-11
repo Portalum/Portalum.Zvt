@@ -107,6 +107,8 @@ namespace Portalum.Zvt
             int acknowledgeReceiveTimeoutMilliseconds = 5000,
             CancellationToken cancellationToken = default)
         {
+            this.ResetDataBuffer();
+
             this._acknowledgeReceivedCancellationTokenSource?.Dispose();
             this._acknowledgeReceivedCancellationTokenSource = new CancellationTokenSource();
 
@@ -224,11 +226,16 @@ namespace Portalum.Zvt
             return false;
         }
 
+        private void ResetDataBuffer()
+        {
+            this._dataBuffer = null;
+        }
+
         private void ForwardUnusedBufferData()
         {
             if (this._dataBuffer.Length == 3)
             {
-                this._dataBuffer = null;
+                this.ResetDataBuffer();
                 return;
             }
 
