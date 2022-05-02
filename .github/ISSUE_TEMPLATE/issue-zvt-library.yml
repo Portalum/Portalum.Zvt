@@ -8,7 +8,7 @@ body:
 - type: markdown
   attributes:
     value: |
-      Please fill in the information as completely as possible
+      Please fill in the information as completely as possible, if you can add the source code also helps to answer your question
 
 - type: input
   id: nuget
@@ -26,7 +26,7 @@ body:
     description: "Which payment service provider do you use"
     placeholder: "PAYONE / CardComplete / Hobex / ..."
   validations:
-    required: false
+    required: true
 
 - type: input
   id: paymentterminal
@@ -35,7 +35,7 @@ body:
     description: "Which payment terminal do you use"
     placeholder: "ingenico iWL250"
   validations:
-    required: false
+    required: true
 
 - type: textarea
   id: communicationlogs
@@ -43,7 +43,7 @@ body:
     label: Communication Logs
     description: "Please add log files from the communication"
   validations:
-    required: true
+    required: false
 
 - type: textarea
   id: information
