@@ -1,0 +1,45 @@
+---
+name: Issue with the Portalum ControlPanel
+description: Report an issue with the Portalum ControlPanel
+title: "**short summary**"
+labels: ["question"]
+body:
+
+- type: markdown
+  attributes:
+    value: |
+      Please fill in the information as completely as possible
+
+- type: input
+  id: paymentserviceprovider
+  attributes:
+    label: Payment service provider
+    description: "Which payment service provider do you use"
+    placeholder: "PAYONE / CardComplete / Hobex / ..."
+  validations:
+    required: true
+
+- type: input
+  id: paymentterminal
+  attributes:
+    label: Payment terminal
+    description: "Which payment terminal do you use"
+    placeholder: "ingenico iWL250"
+  validations:
+    required: true
+
+- type: textarea
+  id: communicationlogs
+  attributes:
+    label: Communication Logs
+    description: "Please add log informations from the communication tab"
+  validations:
+    required: false
+
+- type: textarea
+  id: information
+  attributes:
+    label: More information
+    description: "You can enter more information here"
+  validations:
+    required: true
