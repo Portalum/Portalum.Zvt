@@ -125,7 +125,7 @@ if (!await deviceCommunication.ConnectAsync())
 var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger);
 ```
 
-### Set a custom network terminal device port
+### Set a custom tcp port
 
 ```
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", port: 20007);
