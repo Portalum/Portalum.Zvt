@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SuperSimpleTcp" Version="2.6.0.6" />
+    <PackageReference Include="SuperSimpleTcp" Version="2.6.0.8" />
   </ItemGroup>
 
 </Project>
