@@ -302,6 +302,7 @@ namespace Portalum.Zvt
                     return commandResponse;
                 }
 
+                // There is no infinite timeout here, the timeout comes via the `timeoutCancellationTokenSource`
                 await Task.Delay(Timeout.InfiniteTimeSpan, linkedCancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (timeoutCancellationTokenSource.IsCancellationRequested)
