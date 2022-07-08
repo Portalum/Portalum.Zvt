@@ -183,5 +183,6 @@ Common `BaudRates` is *9600* or *115200*, default `Parity` is *None*, default `D
 
 The official documentation of the ZVT protocol is available here
 
+- https://www.terminalhersteller.de
 - https://www.terminalhersteller.de/downloads/PA00P015_13.09_final_en.pdf
 - https://www.terminalhersteller.de/downloads/PA00P016_04_en.pdf
