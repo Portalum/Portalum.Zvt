@@ -24,6 +24,7 @@ jobs:
       working-directory: ./src
       run: dotnet build --configuration Release --no-restore /p:NoWarn=1591
     - name: Test
+      id: test
       working-directory: ./src
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal --logger trx || true
     - name: Upload Test Report Artifacts
@@ -36,7 +37,7 @@ jobs:
       run: |
         dotnet pack --configuration Release --output $GITHUB_WORKSPACE/out src/Portalum.Zvt/Portalum.Zvt.csproj
     - name: Push NuGet package
-      if: github.event_name != 'pull_request' && github.repository_owner == 'Portalum'
+      if: github.event_name != 'pull_request' && github.repository_owner == 'Portalum' && (${{ steps.test.outcome }} == 'success')
       run: |
         cd $GITHUB_WORKSPACE/out
         dotnet nuget push *.nupkg --source https://www.nuget.org/api/v2/package --api-key ${{secrets.NUGET_TOKEN}} --skip-duplicate --no-symbols
