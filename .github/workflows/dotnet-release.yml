@@ -1,4 +1,4 @@
-name: .NET Portalum.Zvt.ControlPanel
+name: '.NET Portalum.Zvt.ControlPanel'
 
 on:
   push:
