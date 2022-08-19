@@ -104,7 +104,7 @@ namespace Portalum.Zvt
             {
                 this._serialPort.Open();
 
-                return Task.FromResult(true);
+                return Task.FromResult(this._serialPort.IsOpen);
             }
             catch (Exception exception)
             {
