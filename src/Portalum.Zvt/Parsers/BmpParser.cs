@@ -404,8 +404,6 @@ namespace Portalum.Zvt.Parsers
                     currentPosition += dataLength;
                     dataLength = bmpInfo.CalculateDataLength.Invoke(dataLengthData);
                 }
-
-                
                 else if (dataLength == 0)
                 {
                     //Detect TLV Length
@@ -413,15 +411,12 @@ namespace Portalum.Zvt.Parsers
                     dataLength = tlvLengthInfo.NumberOfBytesThatCanBeSkipped + tlvLengthInfo.Length;
                 }
 
-
                 if ((currentPosition + dataLength) > data.Length)
                 {
                     return false;
                 }
 
-
-                byte[] bmpData;
-                bmpData = data.Slice(currentPosition, dataLength).ToArray();
+                var bmpData = data.Slice(currentPosition, dataLength).ToArray();
 
                 if (bmpInfo.TryParse != null)
                 {
