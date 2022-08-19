@@ -1,14 +1,10 @@
-name: .NET
+name: 'CI'
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
-permissions:
-  statuses: write
-  checks: write
 
 jobs:
   build-windows:
@@ -30,14 +26,12 @@ jobs:
     - name: Test
       working-directory: ./src
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal --logger trx || true
-    - name: Test Report
-      uses: dorny/test-reporter@v1
-      if: always()
+    - name: Upload Test Report Artifacts
+      uses: actions/upload-artifact@v2
+      if: success() || failure()
       with:
-        name: 'DotNET Tests'
-        path: "**/*.trx"                            
-        reporter: dotnet-trx
-        fail-on-error: true
+        name: test-results
+        path: "**/*.trx"
     - name: Build project and generate NuGet package
       run: |
         dotnet pack --configuration Release --output $GITHUB_WORKSPACE/out src/Portalum.Zvt/Portalum.Zvt.csproj
