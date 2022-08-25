@@ -289,7 +289,7 @@ namespace Portalum.Zvt
                 }
                 if (sendCommandResult != SendCommandResult.PositiveCompletionReceived)
                 {
-                    this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command");
+                    this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command {sendCommandResult}");
                     commandResponse.State = CommandResponseState.Error;
                     commandResponse.ErrorMessage = sendCommandResult.ToString();
 
