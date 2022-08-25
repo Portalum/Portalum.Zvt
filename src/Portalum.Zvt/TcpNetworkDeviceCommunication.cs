@@ -209,7 +209,14 @@ namespace Portalum.Zvt
             this.DataSent?.Invoke(data);
 
             this._logger.LogDebug($"{nameof(SendAsync)} - {BitConverter.ToString(data)}");
-            await this._tcpClient.SendAsync(data, cancellationToken);
+            try
+            {
+                await this._tcpClient.SendAsync(data, cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                this._logger.LogError(exception, $"{nameof(SendAsync)}");
+            }
         }
     }
 }
