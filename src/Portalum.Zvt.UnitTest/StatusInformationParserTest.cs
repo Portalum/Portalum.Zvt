@@ -31,6 +31,7 @@ namespace Portalum.Zvt.UnitTest
             var statusInformation = statusInformationParser.Parse(data);
 
             Assert.AreEqual("Abbruch durch Kunde", statusInformation.AdditionalText);
+            Assert.AreEqual(0x6C, statusInformation.ErrorCode);
             Assert.AreEqual("abort via timeout or abort-key", statusInformation.ErrorMessage);
             Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
         }
@@ -47,6 +48,7 @@ namespace Portalum.Zvt.UnitTest
             var statusInformation = statusInformationParser.Parse(data);
 
             Assert.AreEqual("Betrag falsch", statusInformation.AdditionalText);
+            Assert.AreEqual(0xFF, statusInformation.ErrorCode);
             Assert.AreEqual("system error (= other/unknown error), See TLV tags 1F16 and 1F17", statusInformation.ErrorMessage);
             Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
         }
@@ -126,6 +128,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual("MASTERCARD", statusInformation.CardName);
             Assert.AreEqual(6, statusInformation.TerminalIdentifier);
             Assert.AreEqual("no error", statusInformation.ErrorMessage);
+            Assert.AreEqual(0, statusInformation.ErrorCode);
             Assert.AreEqual("NFC", statusInformation.CardTechnology);
             Assert.AreEqual("No Cardholder authentication", statusInformation.CardholderAuthentication);
         }
@@ -145,6 +148,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual("MASTERCARD", statusInformation.CardName);
             Assert.AreEqual(6, statusInformation.TerminalIdentifier);
             Assert.AreEqual("no error", statusInformation.ErrorMessage);
+            Assert.AreEqual(0, statusInformation.ErrorCode);
             Assert.AreEqual("Chip", statusInformation.CardTechnology);
             Assert.AreEqual("Offline encrypted Pin", statusInformation.CardholderAuthentication);
         }
@@ -162,6 +166,7 @@ namespace Portalum.Zvt.UnitTest
             var statusInformation = statusInformationParser.Parse(data);
 
             Assert.AreEqual("abort via timeout or abort-key", statusInformation.ErrorMessage);
+            Assert.AreEqual(0x6C, statusInformation.ErrorCode);
             Assert.AreEqual(52500295, statusInformation.TerminalIdentifier);
             Assert.AreEqual(12, statusInformation.Amount);
             Assert.AreEqual(978, statusInformation.CurrencyCode);

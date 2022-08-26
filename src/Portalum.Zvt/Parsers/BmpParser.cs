@@ -506,14 +506,21 @@ namespace Portalum.Zvt.Parsers
         private bool ParseErrorCode(byte[] data, IResponse response)
         {
             var errorMessage = this._errorMessageRepository.GetMessage(data[0]);
-
-            if (response is IResponseErrorMessage typedResponse)
+            bool parsed = false;
+            
+            if (response is IResponseErrorMessage typedErrorMessageResponse)
             {
-                typedResponse.ErrorMessage = errorMessage;
-                return true;
+                typedErrorMessageResponse.ErrorMessage = errorMessage;
+                parsed = true;
+            }
+            
+            if (response is IResponseErrorCode typedErrorCodeResponse)
+            {
+                typedErrorCodeResponse.ErrorCode = data[0];
+                parsed = true;
             }
 
-            return false;
+            return parsed;
         }
 
         private bool ParseTime(byte[] data, IResponse response)

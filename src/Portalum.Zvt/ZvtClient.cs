@@ -323,6 +323,145 @@ namespace Portalum.Zvt
             return commandResponse;
         }
 
+
+        /// <summary>
+        /// SendCommandAsync
+        /// </summary>
+        /// <param name="commandData">The data of the command</param>
+        /// <param name="callback">A callback which is started after receiving a positive StatusInformation. The answer to StatusInformation is delayed until the end of the task or a timeout occurs.</param>
+        /// <param name="endAfterAcknowledge">After receive an acknowledge the command is successful</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<CommandResponse> SendCommandAsyncWithCallback(
+            byte[] commandData,
+            Func<Task<bool>> callback,
+            TimeSpan callbackTimeout,
+            bool endAfterAcknowledge = false,
+            CancellationToken cancellationToken = default
+        )
+        {
+            using var timeoutCancellationTokenSource = new CancellationTokenSource(this._commandCompletionTimeout);
+            using var callbackTimeoutCancellationTokenSource = new CancellationTokenSource(_commandCompletionTimeout);
+            using var dataReceivedCancellationTokenSource = new CancellationTokenSource();
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken,
+                dataReceivedCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
+
+            Task<bool> callbackTask = null;
+
+            var commandResponse = new CommandResponse
+            {
+                State = CommandResponseState.Unknown
+            };
+
+            void completionReceived()
+            {
+                commandResponse.State = CommandResponseState.Successful;
+
+                dataReceivedCancellationTokenSource.Cancel();
+            }
+
+            void abortReceived(string errorMessage)
+            {
+                commandResponse.State = CommandResponseState.Abort;
+                commandResponse.ErrorMessage = errorMessage;
+
+                dataReceivedCancellationTokenSource.Cancel();
+            }
+
+            void intermediateStatusInformationReceived(string status)
+            {
+                timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
+            }
+
+            void statusInformationReceived(StatusInformation statusInformation)
+            {
+                if (callback != null && statusInformation.ErrorCode == 0)
+                {
+                    if (callbackTask == null)
+                    {
+                        this._zvtCommunication.suppressAcknowledge = true;
+                        callbackTimeoutCancellationTokenSource.CancelAfter(callbackTimeout);
+                        callbackTask = Task.Run(callback, callbackTimeoutCancellationTokenSource.Token);
+                        callbackTask.ContinueWith(task =>
+                        {
+                            if (callbackTimeoutCancellationTokenSource.IsCancellationRequested)
+                            {
+                                this._zvtCommunication.SendAcknowledgement(false);
+                            }
+                            else
+                            {
+                                this._zvtCommunication.SendAcknowledgement(task.Result);
+                            }
+                            this._zvtCommunication.suppressAcknowledge = false;
+                        });
+                    }
+                    else
+                    {
+                        this._logger.LogWarning("An additional StatusInformation was received. " +
+                                                "The callback task is already running.");
+                    }
+                }
+
+                timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
+            }
+
+            try
+            {
+                this._receiveHandler.CompletionReceived += completionReceived;
+                this._receiveHandler.AbortReceived += abortReceived;
+                this._receiveHandler.IntermediateStatusInformationReceived += intermediateStatusInformationReceived;
+                this._receiveHandler.StatusInformationReceived += statusInformationReceived;
+
+                this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
+
+                var sendCommandResult =
+                    await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken);
+                if (sendCommandResult == SendCommandResult.NotSupported)
+                {
+                    this._logger.LogError($"{nameof(SendCommandAsync)} - NotSupported");
+                    commandResponse.State = CommandResponseState.NotSupported;
+                    return commandResponse;
+                }
+
+                if (sendCommandResult != SendCommandResult.PositiveCompletionReceived)
+                {
+                    this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command {sendCommandResult}");
+                    commandResponse.State = CommandResponseState.Error;
+                    commandResponse.ErrorMessage = sendCommandResult.ToString();
+
+                    return commandResponse;
+                }
+
+                if (endAfterAcknowledge)
+                {
+                    commandResponse.State = CommandResponseState.Successful;
+                    return commandResponse;
+                }
+
+                // There is no infinite timeout here, the timeout comes via the `timeoutCancellationTokenSource`
+                await Task.Delay(Timeout.InfiniteTimeSpan, linkedCancellationTokenSource.Token).ContinueWith(task =>
+                {
+                    if (timeoutCancellationTokenSource.IsCancellationRequested)
+                    {
+                        commandResponse.State = CommandResponseState.Timeout;
+                        this._logger.LogError(
+                            $"{nameof(SendCommandAsync)} - No result received in the specified timeout {this._commandCompletionTimeout.TotalMilliseconds}ms");
+                    }
+                });
+            }
+            finally
+            {
+                this._receiveHandler.AbortReceived -= abortReceived;
+                this._receiveHandler.CompletionReceived -= completionReceived;
+                this._receiveHandler.IntermediateStatusInformationReceived -= intermediateStatusInformationReceived;
+                this._receiveHandler.StatusInformationReceived -= statusInformationReceived;
+                this._zvtCommunication.suppressAcknowledge = false;
+            }
+
+            return commandResponse;
+        }
+
+
         private byte[] CreatePackage(
             byte[] controlField,
             IEnumerable<byte> packageData)
@@ -408,10 +547,14 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="amount"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="issueGoodsCallback">A optional task which is started after the payment was successful. If the task returns true within issueGoodsTimeout seconds the payment is accepted. Otherwise the PT triggers an auto-reversal.</param>
+        /// <param name="issueGoodsTimeout">Supplies the time in seconds that the PT waits during issue of goods for a response from the ECR. The default value is 30 seconds.</param>
         /// <returns></returns>
         public async Task<CommandResponse> PaymentAsync(
             decimal amount,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            Func<Task<bool>> issueGoodsCallback = null,
+            decimal? issueGoodsTimeout = null)
         {
             this._logger.LogInformation($"{nameof(PaymentAsync)} - Execute with amount of:{amount}");
 
@@ -419,8 +562,30 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
+            if (issueGoodsTimeout != null)
+            {
+                package.Add(0x01); //timeout prefix
+                package.AddRange(NumberHelper.DecimalToBcd((decimal)issueGoodsTimeout / 100, length: 1));
+            }
+            else
+            {
+                issueGoodsTimeout = 30;
+            }
+
             var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x01 }, package);
-            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+
+            if (issueGoodsCallback != null)
+            {
+                return await this.SendCommandAsyncWithCallback(fullPackage,
+                    cancellationToken: cancellationToken,
+                    callback: issueGoodsCallback,
+                    callbackTimeout: TimeSpan.FromSeconds((double)issueGoodsTimeout)
+                );
+            }
+            else
+            {
+                return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+            }
         }
 
         /// <summary>
