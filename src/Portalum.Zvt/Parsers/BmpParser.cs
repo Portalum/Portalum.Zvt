@@ -740,7 +740,10 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseCardNumber typedResponse)
             {
-                var cardNumber = BitConverter.ToString(data).Replace("-", "").Replace("E", "");
+                var cardNumber = BitConverter.ToString(data)
+                    .Replace("F", "")
+                    .Replace("-", "")
+                    .Replace("E", "*");
                 typedResponse.CardNumber = cardNumber;
                 return true;
             }

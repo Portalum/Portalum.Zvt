@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Parsers;
 using Portalum.Zvt.Repositories;
@@ -75,6 +77,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(1, statusInformation.CardSequenceNumber);
             Assert.AreEqual(new TimeSpan(22, 39, 53), statusInformation.Time);
             Assert.AreEqual(28004869, statusInformation.TerminalIdentifier);
+            Assert.AreEqual("4771", statusInformation.CardNumber[^4..]);
         }
 
         [TestMethod]
