@@ -5,6 +5,7 @@ using Portalum.Zvt.Models;
 using Portalum.Zvt.Repositories;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -30,6 +31,7 @@ namespace Portalum.Zvt
         private readonly ZvtCommunication _zvtCommunication;
         private IReceiveHandler _receiveHandler;
         private readonly TimeSpan _commandCompletionTimeout;
+        private readonly ZvtClientConfig _clientConfig;
 
         #region Events
 
@@ -52,6 +54,20 @@ namespace Portalum.Zvt
         /// Receive a full receipt at once
         /// </summary>
         public event Action<ReceiptInfo> ReceiptReceived;
+
+        /// <summary>
+        /// When the event is registered it is queries periodically to check if the issue of goods is finished.
+        /// Upon successful completion the payment is stored, otherwise an auto reversal is triggered.
+        /// For possible return values see CompletionInfoStatus.
+        /// </summary>
+        public event Func<CompletionInfo> GetAsyncCompletionInfo;
+
+        /// <summary>
+        /// Raised when the payment was successful, but before it is stored in the PT. After this event the GetAsyncCompletionInfo
+        /// callback is queries periodically to obtain the completion status. If GetAsyncCompleteInfo is not registered the payment
+        /// is stored immediately in the PT and this event is never raised.
+        /// </summary>
+        public event Action<StatusInformation> StartAsyncCompletion;
 
         #endregion
 
@@ -82,6 +98,7 @@ namespace Portalum.Zvt
             this._commandCompletionTimeout = clientConfig.CommandCompletionTimeout;
 
             this._passwordData = NumberHelper.IntToBcd(clientConfig.Password);
+            this._clientConfig = clientConfig;
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -101,6 +118,7 @@ namespace Portalum.Zvt
 
             this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
             this._zvtCommunication.DataReceived += this.DataReceived;
+            this._zvtCommunication.GetCompletionInfo += GetCompletionInfo;
         }
 
         /// <inheritdoc />
@@ -119,10 +137,16 @@ namespace Portalum.Zvt
             if (disposing)
             {
                 this._zvtCommunication.DataReceived -= this.DataReceived;
+                this._zvtCommunication.GetCompletionInfo -= this.GetCompletionInfo;
                 this._zvtCommunication.Dispose();
 
                 this.UnregisterReceiveHandlerEvents();
             }
+        }
+
+        private CompletionInfo GetCompletionInfo()
+        {
+            return this.GetAsyncCompletionInfo?.Invoke();
         }
 
         private Encoding GetEncoding(ZvtEncoding zvtEncoding)
@@ -182,7 +206,7 @@ namespace Portalum.Zvt
             {
                 return new GermanIntermediateStatusRepository();
             }
-            
+
             return new EnglishIntermediateStatusRepository();
         }
 
@@ -206,23 +230,26 @@ namespace Portalum.Zvt
             this.ReceiptReceived?.Invoke(receiptInfo);
         }
 
-        private bool DataReceived(byte[] data)
+        private ProcessData DataReceived(byte[] data)
         {
-            var processDataState = this._receiveHandler.ProcessData(data);
-            switch (processDataState)
+            var processData = this._receiveHandler.ProcessData(data);
+            switch (processData.State)
             {
                 case ProcessDataState.CannotProcess:
                 case ProcessDataState.ParseFailure:
                     this._logger.LogError($"{nameof(DataReceived)} - Unprocessable data received {BitConverter.ToString(data)}");
-                    return false;
+                    break;
+
                 case ProcessDataState.WaitForMoreData:
-                    return false;
                 case ProcessDataState.Processed:
-                    return true;
+                    break;
+
+                default:
+                    this._logger.LogCritical($"{nameof(DataReceived)} - Invalid state {processData.State}");
+                    break;
             }
 
-            this._logger.LogCritical($"{nameof(DataReceived)} - Invalid state {processDataState}");
-            return false;
+            return processData;
         }
 
         /// <summary>
@@ -238,8 +265,11 @@ namespace Portalum.Zvt
             CancellationToken cancellationToken = default)
         {
             using var timeoutCancellationTokenSource = new CancellationTokenSource(this._commandCompletionTimeout);
-            using var dataReceivcedCancellationTokenSource = new CancellationTokenSource();
-            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, dataReceivcedCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
+            using var dataReceivedCancellationTokenSource = new CancellationTokenSource();
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, dataReceivedCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
+
+            var isAsyncCompletion = this.GetAsyncCompletionInfo != null;
+            var startAsyncCompletionFired = false;
 
             var commandResponse = new CommandResponse
             {
@@ -250,7 +280,7 @@ namespace Portalum.Zvt
             {
                 commandResponse.State = CommandResponseState.Successful;
 
-                dataReceivcedCancellationTokenSource.Cancel();
+                dataReceivedCancellationTokenSource.Cancel();
             }
 
             void abortReceived(string errorMessage)
@@ -258,7 +288,7 @@ namespace Portalum.Zvt
                 commandResponse.State = CommandResponseState.Abort;
                 commandResponse.ErrorMessage = errorMessage;
 
-                dataReceivcedCancellationTokenSource.Cancel();
+                dataReceivedCancellationTokenSource.Cancel();
             }
 
             void intermediateStatusInformationReceived(string status)
@@ -269,6 +299,12 @@ namespace Portalum.Zvt
             void statusInformationReceived(StatusInformation statusInformation)
             {
                 timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
+
+                if (statusInformation.ErrorCode == 0 && isAsyncCompletion && !startAsyncCompletionFired)
+                {
+                    startAsyncCompletionFired = true;
+                    this.StartAsyncCompletion?.Invoke(statusInformation);
+                }
             }
 
             try
@@ -289,7 +325,7 @@ namespace Portalum.Zvt
                 }
                 if (sendCommandResult != SendCommandResult.PositiveCompletionReceived)
                 {
-                    this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command {sendCommandResult}");
+                    this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command: {sendCommandResult}");
                     commandResponse.State = CommandResponseState.Error;
                     commandResponse.ErrorMessage = sendCommandResult.ToString();
 
@@ -321,156 +357,6 @@ namespace Portalum.Zvt
             }
 
             return commandResponse;
-        }
-
-
-        /// <summary>
-        /// SendCommandAsync
-        /// </summary>
-        /// <param name="commandData">The data of the command</param>
-        /// <param name="callback">A callback which is started after receiving a positive StatusInformation. The answer to StatusInformation is delayed until the end of the task or a timeout occurs.</param>
-        /// <param name="endAfterAcknowledge">After receive an acknowledge the command is successful</param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<CommandResponse> SendCommandAsyncWithCallback(
-            byte[] commandData,
-            Func<Task<bool>> callback,
-            TimeSpan callbackTimeout,
-            bool endAfterAcknowledge = false,
-            CancellationToken cancellationToken = default
-        )
-        {
-            using var timeoutCancellationTokenSource = new CancellationTokenSource(this._commandCompletionTimeout);
-            using var callbackTimeoutCancellationTokenSource = new CancellationTokenSource(_commandCompletionTimeout);
-            using var dataReceivedCancellationTokenSource = new CancellationTokenSource();
-            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken,
-                dataReceivedCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
-
-            Task<bool> callbackTask = null;
-
-            var commandResponse = new CommandResponse
-            {
-                State = CommandResponseState.Unknown
-            };
-
-            void completionReceived()
-            {
-                commandResponse.State = CommandResponseState.Successful;
-
-                dataReceivedCancellationTokenSource.Cancel();
-            }
-
-            void abortReceived(string errorMessage)
-            {
-                commandResponse.State = CommandResponseState.Abort;
-                commandResponse.ErrorMessage = errorMessage;
-
-                dataReceivedCancellationTokenSource.Cancel();
-            }
-
-            void intermediateStatusInformationReceived(string status)
-            {
-                timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
-            }
-
-            void statusInformationReceived(StatusInformation statusInformation)
-            {
-                if (callback != null && statusInformation.ErrorCode == 0)
-                {
-                    if (callbackTask == null)
-                    {
-                        this._zvtCommunication.suppressAcknowledge = true;
-                        callbackTimeoutCancellationTokenSource.CancelAfter(callbackTimeout);
-                        callbackTask = Task.Run(callback, callbackTimeoutCancellationTokenSource.Token);
-                        callbackTask.ContinueWith(task =>
-                        {
-                            if (callbackTimeoutCancellationTokenSource.IsCancellationRequested)
-                            {
-                                this._zvtCommunication.SendAcknowledgement(false);
-                            }
-                            else
-                            {
-                                this._zvtCommunication.SendAcknowledgement(task.Result);
-                            }
-                            this._zvtCommunication.suppressAcknowledge = false;
-                        });
-                    }
-                    else
-                    {
-                        this._logger.LogWarning("An additional StatusInformation was received. " +
-                                                "The callback task is already running.");
-                    }
-                }
-
-                timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
-            }
-
-            try
-            {
-                this._receiveHandler.CompletionReceived += completionReceived;
-                this._receiveHandler.AbortReceived += abortReceived;
-                this._receiveHandler.IntermediateStatusInformationReceived += intermediateStatusInformationReceived;
-                this._receiveHandler.StatusInformationReceived += statusInformationReceived;
-
-                this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
-
-                var sendCommandResult =
-                    await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken);
-                if (sendCommandResult == SendCommandResult.NotSupported)
-                {
-                    this._logger.LogError($"{nameof(SendCommandAsync)} - NotSupported");
-                    commandResponse.State = CommandResponseState.NotSupported;
-                    return commandResponse;
-                }
-
-                if (sendCommandResult != SendCommandResult.PositiveCompletionReceived)
-                {
-                    this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command {sendCommandResult}");
-                    commandResponse.State = CommandResponseState.Error;
-                    commandResponse.ErrorMessage = sendCommandResult.ToString();
-
-                    return commandResponse;
-                }
-
-                if (endAfterAcknowledge)
-                {
-                    commandResponse.State = CommandResponseState.Successful;
-                    return commandResponse;
-                }
-
-                // There is no infinite timeout here, the timeout comes via the `timeoutCancellationTokenSource`
-                await Task.Delay(Timeout.InfiniteTimeSpan, linkedCancellationTokenSource.Token).ContinueWith(task =>
-                {
-                    if (timeoutCancellationTokenSource.IsCancellationRequested)
-                    {
-                        commandResponse.State = CommandResponseState.Timeout;
-                        this._logger.LogError(
-                            $"{nameof(SendCommandAsync)} - No result received in the specified timeout {this._commandCompletionTimeout.TotalMilliseconds}ms");
-                    }
-                });
-            }
-            finally
-            {
-                this._receiveHandler.AbortReceived -= abortReceived;
-                this._receiveHandler.CompletionReceived -= completionReceived;
-                this._receiveHandler.IntermediateStatusInformationReceived -= intermediateStatusInformationReceived;
-                this._receiveHandler.StatusInformationReceived -= statusInformationReceived;
-                this._zvtCommunication.suppressAcknowledge = false;
-            }
-
-            return commandResponse;
-        }
-
-
-        private byte[] CreatePackage(
-            byte[] controlField,
-            IEnumerable<byte> packageData)
-        {
-            var package = new List<byte>();
-            package.AddRange(controlField);
-            package.Add((byte)packageData.Count());
-            package.AddRange(packageData);
-            return package.ToArray();
         }
 
         /// <summary>
@@ -537,7 +423,7 @@ namespace Portalum.Zvt
                 //1F05 - Transaction parameter
             }
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x00 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x00 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -547,14 +433,10 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="amount"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="issueGoodsCallback">A optional task which is started after the payment was successful. If the task returns true within issueGoodsTimeout seconds the payment is accepted. Otherwise the PT triggers an auto-reversal.</param>
-        /// <param name="issueGoodsTimeout">Supplies the time in seconds that the PT waits during issue of goods for a response from the ECR. The default value is 30 seconds.</param>
         /// <returns></returns>
         public async Task<CommandResponse> PaymentAsync(
             decimal amount,
-            CancellationToken cancellationToken = default,
-            Func<Task<bool>> issueGoodsCallback = null,
-            decimal? issueGoodsTimeout = null)
+            CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(PaymentAsync)} - Execute with amount of:{amount}");
 
@@ -562,30 +444,14 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
-            if (issueGoodsTimeout != null)
+            if (this.GetAsyncCompletionInfo != null)
             {
-                package.Add(0x01); //timeout prefix
-                package.AddRange(NumberHelper.DecimalToBcd((decimal)issueGoodsTimeout / 100, length: 1));
-            }
-            else
-            {
-                issueGoodsTimeout = 30;
+                package.Add(0x02); // max nr. of status-informations
+                package.Add(this._clientConfig.GetAsyncCompletionInfoLimit);
             }
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x01 }, package);
-
-            if (issueGoodsCallback != null)
-            {
-                return await this.SendCommandAsyncWithCallback(fullPackage,
-                    cancellationToken: cancellationToken,
-                    callback: issueGoodsCallback,
-                    callbackTimeout: TimeSpan.FromSeconds((double)issueGoodsTimeout)
-                );
-            }
-            else
-            {
-                return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
-            }
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x01 }, package);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -607,7 +473,7 @@ namespace Portalum.Zvt
             package.Add(0x87); //ReceiptNumber prefix
             package.AddRange(NumberHelper.IntToBcd(receiptNumber, 2));
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x30 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x30 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -629,7 +495,7 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x31 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x31 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -646,7 +512,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x50 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x50 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -663,7 +529,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x10 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x10 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -680,7 +546,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x20 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x20 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -695,7 +561,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x02 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x02 }, package);
             return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true, cancellationToken: cancellationToken);
         }
 
@@ -710,7 +576,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0xB0 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0xB0 }, package);
             return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true, cancellationToken: cancellationToken);
         }
 
@@ -725,7 +591,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x06, 0x70 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x70 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -740,7 +606,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = this.CreatePackage(new byte[] { 0x08, 0x10 }, package);
+            var fullPackage = PackageHelper.Create(new byte[] { 0x08, 0x10 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -763,7 +629,7 @@ namespace Portalum.Zvt
                 packageData = Array.Empty<byte>();
             }
 
-            var fullPackage = this.CreatePackage(controlFieldData, packageData);
+            var fullPackage = PackageHelper.Create(controlFieldData, packageData);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
     }

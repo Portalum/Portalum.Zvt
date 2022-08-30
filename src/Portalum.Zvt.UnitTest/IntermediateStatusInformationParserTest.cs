@@ -52,7 +52,12 @@ namespace Portalum.Zvt.UnitTest
             var parser = this.GetIntermediateStatusInformationParser();
             var statusMessage = parser.GetMessage(new byte[] { 0xFF, 0x10, 0x06, 0x1A, 0x24, 0x18, 0x07, 0x08, 0x45, 0x55, 0x52, 0x20, 0x31, 0x2E, 0x32, 0x33, 0x07, 0x0C, 0x42, 0x69, 0x74, 0x74, 0x65, 0x20, 0x77, 0x61, 0x72, 0x74, 0x65, 0x6E });
 
-            Assert.AreEqual("EUR 1.23\r\nBitte warten\r\n", statusMessage);
+            // Note, we use the same string builder which the parser uses, so line endings are the same in the asserted string (differs between nix and win)
+            var expectedMessage = new StringBuilder();
+            expectedMessage.AppendLine("EUR 1.23");
+            expectedMessage.AppendLine("Bitte warten");
+            
+            Assert.AreEqual(expectedMessage.ToString(), statusMessage);
         }
     }
 }

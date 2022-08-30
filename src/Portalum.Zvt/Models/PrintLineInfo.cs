@@ -1,9 +1,11 @@
-﻿namespace Portalum.Zvt.Models
+﻿using Portalum.Zvt.Responses;
+
+namespace Portalum.Zvt.Models
 {
     /// <summary>
     /// Print LineInfo
     /// </summary>
-    public class PrintLineInfo
+    public class PrintLineInfo : IResponse
     {
         /// <summary>
         /// Is text centred

@@ -195,7 +195,7 @@ namespace Portalum.Zvt.UnitTest
             {
                 var data = ByteHelper.HexToByteArray(hexLine);
                 var processDataState = receiveHandler.ProcessData(data);
-                Assert.AreEqual(processDataState, ProcessDataState.CannotProcess);
+                Assert.AreEqual(processDataState.State, ProcessDataState.CannotProcess);
             }
 
             receiveHandler.LineReceived -= ReceiveHandlerLineReceived;
@@ -218,7 +218,7 @@ namespace Portalum.Zvt.UnitTest
             {
                 var data = ByteHelper.HexToByteArray(hexLine);
                 var processDataState = receiveHandler.ProcessData(data);
-                Assert.AreEqual(processDataState, ProcessDataState.WaitForMoreData);
+                Assert.AreEqual(processDataState.State, ProcessDataState.WaitForMoreData);
             }
 
             receiveHandler.LineReceived -= ReceiveHandlerLineReceived;

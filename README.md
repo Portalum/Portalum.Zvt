@@ -72,6 +72,30 @@ zvtClient.StatusInformationReceived += (statusInformation) => Console.WriteLine(
 await zvtClient.PaymentAsync(10.5M);
 ```
 
+### Start Payment with asyncronous completion
+
+```cs
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
+if (!await deviceCommunication.ConnectAsync())
+{
+    return;
+}
+
+using var zvtClient = new ZvtClient(deviceCommunication);
+
+CompletionInfo completionInfo = new CompletionInfo();
+zvtClient.GetAsyncCompletionInfo += () => completionInfo;
+zvtClient.StartAsyncCompletion += (_) =>
+{
+  // payment successful, start issuing goods to the customer
+  Task.Delay(3000).ContinueWith(task => completionInfo.State = CompletionInfoState.Successful);
+};
+
+
+await zvtClient.PaymentAsync(10.5M);
+
+```
+
 ### Start End-of-day
 ```cs
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");

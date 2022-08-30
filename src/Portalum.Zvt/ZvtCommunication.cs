@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using Portalum.Zvt.Models;
-using System;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Portalum.Zvt.Helpers;
+using Portalum.Zvt.Models;
 
 namespace Portalum.Zvt
 {
@@ -19,19 +21,23 @@ namespace Portalum.Zvt
         private CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
         private byte[] _dataBuffer;
         private bool _waitForAcknowledge = false;
-        public bool suppressAcknowledge = false;
 
         /// <summary>
         /// New data received from the pt device
         /// </summary>
-        public event Func<byte[], bool> DataReceived;
+        public event Func<byte[], ProcessData> DataReceived;
+
+        /// <summary>
+        /// A callback which is checked 
+        /// </summary>
+        public event Func<CompletionInfo> GetCompletionInfo;
 
         private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
         private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
         private readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
+        private readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
         private readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
         private readonly byte _negativeCompletionPrefix = 0x84;
-        private readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
 
         /// <summary>
         /// ZvtCommunication
@@ -87,25 +93,50 @@ namespace Portalum.Zvt
             this._acknowledgeReceivedCancellationTokenSource?.Cancel();
         }
 
-        public void SendAcknowledgement(bool success = true)
-        {
-            if (success)
-            {
-                this._deviceCommunication.SendAsync(this._positiveCompletionData1);
-            }
-            else
-            {
-                this._deviceCommunication.SendAsync(this._negativeIssueGoodsData);
-            }
-        }
-
         private void ProcessData(byte[] data)
         {
             var dataProcessed = this.DataReceived?.Invoke(data);
-            if (dataProcessed.HasValue && dataProcessed.Value && !this.suppressAcknowledge)
+            if (dataProcessed?.State == ProcessDataState.Processed)
             {
-                //Send acknowledge before process the data
-                this.SendAcknowledgement();
+                if (dataProcessed.Response is StatusInformation { ErrorCode: 0 })
+                {
+                    var completionInfo = this.GetCompletionInfo?.Invoke();
+                    if (completionInfo == null)
+                    {
+                        //Default if no one has subscribed to the event, immediately approve the transaction
+                        this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+                    }
+                    else
+                    {
+                        switch (completionInfo.State)
+                        {
+                            case CompletionInfoState.Wait:
+                                this._deviceCommunication.SendAsync(this._positiveCompletionData3);
+                                break;
+                            case CompletionInfoState.ChangeAmount:
+                                var controlField = new byte[] { 0x84, 0x9D };
+
+                                // Change the amount from the original in the start request
+                                var package = new List<byte>();
+                                package.Add(0x04); //Amount prefix
+                                package.AddRange(NumberHelper.DecimalToBcd(completionInfo.Amount));
+                                this._deviceCommunication.SendAsync(PackageHelper.Create(controlField, package.ToArray()));
+                                break;
+                            case CompletionInfoState.Successful:
+                                this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+                                break;
+                            case CompletionInfoState.Failure:
+                                this._deviceCommunication.SendAsync(this._negativeIssueGoodsData);
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
+                }
+                else
+                {
+                    this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+                }
             }
         }
 
