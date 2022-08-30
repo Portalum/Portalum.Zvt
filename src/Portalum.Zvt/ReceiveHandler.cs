@@ -106,7 +106,7 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public ProcessData ProcessData(Span<byte> data)
+        public virtual ProcessData ProcessData(Span<byte> data)
         {
             if (data.Length == 0)
             {
@@ -195,13 +195,13 @@ namespace Portalum.Zvt
             return this.ProcessApdu(apduInfo, apduData);
         }
 
-        private void ResetFragmentInfo()
+        protected virtual void ResetFragmentInfo()
         {
             this._receiveBufferEndPosition = 0;
             this._missingDataOfExpectedPackage = 0;
         }
 
-        private ProcessData ProcessApdu(
+        protected virtual ProcessData ProcessApdu(
             ApduResponseInfo apduInfo,
             Span<byte> apduData)
         {
@@ -234,7 +234,7 @@ namespace Portalum.Zvt
                 }
 
                 this.IntermediateStatusInformationReceived?.Invoke(intermediateStatusInformation);
-                return new ProcessData(ProcessDataState.Processed);
+                return new ProcessData(ProcessDataState.Processed, new IntermediateStatusInformation{ErrorMessage = intermediateStatusInformation});
             }
 
             //Print Line
@@ -256,7 +256,7 @@ namespace Portalum.Zvt
                 }
 
                 this.ReceiptReceived?.Invoke(receipt);
-                return new ProcessData(ProcessDataState.Processed);
+                return new ProcessData(ProcessDataState.Processed, new PrintTextBlock());
             }
 
             //Completion (3.2 Completion)
@@ -264,17 +264,18 @@ namespace Portalum.Zvt
             {
                 this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Completion' received");
                 this.CompletionReceived?.Invoke();
-                return new ProcessData(ProcessDataState.Processed);
+                return new ProcessData(ProcessDataState.Processed, new Completion());
             }
 
             //Abort (3.3 Abort)
             if (apduInfo.CanHandle(this._abortCommandControlField))
             {
                 var errorMessage = string.Empty;
-
+                byte errorCode = 0x60;
+                
                 if (apduData.Length > 0)
                 {
-                    var errorCode = apduData[0];
+                    errorCode = apduData[0];
                     errorMessage = this._errorMessageRepository.GetMessage(errorCode);
                 }
                 else
@@ -285,7 +286,7 @@ namespace Portalum.Zvt
                 this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Abort' received with message:{errorMessage}");
                 this.AbortReceived?.Invoke(errorMessage);
 
-                return new ProcessData(ProcessDataState.Processed);
+                return new ProcessData(ProcessDataState.Processed, new Abort {ErrorCode = errorCode, ErrorMessage = errorMessage});
             }
 
             return new ProcessData(ProcessDataState.CannotProcess);

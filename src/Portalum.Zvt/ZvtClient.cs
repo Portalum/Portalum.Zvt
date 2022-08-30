@@ -82,7 +82,8 @@ namespace Portalum.Zvt
             IDeviceCommunication deviceCommunication,
             ILogger<ZvtClient> logger = default,
             ZvtClientConfig clientConfig = default,
-            IReceiveHandler receiveHandler = default)
+            IReceiveHandler receiveHandler = default,
+            ZvtCommunication zvtCommunication = default)
         {
             if (logger == null)
             {
@@ -116,7 +117,14 @@ namespace Portalum.Zvt
 
             #endregion
 
-            this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
+            if( zvtCommunication == default)
+            {
+                this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
+            }
+            else
+            {
+                this._zvtCommunication = zvtCommunication;
+            }
             this._zvtCommunication.DataReceived += this.DataReceived;
             this._zvtCommunication.GetCompletionInfo += GetCompletionInfo;
         }
