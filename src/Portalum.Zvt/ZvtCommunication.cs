@@ -15,12 +15,12 @@ namespace Portalum.Zvt
     /// </summary>
     public class ZvtCommunication : IDisposable
     {
-        private readonly ILogger _logger;
-        private readonly IDeviceCommunication _deviceCommunication;
+        protected readonly ILogger _logger;
+        protected readonly IDeviceCommunication _deviceCommunication;
 
-        private CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
-        private byte[] _dataBuffer;
-        private bool _waitForAcknowledge = false;
+        protected CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
+        protected byte[] _dataBuffer;
+        protected bool _waitForAcknowledge = false;
 
         /// <summary>
         /// New data received from the pt device
@@ -32,12 +32,12 @@ namespace Portalum.Zvt
         /// </summary>
         public event Func<CompletionInfo> GetCompletionInfo;
 
-        private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
-        private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
-        private readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
-        private readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
-        private readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
-        private readonly byte _negativeCompletionPrefix = 0x84;
+        protected readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
+        protected readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
+        protected readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
+        protected readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
+        protected readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
+        protected readonly byte _negativeCompletionPrefix = 0x84;
 
         /// <summary>
         /// ZvtCommunication
