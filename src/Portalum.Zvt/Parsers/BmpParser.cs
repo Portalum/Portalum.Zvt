@@ -290,7 +290,7 @@ namespace Portalum.Zvt.Parsers
                 new BmpInfo { Id = 0x0E, DataLength = 2, Description = "Expiry-date, format YYMM", TryParse = this.ParseExpiryDate },
                 new BmpInfo { Id = 0x17, DataLength = 2, Description = "Card sequence-number", TryParse = this.ParseCardSequenceNumber },
                 new BmpInfo { Id = 0x19, DataLength = 1, Description = "Status-byte as defined in Registration (06 00) / Payment-type as defined in Authorization (06 01) / Card-type as defined in Read Card (06 C0)", TryParse = null },
-                new BmpInfo { Id = 0x22, DataLength = 2, CalculateDataLength = this.GetDataLengthLL, Description = "PAN / EF_ID, 'E' used to indicate a masked numeric digit1. If the card-number contains an odd number of digits, it is padded with an ‘F’.", TryParse = null },
+                new BmpInfo { Id = 0x22, DataLength = 2, CalculateDataLength = this.GetDataLengthLL, Description = "PAN / EF_ID, 'E' used to indicate a masked numeric digit1. If the card-number contains an odd number of digits, it is padded with an ‘F’.", TryParse = ParsePanData },
                 new BmpInfo { Id = 0x23, DataLength = 2, CalculateDataLength = this.GetDataLengthLL, Description = "Track 2 data, without start and end markers; 'E' used to indicate a masked numeric digit", TryParse = null },
                 new BmpInfo { Id = 0x24, DataLength = 3, CalculateDataLength = this.GetDataLengthLLL, Description = "Track 3 data, without start and end markers; 'E' used to indicate a masked numeric digit", TryParse = null },
                 new BmpInfo { Id = 0x27, DataLength = 1, Description = "Result-Code as defined in chapter Error-Messages", TryParse = this.ParseErrorCode },
@@ -735,7 +735,17 @@ namespace Portalum.Zvt.Parsers
 
             return false;
         }
-
+        
+        private bool ParsePanData(byte[] data, IResponse response)
+        {
+            if (response is IResponseCardNumber typedResponse)
+            {
+                var cardNumber = BitConverter.ToString(data).Replace("-", "").Replace("E", "");
+                typedResponse.CardNumber = cardNumber;
+                return true;
+            }
+            return false;
+        }
         private bool ParseCardName(byte[] data, IResponse response)
         {
             if (response is IResponseCardName typedResponse)
