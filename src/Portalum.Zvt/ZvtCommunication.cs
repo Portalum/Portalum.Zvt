@@ -76,7 +76,7 @@ namespace Portalum.Zvt
         /// Switch for incoming data
         /// </summary>
         /// <param name="data"></param>
-        private void DataReceiveSwitch(byte[] data)
+        protected virtual void DataReceiveSwitch(byte[] data)
         {
             if (this._waitForAcknowledge)
             {
@@ -87,13 +87,13 @@ namespace Portalum.Zvt
             this.ProcessData(data);
         }
 
-        private void AddDataToBuffer(byte[] data)
+        protected virtual void AddDataToBuffer(byte[] data)
         {
             this._dataBuffer = data;
             this._acknowledgeReceivedCancellationTokenSource?.Cancel();
         }
 
-        private void ProcessData(byte[] data)
+        protected virtual void ProcessData(byte[] data)
         {
             var dataProcessed = this.DataReceived?.Invoke(data);
             if (dataProcessed?.State == ProcessDataState.Processed)
@@ -209,7 +209,7 @@ namespace Portalum.Zvt
             return SendCommandResult.UnknownFailure;
         }
 
-        private bool CheckIsPositiveCompletion()
+        protected virtual bool CheckIsPositiveCompletion()
         {
             if (this._dataBuffer.Length < 3)
             {
@@ -236,7 +236,7 @@ namespace Portalum.Zvt
             return false;
         }
 
-        private bool CheckIsNegativeCompletion()
+        protected virtual bool CheckIsNegativeCompletion()
         {
             if (this._dataBuffer.Length < 3)
             {
@@ -254,7 +254,7 @@ namespace Portalum.Zvt
             return false;
         }
 
-        private bool CheckIsNotSupported()
+        protected virtual bool CheckIsNotSupported()
         {
             if (this._dataBuffer.Length < 3)
             {
@@ -271,12 +271,12 @@ namespace Portalum.Zvt
             return false;
         }
 
-        private void ResetDataBuffer()
+        protected virtual void ResetDataBuffer()
         {
             this._dataBuffer = null;
         }
 
-        private void ForwardUnusedBufferData()
+        protected virtual void ForwardUnusedBufferData()
         {
             if (this._dataBuffer.Length == 3)
             {
