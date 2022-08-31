@@ -4,6 +4,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Portalum.Zvt.Helpers;
+using System.Collections.Generic;
 
 namespace Portalum.Zvt
 {
@@ -23,11 +25,17 @@ namespace Portalum.Zvt
         /// <summary>
         /// New data received from the pt device
         /// </summary>
-        public event Func<byte[], bool> DataReceived;
+        public event Func<byte[], ProcessData> DataReceived;
+
+        /// <summary>
+        /// A callback which is checked 
+        /// </summary>
+        public event Func<CompletionInfo> GetCompletionInfo;
 
         protected readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
         protected readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
         protected readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
+        protected readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
         protected readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
         protected readonly byte _negativeCompletionPrefix = 0x84;
 
@@ -46,7 +54,7 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public virtual void Dispose()
+        public void Dispose()
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
@@ -88,10 +96,47 @@ namespace Portalum.Zvt
         protected virtual void ProcessData(byte[] data)
         {
             var dataProcessed = this.DataReceived?.Invoke(data);
-            if (dataProcessed.HasValue && dataProcessed.Value)
+            if (dataProcessed?.State == ProcessDataState.Processed)
             {
-                //Send acknowledge before process the data
-                this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+                if (dataProcessed.Response is StatusInformation { ErrorCode: 0 })
+                {
+                    var completionInfo = this.GetCompletionInfo?.Invoke();
+                    if (completionInfo == null)
+                    {
+                        //Default if no one has subscribed to the event, immediately approve the transaction
+                        this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+                    }
+                    else
+                    {
+                        switch (completionInfo.State)
+                        {
+                            case CompletionInfoState.Wait:
+                                this._deviceCommunication.SendAsync(this._positiveCompletionData3);
+                                break;
+                            case CompletionInfoState.ChangeAmount:
+                                var controlField = new byte[] { 0x84, 0x9D };
+
+                                // Change the amount from the original in the start request
+                                var package = new List<byte>();
+                                package.Add(0x04); //Amount prefix
+                                package.AddRange(NumberHelper.DecimalToBcd(completionInfo.Amount));
+                                this._deviceCommunication.SendAsync(PackageHelper.Create(controlField, package.ToArray()));
+                                break;
+                            case CompletionInfoState.Successful:
+                                this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+                                break;
+                            case CompletionInfoState.Failure:
+                                this._deviceCommunication.SendAsync(this._negativeIssueGoodsData);
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
+                }
+                else
+                {
+                    this._deviceCommunication.SendAsync(this._positiveCompletionData1);
+                }
             }
         }
 

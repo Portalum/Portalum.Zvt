@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Diagnostics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Portalum.Zvt.Models;
 using System.Linq;
@@ -14,10 +15,10 @@ namespace Portalum.Zvt.UnitTest
         {
             var additionalDataReceived = false;
 
-            bool dataReceived(byte[] data)
+            ProcessData dataReceived(byte[] data)
             {
                 additionalDataReceived = true;
-                return true;
+                return new ProcessData{ State = ProcessDataState.Processed };
             }
 
             var loggerZvtCommunication = LoggerHelper.GetLogger<ZvtCommunication>();
@@ -43,11 +44,11 @@ namespace Portalum.Zvt.UnitTest
             var additionalDataReceived = false;
             byte[] additionalData = null;
 
-            bool dataReceived(byte[] data)
+            ProcessData dataReceived(byte[] data)
             {
                 additionalDataReceived = true;
                 additionalData = data;
-                return true;
+                return new ProcessData{ State = ProcessDataState.Processed };
             }
 
             var loggerZvtCommunication = LoggerHelper.GetLogger<ZvtCommunication>();

@@ -106,11 +106,11 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public ProcessDataState ProcessData(Span<byte> data)
+        public virtual ProcessData ProcessData(Span<byte> data)
         {
             if (data.Length == 0)
             {
-                return ProcessDataState.CannotProcess;
+                return new ProcessData {State = ProcessDataState.CannotProcess };
             }
 
             var apduInfo = ApduHelper.GetApduInfo(data);
@@ -144,14 +144,14 @@ namespace Portalum.Zvt
                     this._receiveBufferEndPosition = data.Length;
                     this._missingDataOfExpectedPackage = apduInfo.PackageSize - this._receiveBufferEndPosition;
 
-                    return ProcessDataState.WaitForMoreData;
+                    return new ProcessData{ State = ProcessDataState.WaitForMoreData };
                 }
 
                 if (data.Length > apduInfo.PackageSize)
                 {
                     this.ResetFragmentInfo();
                     this._logger.LogError($"{nameof(ProcessData)} - Apdu data part corrupt");
-                    return ProcessDataState.CannotProcess;
+                    return new ProcessData{ State = ProcessDataState.CannotProcess };
                 }
 
                 apduData = data.Slice(apduInfo.DataStartIndex, apduInfo.DataLength);
@@ -171,7 +171,7 @@ namespace Portalum.Zvt
 
                     if (this._missingDataOfExpectedPackage > 0)
                     {
-                        return ProcessDataState.WaitForMoreData;
+                        return new ProcessData{ State = ProcessDataState.WaitForMoreData };
                     }
                 }
 
@@ -201,14 +201,14 @@ namespace Portalum.Zvt
             this._missingDataOfExpectedPackage = 0;
         }
 
-        protected virtual ProcessDataState ProcessApdu(
+        protected virtual ProcessData ProcessApdu(
             ApduResponseInfo apduInfo,
             Span<byte> apduData)
         {
             if (apduInfo.ControlField == null ||
                 apduInfo.ControlField.Length != 2)
             {
-                return ProcessDataState.ParseFailure;
+                return new ProcessData{ State = ProcessDataState.ParseFailure };
             }
 
             //Status Information
@@ -217,11 +217,11 @@ namespace Portalum.Zvt
                 var statusInformation = this._statusInformationParser.Parse(apduData);
                 if (statusInformation == null)
                 {
-                    return ProcessDataState.ParseFailure;
+                    return new ProcessData{ State = ProcessDataState.ParseFailure };
                 }
 
                 this.StatusInformationReceived?.Invoke(statusInformation);
-                return ProcessDataState.Processed;
+                return new ProcessData{ State = ProcessDataState.Processed, Response = statusInformation };
             }
 
             //Intermediate Status Information
@@ -230,11 +230,14 @@ namespace Portalum.Zvt
                 var intermediateStatusInformation = this._intermediateStatusInformationParser.GetMessage(apduData);
                 if (intermediateStatusInformation == null)
                 {
-                    return ProcessDataState.ParseFailure;
+                    return new ProcessData{ State = ProcessDataState.ParseFailure };
                 }
 
                 this.IntermediateStatusInformationReceived?.Invoke(intermediateStatusInformation);
-                return ProcessDataState.Processed;
+                return new ProcessData { 
+                    State = ProcessDataState.Processed, 
+                    Response = new IntermediateStatusInformation{ErrorMessage = intermediateStatusInformation} 
+                };
             }
 
             //Print Line
@@ -243,7 +246,7 @@ namespace Portalum.Zvt
                 //Use apdu length info, length is hardcoded
                 var printLineInfo = this._printLineParser.Parse(apduData);
                 this.LineReceived?.Invoke(printLineInfo);
-                return ProcessDataState.Processed;
+                return new ProcessData{ State = ProcessDataState.Processed, Response = printLineInfo };
             }
 
             //Print Text-Block
@@ -252,11 +255,11 @@ namespace Portalum.Zvt
                 var receipt = this._printTextBlockParser.Parse(apduData);
                 if (receipt == null)
                 {
-                    return ProcessDataState.ParseFailure;
+                    return new ProcessData{ State = ProcessDataState.ParseFailure };
                 }
 
                 this.ReceiptReceived?.Invoke(receipt);
-                return ProcessDataState.Processed;
+                return new ProcessData{ State = ProcessDataState.Processed, Response = new PrintTextBlock() };
             }
 
             //Completion (3.2 Completion)
@@ -264,17 +267,18 @@ namespace Portalum.Zvt
             {
                 this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Completion' received");
                 this.CompletionReceived?.Invoke();
-                return ProcessDataState.Processed;
+                return new ProcessData{ State = ProcessDataState.Processed, Response = new Completion() };
             }
 
             //Abort (3.3 Abort)
             if (apduInfo.CanHandle(this._abortCommandControlField))
             {
                 var errorMessage = string.Empty;
-
+                byte errorCode = 0x60;
+                
                 if (apduData.Length > 0)
                 {
-                    var errorCode = apduData[0];
+                    errorCode = apduData[0];
                     errorMessage = this._errorMessageRepository.GetMessage(errorCode);
                 }
                 else
@@ -285,10 +289,13 @@ namespace Portalum.Zvt
                 this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Abort' received with message:{errorMessage}");
                 this.AbortReceived?.Invoke(errorMessage);
 
-                return ProcessDataState.Processed;
+                return new ProcessData{ 
+                    State = ProcessDataState.Processed, 
+                    Response = new Abort {ErrorCode = errorCode, ErrorMessage = errorMessage}
+                };
             }
 
-            return ProcessDataState.CannotProcess;
+            return new ProcessData{ State = ProcessDataState.CannotProcess };
         }
     }
 }

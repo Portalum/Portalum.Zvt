@@ -26,5 +26,13 @@ namespace Portalum.Zvt
         /// Timeout after Command Acknowledge and Completion
         /// </summary>
         public TimeSpan CommandCompletionTimeout = TimeSpan.FromSeconds(180);
+
+        
+        /// <summary>
+        /// Maximum number of times the AskForCompletionInfo callback is called. After this number of
+        /// times a auto reversal will be triggered and the payment will fail. A PT usually queries
+        /// every 2 (ZVT standard) to 4 (observed in practice) seconds for the completion status.
+        /// </summary>
+        public byte GetAsyncCompletionInfoLimit = 10;
     }
 }

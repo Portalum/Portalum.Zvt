@@ -46,11 +46,11 @@ namespace Portalum.Zvt.UnitTest
 
                 if (i == hexLines.Length - 1)
                 {
-                    Assert.AreEqual(processDataState, ProcessDataState.Processed);
+                    Assert.AreEqual(processDataState.State, ProcessDataState.Processed);
                     continue;
                 }
 
-                Assert.AreEqual(processDataState, ProcessDataState.WaitForMoreData);
+                Assert.AreEqual(processDataState.State, ProcessDataState.WaitForMoreData);
             }
         }
 
@@ -72,11 +72,11 @@ namespace Portalum.Zvt.UnitTest
 
                 if (i == hexLines.Length - 1)
                 {
-                    Assert.AreEqual(processDataState, ProcessDataState.Processed);
+                    Assert.AreEqual(processDataState.State, ProcessDataState.Processed);
                     continue;
                 }
 
-                Assert.AreEqual(processDataState, ProcessDataState.WaitForMoreData);
+                Assert.AreEqual(processDataState.State, ProcessDataState.WaitForMoreData);
             }
         }
 
@@ -94,7 +94,7 @@ namespace Portalum.Zvt.UnitTest
             {
                 var data = ByteHelper.HexToByteArray(hexLine);
                 var processDataState = receiveHandler.ProcessData(data);
-                Assert.AreEqual(processDataState, ProcessDataState.Processed);
+                Assert.AreEqual(processDataState.State, ProcessDataState.Processed);
             }
         }
     }
