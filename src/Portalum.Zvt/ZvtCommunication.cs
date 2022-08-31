@@ -13,23 +13,23 @@ namespace Portalum.Zvt
     /// </summary>
     public class ZvtCommunication : IDisposable
     {
-        private readonly ILogger _logger;
-        private readonly IDeviceCommunication _deviceCommunication;
+        protected readonly ILogger _logger;
+        protected readonly IDeviceCommunication _deviceCommunication;
 
-        private CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
-        private byte[] _dataBuffer;
-        private bool _waitForAcknowledge = false;
+        protected CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
+        protected byte[] _dataBuffer;
+        protected bool _waitForAcknowledge = false;
 
         /// <summary>
         /// New data received from the pt device
         /// </summary>
         public event Func<byte[], bool> DataReceived;
 
-        private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
-        private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
-        private readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
-        private readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
-        private readonly byte _negativeCompletionPrefix = 0x84;
+        protected readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
+        protected readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
+        protected readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
+        protected readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
+        protected readonly byte _negativeCompletionPrefix = 0x84;
 
         /// <summary>
         /// ZvtCommunication
@@ -46,7 +46,7 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
@@ -68,7 +68,7 @@ namespace Portalum.Zvt
         /// Switch for incoming data
         /// </summary>
         /// <param name="data"></param>
-        private void DataReceiveSwitch(byte[] data)
+        protected virtual void DataReceiveSwitch(byte[] data)
         {
             if (this._waitForAcknowledge)
             {
@@ -79,13 +79,13 @@ namespace Portalum.Zvt
             this.ProcessData(data);
         }
 
-        private void AddDataToBuffer(byte[] data)
+        protected virtual void AddDataToBuffer(byte[] data)
         {
             this._dataBuffer = data;
             this._acknowledgeReceivedCancellationTokenSource?.Cancel();
         }
 
-        private void ProcessData(byte[] data)
+        protected virtual void ProcessData(byte[] data)
         {
             var dataProcessed = this.DataReceived?.Invoke(data);
             if (dataProcessed.HasValue && dataProcessed.Value)
@@ -102,7 +102,7 @@ namespace Portalum.Zvt
         /// <param name="acknowledgeReceiveTimeoutMilliseconds">Maximum waiting time for the acknowledge package, default is 5 seconds, T3 Timeout</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<SendCommandResult> SendCommandAsync(
+        public async virtual Task<SendCommandResult> SendCommandAsync(
             byte[] commandData,
             int acknowledgeReceiveTimeoutMilliseconds = 5000,
             CancellationToken cancellationToken = default)
@@ -164,7 +164,7 @@ namespace Portalum.Zvt
             return SendCommandResult.UnknownFailure;
         }
 
-        private bool CheckIsPositiveCompletion()
+        protected virtual bool CheckIsPositiveCompletion()
         {
             if (this._dataBuffer.Length < 3)
             {
@@ -191,7 +191,7 @@ namespace Portalum.Zvt
             return false;
         }
 
-        private bool CheckIsNegativeCompletion()
+        protected virtual bool CheckIsNegativeCompletion()
         {
             if (this._dataBuffer.Length < 3)
             {
@@ -209,7 +209,7 @@ namespace Portalum.Zvt
             return false;
         }
 
-        private bool CheckIsNotSupported()
+        protected virtual bool CheckIsNotSupported()
         {
             if (this._dataBuffer.Length < 3)
             {
@@ -226,12 +226,12 @@ namespace Portalum.Zvt
             return false;
         }
 
-        private void ResetDataBuffer()
+        protected virtual void ResetDataBuffer()
         {
             this._dataBuffer = null;
         }
 
-        private void ForwardUnusedBufferData()
+        protected virtual void ForwardUnusedBufferData()
         {
             if (this._dataBuffer.Length == 3)
             {

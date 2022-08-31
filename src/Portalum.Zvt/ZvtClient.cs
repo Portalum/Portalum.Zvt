@@ -62,11 +62,13 @@ namespace Portalum.Zvt
         /// <param name="logger"></param>
         /// <param name="clientConfig">ZVT Configuration</param>
         /// <param name="receiveHandler">Inject own receive handler</param>
+        /// <param name="zvtCommunication">Inject own ZVT Communication</param>
         public ZvtClient(
             IDeviceCommunication deviceCommunication,
             ILogger<ZvtClient> logger = default,
             ZvtClientConfig clientConfig = default,
-            IReceiveHandler receiveHandler = default)
+            IReceiveHandler receiveHandler = default,
+            ZvtCommunication zvtCommunication = default)
         {
             if (logger == null)
             {
@@ -99,8 +101,19 @@ namespace Portalum.Zvt
 
             #endregion
 
-            this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
-            this._zvtCommunication.DataReceived += this.DataReceived;
+            # region ZvtCommunication
+            
+            if (zvtCommunication == default)
+            {
+                this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
+            }
+            else
+            {
+                this._zvtCommunication = zvtCommunication;
+            }
+            this.RegisterZvtCommunicationHandlerEvents();
+
+            #endregion
         }
 
         /// <inheritdoc />
@@ -118,9 +131,9 @@ namespace Portalum.Zvt
         {
             if (disposing)
             {
-                this._zvtCommunication.DataReceived -= this.DataReceived;
+                this.UnregisterZvtCommunicationHandlerEvents();
                 this._zvtCommunication.Dispose();
-
+                
                 this.UnregisterReceiveHandlerEvents();
             }
         }
@@ -152,6 +165,16 @@ namespace Portalum.Zvt
 
             this._receiveHandler = new ReceiveHandler(this._logger, encoding, errorMessageRepository, intermediateStatusRepository);
             this.RegisterReceiveHandlerEvents();
+        }
+
+        private void RegisterZvtCommunicationHandlerEvents()
+        {
+            this._zvtCommunication.DataReceived += this.DataReceived;
+        }
+        
+        private void UnregisterZvtCommunicationHandlerEvents()
+        {
+            this._zvtCommunication.DataReceived -= this.DataReceived;
         }
 
         private void RegisterReceiveHandlerEvents()
