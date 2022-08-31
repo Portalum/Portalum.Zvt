@@ -6,10 +6,12 @@ namespace Portalum.Zvt.Models
     public class StatusInformation :
         IResponse,
         IResponseErrorMessage,
+        IResponseErrorCode,
         IResponseAdditionalText,
         IResponseTerminalIdentifier,
         IResponseAmount,
         IResponseCardName,
+        IResponseCardNumber,
         IResponseCardholderAuthentication,
         IResponseCardTechnology,
         IResponseTime,
@@ -25,9 +27,11 @@ namespace Portalum.Zvt.Models
         IResponseCardType
     {
         public string ErrorMessage { get; set; }
+        public byte ErrorCode { get; set; }
         public int TerminalIdentifier { get; set; }
         public string AdditionalText { get; set; }
         public string CardName { get; set; }
+        public string CardNumber { get; set; }
         public decimal Amount { get; set; }
         public string CardholderAuthentication { get; set; }
         public bool PrintoutNeeded { get; set; }
