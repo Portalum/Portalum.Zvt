@@ -286,7 +286,7 @@ namespace Portalum.Zvt.Parsers
                 new BmpInfo { Id = 0x06, DataLength = 0, Description = "TLV-container; length according to TLV-encoding (not LLL-Var !)", TryParse = tlvParser.Parse },
                 new BmpInfo { Id = 0x0B, DataLength = 3, Description = "Trace number", TryParse = this.ParseTraceNumber },
                 new BmpInfo { Id = 0x0C, DataLength = 3, Description = "Time, format HHMMSS", TryParse = this.ParseTime },
-                new BmpInfo { Id = 0x0D, DataLength = 2, Description = "Date, format MMDD (see also AA)", TryParse = null },
+                new BmpInfo { Id = 0x0D, DataLength = 2, Description = "Date, format MMDD (see also AA)", TryParse = this.ParseDate },
                 new BmpInfo { Id = 0x0E, DataLength = 2, Description = "Expiry-date, format YYMM", TryParse = this.ParseExpiryDate },
                 new BmpInfo { Id = 0x17, DataLength = 2, Description = "Card sequence-number", TryParse = this.ParseCardSequenceNumber },
                 new BmpInfo { Id = 0x19, DataLength = 1, Description = "Status-byte as defined in Registration (06 00) / Payment-type as defined in Authorization (06 01) / Card-type as defined in Read Card (06 C0)", TryParse = null },
@@ -506,7 +506,7 @@ namespace Portalum.Zvt.Parsers
         private bool ParseErrorCode(byte[] data, IResponse response)
         {
             var errorMessage = this._errorMessageRepository.GetMessage(data[0]);
-            bool parsed = false;
+            var parsed = false;
             
             if (response is IResponseErrorMessage typedErrorMessageResponse)
             {
@@ -568,6 +568,36 @@ namespace Portalum.Zvt.Parsers
 
                 typedResponse.ExpiryDateMonth = month;
                 typedResponse.ExpiryDateYear = year;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ParseDate(byte[] data, IResponse response)
+        {
+            if (response is IResponseDate typedResponse)
+            {
+                if (data.Length != 2)
+                {
+                    return false;
+                }
+
+                var dateString = ByteHelper.ByteArrayToHex(data);
+
+                if (!int.TryParse(dateString.Substring(0,2), out var month))
+                {
+                    return false;
+                }
+
+                if (!int.TryParse(dateString.Substring(2, 2), out var day))
+                {
+                    return false;
+                }
+
+                typedResponse.DateDay = day;
+                typedResponse.DateMonth = month;
 
                 return true;
             }
