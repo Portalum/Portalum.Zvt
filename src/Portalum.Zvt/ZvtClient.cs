@@ -77,6 +77,7 @@ namespace Portalum.Zvt
         /// <param name="logger"></param>
         /// <param name="clientConfig">ZVT Configuration</param>
         /// <param name="receiveHandler">Inject own receive handler</param>
+        /// <param name="zvtCommunication">Inject own ZVT Communication</param>
         public ZvtClient(
             IDeviceCommunication deviceCommunication,
             ILogger<ZvtClient> logger = default,
@@ -148,7 +149,7 @@ namespace Portalum.Zvt
             {
                 this.UnregisterZvtCommunicationHandlerEvents();
                 this._zvtCommunication.Dispose();
-
+                
                 this.UnregisterReceiveHandlerEvents();
             }
         }

@@ -54,7 +54,7 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
