@@ -12,6 +12,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - run: echo "The job was automatically triggered by a ${{ github.event_name }}"
     - uses: actions/checkout@v2
     - name: Setup .NET 6.0
       uses: actions/setup-dotnet@v1
@@ -37,7 +38,7 @@ jobs:
       run: |
         dotnet pack --configuration Release --output $GITHUB_WORKSPACE/out src/Portalum.Zvt/Portalum.Zvt.csproj
     - name: Push NuGet package
-      if: github.event_name != 'pull_request' && github.repository_owner == 'Portalum' && (${{ steps.test.outcome }} == 'success')
+      if: github.event_name != 'pull_request' && github.repository_owner == 'Portalum' && steps.test.outcome == 'success'
       run: |
         cd $GITHUB_WORKSPACE/out
         dotnet nuget push *.nupkg --source https://www.nuget.org/api/v2/package --api-key ${{secrets.NUGET_TOKEN}} --skip-duplicate --no-symbols
