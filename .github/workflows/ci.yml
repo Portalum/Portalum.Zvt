@@ -36,6 +36,8 @@ jobs:
     - name: Build project and generate NuGet package
       run: |
         dotnet pack --configuration Release --output $GITHUB_WORKSPACE/out src/Portalum.Zvt/Portalum.Zvt.csproj
+    - name: Explain why this job ran
+        run: echo "The ${{ github.event_name }} event triggered this step."
     - name: Push NuGet package
       if: github.event_name != 'pull_request' && github.repository_owner == 'Portalum' && (${{ steps.test.outcome }} == 'success')
       run: |
