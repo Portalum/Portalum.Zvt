@@ -389,6 +389,14 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"CardName: {statusInformation.CardName}");
             }
+            if (!string.IsNullOrEmpty(statusInformation.CardNumber))
+            {
+                lines.Add($"CardNumber: {statusInformation.CardNumber}");
+            }
+            if (statusInformation.CardSequenceNumber > 0)
+            {
+                lines.Add($"CardSequenceNumber: {statusInformation.CardSequenceNumber}");
+            }
             if (!string.IsNullOrEmpty(statusInformation.CardholderAuthentication))
             {
                 lines.Add($"CardholderAuthentication: {statusInformation.CardholderAuthentication}");
@@ -420,6 +428,14 @@ namespace Portalum.Zvt.ControlPanel
             if (statusInformation.CurrencyCode > 0)
             {
                 lines.Add($"CurrencyCode: {statusInformation.CurrencyCode}");
+            }
+            if (statusInformation.DateDay > 0 && statusInformation.DateMonth > 0)
+            {
+                lines.Add($"Date: {statusInformation.DateDay:00}/{statusInformation.DateMonth:00}");
+            }
+            if (statusInformation.Time != TimeSpan.Zero)
+            {
+                lines.Add($"Time: {statusInformation.Time}");
             }
 
             var outputInfo = new OutputInfo

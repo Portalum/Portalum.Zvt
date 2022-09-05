@@ -33,10 +33,12 @@ namespace Portalum.Zvt.Models
         public string AdditionalText { get; set; }
         public string CardName { get; set; }
         public string CardNumber { get; set; }
-        public decimal Amount { get; set; }
-        public string CardholderAuthentication { get; set; }
-        public bool PrintoutNeeded { get; set; }
+        public int CardSequenceNumber { get; set; }
         public string CardTechnology { get; set; }
+        public string CardType { get; set; }
+        public string CardholderAuthentication { get; set; }
+        public decimal Amount { get; set; }
+        public bool PrintoutNeeded { get; set; }
         public TimeSpan Time { get; set; }
         public int CurrencyCode { get; set; }
         public int ReceiptNumber { get; set; }
@@ -46,9 +48,7 @@ namespace Portalum.Zvt.Models
         public string AidAuthorisationAttribute { get; set; }
         public int ExpiryDateYear { get; set; }
         public int ExpiryDateMonth { get; set; }
-        public int CardSequenceNumber { get; set; }
         public int TurnoverRecordNumber { get; set; }
-        public string CardType { get; set; }
         public int DateMonth { get; set; }
         public int DateDay { get; set; }
     }
