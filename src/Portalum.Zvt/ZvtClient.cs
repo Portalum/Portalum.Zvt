@@ -278,6 +278,7 @@ namespace Portalum.Zvt
         /// <param name="commandData">The data of the command</param>
         /// <param name="endAfterAcknowledge">After receive an acknowledge the command is successful</param>
         /// <param name="cancellationToken"></param>
+        /// <param name="asyncCompletion">set to true to use asynchronous completion and it's callbacks.</param>
         /// <returns></returns>
         private async Task<CommandResponse> SendCommandAsync(
             byte[] commandData,
