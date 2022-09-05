@@ -134,6 +134,8 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(0, statusInformation.ErrorCode);
             Assert.AreEqual("NFC", statusInformation.CardTechnology);
             Assert.AreEqual("No Cardholder authentication", statusInformation.CardholderAuthentication);
+            Assert.AreEqual(29, statusInformation.DateDay);
+            Assert.AreEqual(10, statusInformation.DateMonth);
         }
 
         [TestMethod]
@@ -173,6 +175,8 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(52500295, statusInformation.TerminalIdentifier);
             Assert.AreEqual(12, statusInformation.Amount);
             Assert.AreEqual(978, statusInformation.CurrencyCode);
+            Assert.AreEqual(17, statusInformation.DateDay);
+            Assert.AreEqual(8, statusInformation.DateMonth);
         }
     }
 }

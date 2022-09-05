@@ -15,6 +15,7 @@ namespace Portalum.Zvt.Models
         IResponseCardholderAuthentication,
         IResponseCardTechnology,
         IResponseTime,
+        IResponseDate,
         IResponseCurrencyCode,
         IResponseReceiptNumber,
         IResponseTraceNumber,
@@ -48,5 +49,7 @@ namespace Portalum.Zvt.Models
         public int CardSequenceNumber { get; set; }
         public int TurnoverRecordNumber { get; set; }
         public string CardType { get; set; }
+        public int DateMonth { get; set; }
+        public int DateDay { get; set; }
     }
 }
