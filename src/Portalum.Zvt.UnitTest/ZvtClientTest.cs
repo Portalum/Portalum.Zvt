@@ -110,14 +110,16 @@ namespace Portalum.Zvt.UnitTest
         [TestMethod]
         public async Task PaymentAsync_SuccessfulPayment_Successful()
         {
-            byte[] dataSent = Array.Empty<byte>();
+            var dataSent = Array.Empty<byte>();
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
             var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+            var dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
                 .Returns(Task(byte[] data, CancellationToken token) =>
                 {
                     dataSent = data;
+                    dataSentCancellationTokenSource.Cancel();
                     return Task.CompletedTask;
                 });
 
@@ -137,13 +139,14 @@ namespace Portalum.Zvt.UnitTest
 
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null,
                 new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
-            await Task.Delay(1000);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // check that the ECR answers immediately, as no issueGoodsCallback is set
             CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent);
 
+            dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x0F, 0x00 });
-            await Task.Delay(1000);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
             var commandResponse = await paymentTask;
             Assert.IsFalse(startAsyncCompletionCalled);
 
@@ -172,7 +175,6 @@ namespace Portalum.Zvt.UnitTest
 
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, cardRejectedStatusInformation);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
-            await Task.Delay(1000);
             var commandResponse = await paymentTask;
 
             zvtClient.Dispose();
@@ -182,14 +184,16 @@ namespace Portalum.Zvt.UnitTest
         [TestMethod]
         public async Task PaymentAsync_IssueOfGoods_DelayedSuccess_Successful()
         {
-            byte[] dataSent = Array.Empty<byte>();
+            var dataSent = Array.Empty<byte>();
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
             var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+            var dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
                 .Returns(Task(byte[] data, CancellationToken token) =>
                 {
                     dataSent = data;
+                    dataSentCancellationTokenSource.Cancel();
                     return Task.CompletedTask;
                 });
 
@@ -211,7 +215,7 @@ namespace Portalum.Zvt.UnitTest
 
             dataSent = Array.Empty<byte>();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
-            await Task.Delay(1000);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // the ECR immediately requests for a timeout-extension
             CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent);
@@ -219,8 +223,9 @@ namespace Portalum.Zvt.UnitTest
             // if the completion info indicates a success with a changed amount ...
             completionInfo.State = CompletionInfoState.ChangeAmount;
             completionInfo.Amount = 22m;
+            dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
-            await Task.Delay(1000);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
             
             // ... the PT is informed about the changed amount
             CollectionAssert.AreEqual(new byte[] { 0x84, 0x9D, 0x07, 0x04, 0x00, 0x00, 0x00, 0x00, 0x22, 0x00 }, dataSent);
@@ -239,14 +244,16 @@ namespace Portalum.Zvt.UnitTest
         [TestMethod]
         public async Task PaymentAsync_IssueOfGoods_DelayedFailure_Successful()
         {
-            byte[] dataSent = Array.Empty<byte>();
+            var dataSent = Array.Empty<byte>();
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
             var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+            var dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
                 .Returns(Task(byte[] data, CancellationToken token) =>
                 {
                     dataSent = data;
+                    dataSentCancellationTokenSource.Cancel();
                     return Task.CompletedTask;
                 });
 
@@ -266,15 +273,16 @@ namespace Portalum.Zvt.UnitTest
 
             dataSent = Array.Empty<byte>();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
-            await Task.Delay(1000);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // the ECR immediately requests for a timeout-extension
             CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent);
 
             // if the completion info indicates a failure, the status information's response changes
             completionInfo.State = CompletionInfoState.Failure;
+            dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
-            await Task.Delay(1000);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
             CollectionAssert.AreEqual(new byte[] { 0x84, 0x66, 0x00 }, dataSent);
 
             // the pt will send a negative completion
@@ -288,14 +296,16 @@ namespace Portalum.Zvt.UnitTest
         [TestMethod]
         public async Task PaymentAsync_IssueOfGoods_RejectedCard_Successful()
         {
-            byte[] dataSent = Array.Empty<byte>();
+            var dataSent = Array.Empty<byte>();
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
             var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+            var dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
                 .Returns(Task(byte[] data, CancellationToken token) =>
                 {
                     dataSent = data;
+                    dataSentCancellationTokenSource.Cancel();
                     return Task.CompletedTask;
                 });
 
@@ -325,8 +335,8 @@ namespace Portalum.Zvt.UnitTest
             var cardRejectedStatusInformation = ByteHelper.HexToByteArray(negativeAuthorization);
 
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, cardRejectedStatusInformation);
-            await Task.Delay(1000);
-
+            await Task.Delay(5000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+            
             // a not successful status must neither trigger the askForCompletion nor the startCompletion events
             Assert.IsFalse(askForCompletionCalled);
             Assert.IsFalse(startAsyncCompletionCalled);
