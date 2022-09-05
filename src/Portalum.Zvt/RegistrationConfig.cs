@@ -35,6 +35,13 @@ namespace Portalum.Zvt
         /// Electronic Cash Register controls administration function
         /// </summary>
         public bool AllowAdministrationViaPaymentTerminal = false;
+        
+        /// <summary>
+        /// Payment terminal generates the receipt and sends it via print text line or print text block.
+        /// When disabled, the Electronic Cash Register only receives the status information and _no_ receipt.
+        /// It has to generate the receipt itself.
+        /// </summary>
+        public bool ReceiptPrintoutGeneratedViaPaymentTerminal = true;
 
         #endregion
 
@@ -84,8 +91,10 @@ namespace Portalum.Zvt
             {
                 configByte = BitHelper.SetBit(configByte, 5);
             }
-
-            configByte = BitHelper.SetBit(configByte, 7); //ECR print-type
+            if (this.ReceiptPrintoutGeneratedViaPaymentTerminal)
+            {
+                configByte = BitHelper.SetBit(configByte, 7);    
+            }
 
             return configByte;
         }
