@@ -206,6 +206,7 @@ namespace Portalum.Zvt
                 return SendCommandResult.NegativeCompletionReceived;
             }
 
+            this._logger.LogError($"{nameof(SendCommandAsync)} - Unknown Failure, DataBuffer {BitConverter.ToString(this._dataBuffer)}");
             return SendCommandResult.UnknownFailure;
         }
 

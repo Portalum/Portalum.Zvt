@@ -334,7 +334,9 @@ namespace Portalum.Zvt
                 this._receiveHandler.IntermediateStatusInformationReceived += intermediateStatusInformationReceived;
                 this._receiveHandler.StatusInformationReceived += statusInformationReceived;
                 if (asyncCompletion)
+                {
                     this._zvtCommunication.GetCompletionInfo += this.GetCompletionInfo;
+                }
 
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
@@ -350,7 +352,6 @@ namespace Portalum.Zvt
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command: {sendCommandResult}");
                     commandResponse.State = CommandResponseState.Error;
                     commandResponse.ErrorMessage = sendCommandResult.ToString();
-
                     return commandResponse;
                 }
 
@@ -376,7 +377,11 @@ namespace Portalum.Zvt
                 this._receiveHandler.CompletionReceived -= completionReceived;
                 this._receiveHandler.IntermediateStatusInformationReceived -= intermediateStatusInformationReceived;
                 this._receiveHandler.StatusInformationReceived -= statusInformationReceived;
-                this._zvtCommunication.GetCompletionInfo -= this.GetCompletionInfo;
+
+                if (asyncCompletion)
+                {
+                    this._zvtCommunication.GetCompletionInfo -= this.GetCompletionInfo;
+                }
             }
 
             return commandResponse;
