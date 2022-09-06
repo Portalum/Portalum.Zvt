@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
+using System.Diagnostics;
 
 namespace Portalum.Zvt.UnitTest
 {
@@ -214,6 +215,7 @@ namespace Portalum.Zvt.UnitTest
             var paymentTask = zvtClient.PaymentAsync(33);
             await Task.Delay(1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
+            Trace.WriteLine($"Collection: {BitConverter.ToString(dataSent)}");
             CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             dataSent = Array.Empty<byte>();
@@ -221,6 +223,7 @@ namespace Portalum.Zvt.UnitTest
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // the ECR immediately requests for a timeout-extension
+            Trace.WriteLine($"Collection: {BitConverter.ToString(dataSent)}");
             CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             // if the completion info indicates a success with a changed amount ...
