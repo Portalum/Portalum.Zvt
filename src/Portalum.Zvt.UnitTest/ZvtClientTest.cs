@@ -136,14 +136,14 @@ namespace Portalum.Zvt.UnitTest
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
             // ensure the timeout is not set, when nothing is passed to PaymentAsync
             CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x07, 0x04, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00 },
-                dataSent);
+                dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null,
                 new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // check that the ECR answers immediately, as no issueGoodsCallback is set
-            CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x0F, 0x00 });
@@ -214,14 +214,14 @@ namespace Portalum.Zvt.UnitTest
             var paymentTask = zvtClient.PaymentAsync(33);
             await Task.Delay(1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
-            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             dataSent = Array.Empty<byte>();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // the ECR immediately requests for a timeout-extension
-            CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             // if the completion info indicates a success with a changed amount ...
             completionInfo.State = CompletionInfoState.ChangeAmount;
@@ -231,7 +231,7 @@ namespace Portalum.Zvt.UnitTest
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
             
             // ... the PT is informed about the changed amount
-            CollectionAssert.AreEqual(new byte[] { 0x84, 0x9D, 0x07, 0x04, 0x00, 0x00, 0x00, 0x00, 0x22, 0x00 }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x84, 0x9D, 0x07, 0x04, 0x00, 0x00, 0x00, 0x00, 0x22, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             // the start completion event MUST only be triggered once, even tough we have received two status information events
             Assert.AreEqual(1, startAsyncCompletionLaunchCount);
@@ -273,21 +273,21 @@ namespace Portalum.Zvt.UnitTest
             var paymentTask = zvtClient.PaymentAsync(33);
             await Task.Delay(1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
-            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             dataSent = Array.Empty<byte>();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // the ECR immediately requests for a timeout-extension
-            CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             // if the completion info indicates a failure, the status information's response changes
             completionInfo.State = CompletionInfoState.Failure;
             dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
-            CollectionAssert.AreEqual(new byte[] { 0x84, 0x66, 0x00 }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x84, 0x66, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             // the pt will send a negative completion
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
@@ -333,7 +333,7 @@ namespace Portalum.Zvt.UnitTest
             var paymentTask = zvtClient.PaymentAsync(33);
             await Task.Delay(1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
-            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             dataSent = Array.Empty<byte>();
             var negativeAuthorization = "04-0F-25-27-05-29-29-00-02-74-3C-F0-F0-F9-41-62-67-65-6C-65-68-6E-74-8A-06-06-0D-24-0B-07-09-41-62-67-65-6C-65-68-6E-74";
@@ -347,7 +347,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.IsFalse(startAsyncCompletionCalled);
 
             // ensure we answer with an ack in this case
-            CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent);
+            CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
             var commandResponse = await paymentTask;
