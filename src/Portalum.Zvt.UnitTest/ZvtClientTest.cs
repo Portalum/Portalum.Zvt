@@ -1,12 +1,11 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
+using System;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Portalum.Zvt.UnitTest
 {
@@ -117,11 +116,11 @@ namespace Portalum.Zvt.UnitTest
             var dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
-                .Returns(Task(byte[] data, CancellationToken token) =>
+                .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
-                    dataSentCancellationTokenSource.Cancel();
-                    return Task.CompletedTask;
+                    //dataSentCancellationTokenSource.Cancel();
+                    return true;
                 });
 
             var startAsyncCompletionCalled = false;
@@ -198,7 +197,7 @@ namespace Portalum.Zvt.UnitTest
                 .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
-                    dataSentCancellationTokenSource.Cancel();
+                    //dataSentCancellationTokenSource.Cancel();
                     return true;
                 });
 
@@ -260,7 +259,7 @@ namespace Portalum.Zvt.UnitTest
                 .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
-                    dataSentCancellationTokenSource.Cancel();
+                    //dataSentCancellationTokenSource.Cancel();
                     return true;
                 });
 
@@ -313,7 +312,7 @@ namespace Portalum.Zvt.UnitTest
                 .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
-                    dataSentCancellationTokenSource.Cancel();
+                    //dataSentCancellationTokenSource.Cancel();
                     return true;
                 });
 
