@@ -202,7 +202,7 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public async Task SendAsync(
+        public async Task<bool> SendAsync(
             byte[] data,
             CancellationToken cancellationToken = default)
         {
@@ -212,10 +212,12 @@ namespace Portalum.Zvt
             try
             {
                 await this._tcpClient.SendAsync(data, cancellationToken);
+                return true;
             }
             catch (Exception exception)
             {
                 this._logger.LogError(exception, $"{nameof(SendAsync)}");
+                return false;
             }
         }
     }

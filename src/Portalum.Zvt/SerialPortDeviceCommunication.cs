@@ -138,7 +138,7 @@ namespace Portalum.Zvt
         }
 
         /// <inheritdoc />
-        public Task SendAsync(
+        public async Task<bool> SendAsync(
             byte[] data,
             CancellationToken cancellationToken = default)
         {
@@ -165,7 +165,7 @@ namespace Portalum.Zvt
                 memoryStream.WriteByte(DLE);
                 memoryStream.WriteByte(ETX);
 
-                memoryStream.Write(cs2, 0, cs2.Length);
+                await memoryStream.WriteAsync(cs2, 0, cs2.Length, cancellationToken);
 
                 #endregion
 
@@ -190,7 +190,7 @@ namespace Portalum.Zvt
                 #endregion
             }
 
-            return Task.CompletedTask;
+            return true;
         }
 
         private void SendRaw(params byte[] data)

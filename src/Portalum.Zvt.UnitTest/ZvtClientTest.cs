@@ -187,17 +187,19 @@ namespace Portalum.Zvt.UnitTest
         [TestMethod]
         public async Task PaymentAsync_IssueOfGoods_DelayedSuccess_Successful()
         {
-            var dataSent = Array.Empty<byte>();
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
             var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+
+            var dataSent = Array.Empty<byte>();
             var dataSentCancellationTokenSource = new CancellationTokenSource();
+
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
-                .Returns(Task(byte[] data, CancellationToken token) =>
+                .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
                     dataSentCancellationTokenSource.Cancel();
-                    return Task.CompletedTask;
+                    return true;
                 });
 
             var startAsyncCompletionLaunchCount = 0;
@@ -216,7 +218,6 @@ namespace Portalum.Zvt.UnitTest
             await Task.Delay(1000);
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
             Trace.WriteLine($"Collection: {BitConverter.ToString(dataSent)}");
-            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
 
             dataSent = Array.Empty<byte>();
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
@@ -256,11 +257,11 @@ namespace Portalum.Zvt.UnitTest
             var dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
-                .Returns(Task(byte[] data, CancellationToken token) =>
+                .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
                     dataSentCancellationTokenSource.Cancel();
-                    return Task.CompletedTask;
+                    return true;
                 });
 
             var clientConfig = new ZvtClientConfig
@@ -309,11 +310,11 @@ namespace Portalum.Zvt.UnitTest
             var dataSentCancellationTokenSource = new CancellationTokenSource();
             mockDeviceCommunication
                 .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
-                .Returns(Task(byte[] data, CancellationToken token) =>
+                .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
                     dataSentCancellationTokenSource.Cancel();
-                    return Task.CompletedTask;
+                    return true;
                 });
 
             var startAsyncCompletionCalled = false;
