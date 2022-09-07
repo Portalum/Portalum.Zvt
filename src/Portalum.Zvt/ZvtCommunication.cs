@@ -15,12 +15,13 @@ namespace Portalum.Zvt
     /// </summary>
     public class ZvtCommunication : IDisposable
     {
-        protected readonly ILogger _logger;
-        protected readonly IDeviceCommunication _deviceCommunication;
+        private readonly ILogger _logger;
+        private readonly IDeviceCommunication _deviceCommunication;
+        private readonly SemaphoreSlim _processingSyncLock = new SemaphoreSlim(1);
 
-        protected CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
-        protected byte[] _dataBuffer;
-        protected bool _waitForAcknowledge = false;
+        private CancellationTokenSource _acknowledgeReceivedCancellationTokenSource;
+        private byte[] _dataBuffer;
+        private bool _waitForAcknowledge = false;
 
         /// <summary>
         /// New data received from the pt device
@@ -78,19 +79,27 @@ namespace Portalum.Zvt
         /// <param name="data"></param>
         protected virtual void DataReceiveSwitch(byte[] data)
         {
-            if (this._waitForAcknowledge)
+            try
             {
-                this.AddDataToBuffer(data);
-                return;
+                this._processingSyncLock.Wait();
+
+                if (this._waitForAcknowledge)
+                {
+                    this._logger.LogDebug($"{nameof(DataReceiveSwitch)} - wait for Acknowledge mode");
+
+                    this._dataBuffer = data;
+                    this._waitForAcknowledge = false;
+                    this._acknowledgeReceivedCancellationTokenSource?.Cancel();
+
+                    return;
+                }
+            }
+            finally
+            {
+                this._processingSyncLock.Release();
             }
 
             this.ProcessData(data);
-        }
-
-        protected virtual void AddDataToBuffer(byte[] data)
-        {
-            this._dataBuffer = data;
-            this._acknowledgeReceivedCancellationTokenSource?.Cancel();
         }
 
         protected virtual void ProcessData(byte[] data)
@@ -177,8 +186,6 @@ namespace Portalum.Zvt
                 {
                     this._logger.LogError($"{nameof(SendCommandAsync)} - Wait task for acknowledge was aborted");
                 }
-
-                this._waitForAcknowledge = false;
             });
 
             this._acknowledgeReceivedCancellationTokenSource.Dispose();
