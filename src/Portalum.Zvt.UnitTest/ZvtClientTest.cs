@@ -3,7 +3,6 @@ using Moq;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -341,6 +340,13 @@ namespace Portalum.Zvt.UnitTest
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
             var mockDeviceCommunication = new Mock<IDeviceCommunication>();
 
+            StatusInformation receivedStatusInformation = null;
+
+            void statusInformationReceived(StatusInformation statusInformation)
+            {
+                receivedStatusInformation = statusInformation;
+            }
+
             var dataSent = Array.Empty<byte>();
             var dataSentCancellationTokenSource = new CancellationTokenSource();
 
@@ -349,7 +355,7 @@ namespace Portalum.Zvt.UnitTest
                 .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
                 {
                     dataSent = data;
-                    dataSentCancellationTokenSource.Cancel();
+                    dataSentCancellationTokenSource?.Cancel();
                     return true;
                 });
 
@@ -361,10 +367,12 @@ namespace Portalum.Zvt.UnitTest
             var completionInfo = new CompletionInfo();
 
             var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
+            zvtClient.StatusInformationReceived += statusInformationReceived;
             zvtClient.GetAsyncCompletionInfo += () => completionInfo;
 
             var paymentTask = zvtClient.PaymentAsync(33);
             await Task.Delay(500, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+
             CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
             dataSent = Array.Empty<byte>();
 
@@ -379,6 +387,9 @@ namespace Portalum.Zvt.UnitTest
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalStatusInformation);
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
+            Assert.IsNotNull(receivedStatusInformation);
+            receivedStatusInformation = null;
+
             // the ECR immediately requests for a timeout-extension
             CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
             dataSent = Array.Empty<byte>();
@@ -391,8 +402,11 @@ namespace Portalum.Zvt.UnitTest
             completionInfo.State = CompletionInfoState.Failure;
 
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalStatusInformation);
-
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+
+            Assert.IsNotNull(receivedStatusInformation);
+            receivedStatusInformation = null;
+
             CollectionAssert.AreEqual(new byte[] { 0x84, 0x66, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
             dataSent = Array.Empty<byte>();
 
@@ -400,23 +414,29 @@ namespace Portalum.Zvt.UnitTest
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
             var commandResponse = await paymentTask;
 
+            zvtClient.StatusInformationReceived -= statusInformationReceived;
+
             zvtClient.Dispose();
+            dataSentCancellationTokenSource.Dispose();
+
             Assert.AreEqual(CommandResponseState.Abort, commandResponse.State);
         }
 
         //[TestMethod]
         //public async Task PaymentAsync_IssueOfGoods_RejectedCard_Successful()
         //{
-        //    var dataSent = Array.Empty<byte>();
         //    var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
         //    var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+
+        //    var dataSent = Array.Empty<byte>();
         //    var dataSentCancellationTokenSource = new CancellationTokenSource();
+
         //    mockDeviceCommunication
         //        .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
         //        .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
         //        {
         //            dataSent = data;
-        //            //dataSentCancellationTokenSource.Cancel();
+        //            dataSentCancellationTokenSource?.Cancel();
         //            return true;
         //        });
 
