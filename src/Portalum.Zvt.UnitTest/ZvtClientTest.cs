@@ -422,65 +422,75 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(CommandResponseState.Abort, commandResponse.State);
         }
 
-        //[TestMethod]
-        //public async Task PaymentAsync_IssueOfGoods_RejectedCard_Successful()
-        //{
-        //    var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
-        //    var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+        [TestMethod]
+        public async Task PaymentAsync_IssueOfGoods_RejectedCard_Successful()
+        {
+            var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
+            var mockDeviceCommunication = new Mock<IDeviceCommunication>();
 
-        //    var dataSent = Array.Empty<byte>();
-        //    var dataSentCancellationTokenSource = new CancellationTokenSource();
+            var dataSent = Array.Empty<byte>();
+            var dataSentCancellationTokenSource = new CancellationTokenSource();
 
-        //    mockDeviceCommunication
-        //        .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
-        //        .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
-        //        {
-        //            dataSent = data;
-        //            dataSentCancellationTokenSource?.Cancel();
-        //            return true;
-        //        });
+            mockDeviceCommunication
+                .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
+                {
+                    dataSent = data;
+                    dataSentCancellationTokenSource?.Cancel();
+                    return true;
+                });
 
-        //    var startAsyncCompletionCalled = false;
-        //    var clientConfig = new ZvtClientConfig
-        //    {
-        //        CommandCompletionTimeout = TimeSpan.FromSeconds(5)
-        //    };
+            var startAsyncCompletionCalled = false;
+            var completionInfo = new CompletionInfo();
+            var askForCompletionCalled = false;
+            var clientConfig = new ZvtClientConfig
+            {
+                CommandCompletionTimeout = TimeSpan.FromSeconds(5)
+            };
 
-        //    var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
-        //    var completionInfo = new CompletionInfo();
-        //    var askForCompletionCalled = false;
+            var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
 
-        //    zvtClient.StartAsyncCompletion += (_) => startAsyncCompletionCalled = true;
-        //    zvtClient.GetAsyncCompletionInfo += () =>
-        //    {
-        //        askForCompletionCalled = true;
-        //        return completionInfo;
-        //    };
+            zvtClient.StartAsyncCompletion += (_) => startAsyncCompletionCalled = true;
+            zvtClient.GetAsyncCompletionInfo += () =>
+            {
+                askForCompletionCalled = true;
+                return completionInfo;
+            };
 
-        //    var paymentTask = zvtClient.PaymentAsync(33);
-        //    await Task.Delay(1000);
-        //    mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
-        //    CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            var paymentTask = zvtClient.PaymentAsync(33);
+            await Task.Delay(500, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
-        //    dataSent = Array.Empty<byte>();
-        //    var negativeAuthorization = "04-0F-25-27-05-29-29-00-02-74-3C-F0-F0-F9-41-62-67-65-6C-65-68-6E-74-8A-06-06-0D-24-0B-07-09-41-62-67-65-6C-65-68-6E-74";
-        //    var cardRejectedStatusInformation = ByteHelper.HexToByteArray(negativeAuthorization);
+            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            dataSent = Array.Empty<byte>();
 
-        //    mockDeviceCommunication.Raise(mock => mock.DataReceived += null, cardRejectedStatusInformation);
-        //    await Task.Delay(5000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+            var paymentTerminalPositiveCompletion = new byte[] { 0x80, 0x00, 0x00 };
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalPositiveCompletion);
 
-        //    // a not successful status must neither trigger the askForCompletion nor the startCompletion events
-        //    Assert.IsFalse(askForCompletionCalled);
-        //    Assert.IsFalse(startAsyncCompletionCalled);
+            //Recreate Cancellation Token
+            dataSentCancellationTokenSource.Dispose();
+            dataSentCancellationTokenSource = new CancellationTokenSource();
 
-        //    // ensure we answer with an ack in this case
-        //    CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            var negativeAuthorization = "04-0F-25-27-05-29-29-00-02-74-3C-F0-F0-F9-41-62-67-65-6C-65-68-6E-74-8A-06-06-0D-24-0B-07-09-41-62-67-65-6C-65-68-6E-74";
+            var cardRejectedStatusInformation = ByteHelper.HexToByteArray(negativeAuthorization);
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, cardRejectedStatusInformation);
 
-        //    mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
-        //    var commandResponse = await paymentTask;
+            await Task.Delay(5000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
-        //    zvtClient.Dispose();
-        //    Assert.AreEqual(CommandResponseState.Abort, commandResponse.State);
-        //}
+            // a not successful status must neither trigger the askForCompletion nor the startCompletion events
+            Assert.IsFalse(askForCompletionCalled);
+            Assert.IsFalse(startAsyncCompletionCalled);
+
+            // ensure we answer with an ack in this case
+            CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            dataSent = Array.Empty<byte>();
+
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
+            var commandResponse = await paymentTask;
+
+            zvtClient.Dispose();
+            dataSentCancellationTokenSource.Dispose();
+
+            Assert.AreEqual(CommandResponseState.Abort, commandResponse.State);
+        }
     }
 }
