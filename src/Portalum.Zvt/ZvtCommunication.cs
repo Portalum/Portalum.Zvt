@@ -89,7 +89,15 @@ namespace Portalum.Zvt
 
                     this._dataBuffer = data;
                     this._waitForAcknowledge = false;
-                    this._acknowledgeReceivedCancellationTokenSource?.Cancel();
+
+                    try
+                    {
+                        this._acknowledgeReceivedCancellationTokenSource?.Cancel();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        this._logger.LogWarning($"{nameof(DataReceiveSwitch)} - TokenSource is already disposed");
+                    }
 
                     return;
                 }
