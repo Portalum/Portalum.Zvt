@@ -313,7 +313,7 @@ namespace Portalum.Zvt.UnitTest
             dataSentCancellationTokenSource.Dispose();
             dataSentCancellationTokenSource = new CancellationTokenSource();
 
-            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalStatusInformation);
             await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
 
             // ... the PT is informed about the changed amount
@@ -335,58 +335,74 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(CommandResponseState.Successful, commandResponse.State);
         }
 
-        //[TestMethod]
-        //public async Task PaymentAsync_IssueOfGoods_DelayedFailure_Successful()
-        //{
-        //    var dataSent = Array.Empty<byte>();
-        //    var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
-        //    var mockDeviceCommunication = new Mock<IDeviceCommunication>();
-        //    var dataSentCancellationTokenSource = new CancellationTokenSource();
-        //    mockDeviceCommunication
-        //        .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
-        //        .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
-        //        {
-        //            dataSent = data;
-        //            //dataSentCancellationTokenSource.Cancel();
-        //            return true;
-        //        });
+        [TestMethod]
+        public async Task PaymentAsync_IssueOfGoods_DelayedFailure_Successful()
+        {
+            var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
+            var mockDeviceCommunication = new Mock<IDeviceCommunication>();
 
-        //    var clientConfig = new ZvtClientConfig
-        //    {
-        //        CommandCompletionTimeout = TimeSpan.FromSeconds(5)
-        //    };
+            var dataSent = Array.Empty<byte>();
+            var dataSentCancellationTokenSource = new CancellationTokenSource();
 
-        //    var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
-        //    var completionInfo = new CompletionInfo();
+            mockDeviceCommunication
+                .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
+                {
+                    dataSent = data;
+                    dataSentCancellationTokenSource.Cancel();
+                    return true;
+                });
 
-        //    zvtClient.GetAsyncCompletionInfo += () => completionInfo;
+            var clientConfig = new ZvtClientConfig
+            {
+                CommandCompletionTimeout = TimeSpan.FromSeconds(5)
+            };
 
-        //    var paymentTask = zvtClient.PaymentAsync(33);
-        //    await Task.Delay(1000);
-        //    mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x80, 0x00, 0x00 });
-        //    CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            var completionInfo = new CompletionInfo();
 
-        //    dataSent = Array.Empty<byte>();
-        //    mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
-        //    await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+            var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
+            zvtClient.GetAsyncCompletionInfo += () => completionInfo;
 
-        //    // the ECR immediately requests for a timeout-extension
-        //    CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            var paymentTask = zvtClient.PaymentAsync(33);
+            await Task.Delay(500, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0x09, 0x04, 0x00, 0x00, 0x00, 0x00, 0x33, 0x00, 0x02, 0x0A }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            dataSent = Array.Empty<byte>();
 
-        //    // if the completion info indicates a failure, the status information's response changes
-        //    completionInfo.State = CompletionInfoState.Failure;
-        //    dataSentCancellationTokenSource = new CancellationTokenSource();
-        //    mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 });
-        //    await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
-        //    CollectionAssert.AreEqual(new byte[] { 0x84, 0x66, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            var paymentTerminalPositiveCompletion = new byte[] { 0x80, 0x00, 0x00 };
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalPositiveCompletion);
 
-        //    // the pt will send a negative completion
-        //    mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
-        //    var commandResponse = await paymentTask;
+            //Recreate Cancellation Token
+            dataSentCancellationTokenSource.Dispose();
+            dataSentCancellationTokenSource = new CancellationTokenSource();
 
-        //    zvtClient.Dispose();
-        //    Assert.AreEqual(CommandResponseState.Abort, commandResponse.State);
-        //}
+            var paymentTerminalStatusInformation = new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 };
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalStatusInformation);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+
+            // the ECR immediately requests for a timeout-extension
+            CollectionAssert.AreEqual(new byte[] { 0x84, 0x9C, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            dataSent = Array.Empty<byte>();
+
+            //Recreate Cancellation Token
+            dataSentCancellationTokenSource.Dispose();
+            dataSentCancellationTokenSource = new CancellationTokenSource();
+
+            // if the completion info indicates a failure, the status information's response changes
+            completionInfo.State = CompletionInfoState.Failure;
+
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalStatusInformation);
+
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+            CollectionAssert.AreEqual(new byte[] { 0x84, 0x66, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            dataSent = Array.Empty<byte>();
+
+            // the pt will send a negative completion
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
+            var commandResponse = await paymentTask;
+
+            zvtClient.Dispose();
+            Assert.AreEqual(CommandResponseState.Abort, commandResponse.State);
+        }
 
         //[TestMethod]
         //public async Task PaymentAsync_IssueOfGoods_RejectedCard_Successful()
