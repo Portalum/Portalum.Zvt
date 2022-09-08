@@ -16,25 +16,25 @@ namespace Portalum.Zvt
     /// </summary>
     public class ReceiveHandler : IReceiveHandler
     {
-        protected readonly ILogger _logger;
-        protected readonly IErrorMessageRepository _errorMessageRepository;
+        private readonly ILogger _logger;
+        private readonly IErrorMessageRepository _errorMessageRepository;
 
-        protected readonly IPrintLineParser _printLineParser;
-        protected readonly IPrintTextBlockParser _printTextBlockParser;
-        protected readonly IStatusInformationParser _statusInformationParser;
-        protected readonly IIntermediateStatusInformationParser _intermediateStatusInformationParser;
-        protected readonly List<byte[]> _availableControlFields;
+        private readonly IPrintLineParser _printLineParser;
+        private readonly IPrintTextBlockParser _printTextBlockParser;
+        private readonly IStatusInformationParser _statusInformationParser;
+        private readonly IIntermediateStatusInformationParser _intermediateStatusInformationParser;
+        private readonly List<byte[]> _availableControlFields;
 
-        protected readonly byte[] _receiveBuffer = new byte[ushort.MaxValue];
-        protected int _receiveBufferEndPosition = 0;
-        protected int _missingDataOfExpectedPackage = 0;
+        private readonly byte[] _receiveBuffer = new byte[ushort.MaxValue];
+        private int _receiveBufferEndPosition = 0;
+        private int _missingDataOfExpectedPackage = 0;
 
-        protected readonly byte[] _statusInformationControlField = new byte[] { 0x04, 0x0F };
-        protected readonly byte[] _intermediateStatusInformationControlField = new byte[] { 0x04, 0xFF };
-        protected readonly byte[] _printLineControlField = new byte[] { 0x06, 0xD1 };
-        protected readonly byte[] _printTextBlockControlField = new byte[] { 0x06, 0xD3 };
-        protected readonly byte[] _completionCommandControlField = new byte[] { 0x06, 0x0F };
-        protected readonly byte[] _abortCommandControlField = new byte[] { 0x06, 0x1E };
+        private readonly byte[] _statusInformationControlField = new byte[] { 0x04, 0x0F };
+        private readonly byte[] _intermediateStatusInformationControlField = new byte[] { 0x04, 0xFF };
+        private readonly byte[] _printLineControlField = new byte[] { 0x06, 0xD1 };
+        private readonly byte[] _printTextBlockControlField = new byte[] { 0x06, 0xD3 };
+        private readonly byte[] _completionCommandControlField = new byte[] { 0x06, 0x0F };
+        private readonly byte[] _abortCommandControlField = new byte[] { 0x06, 0x1E };
 
         /// <inheritdoc />
         public event Action<PrintLineInfo> LineReceived;
@@ -195,12 +195,19 @@ namespace Portalum.Zvt
             return this.ProcessApdu(apduInfo, apduData);
         }
 
-        protected virtual void ResetFragmentInfo()
+        private void ResetFragmentInfo()
         {
             this._receiveBufferEndPosition = 0;
             this._missingDataOfExpectedPackage = 0;
         }
 
+        /// <summary>
+        /// Process a received application process data unit (APDU) using one of the available parsers.
+        /// This method also fires any event handler for the message type.
+        /// </summary>
+        /// <param name="apduInfo">Parsed APDU info from the message header</param>
+        /// <param name="apduData">The raw data of the message (including the message header)</param>
+        /// <returns></returns>
         protected virtual ProcessData ProcessApdu(
             ApduResponseInfo apduInfo,
             Span<byte> apduData)

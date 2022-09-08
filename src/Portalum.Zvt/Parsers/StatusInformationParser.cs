@@ -44,6 +44,7 @@ namespace Portalum.Zvt.Parsers
                 new TlvInfo { Tag = "1F10", Description = "Cardholder authentication", TryProcess = this.SetCardholderAuthentication },
                 new TlvInfo { Tag = "1F12", Description = "Card technology", TryProcess = this.SetCardTechnology },
                 new TlvInfo { Tag = "60", Description = "Application", TryProcess = null },
+                new TlvInfo { Tag = "43", Description = "Application Id", TryProcess = this.SetApplicationId },
                 new TlvInfo { Tag = "1F2B", Description = "Trace number (long format)", TryProcess = this.SetTraceNumberLongFormat }
             };
 
@@ -64,6 +65,16 @@ namespace Portalum.Zvt.Parsers
             }
 
             return statusInformation;
+        }
+
+        private bool SetApplicationId(byte[] data, IResponse response)
+        {
+            if (response is IResponseApplicationId typedResponse)
+            {
+                typedResponse.ApplicationId = ByteHelper.ByteArrayToHex(data).ToUpper();
+                return true;
+            }
+            return false;
         }
 
         private bool SetCardholderAuthentication(byte[] data, IResponse response)

@@ -33,12 +33,12 @@ namespace Portalum.Zvt
         /// </summary>
         public event Func<CompletionInfo> GetCompletionInfo;
 
-        protected readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
-        protected readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
-        protected readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
-        protected readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
-        protected readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
-        protected readonly byte _negativeCompletionPrefix = 0x84;
+        private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
+        private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
+        private readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
+        private readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
+        private readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
+        private readonly byte _negativeCompletionPrefix = 0x84;
 
         /// <summary>
         /// ZvtCommunication
@@ -110,6 +110,13 @@ namespace Portalum.Zvt
             this.ProcessData(data);
         }
 
+        /// <summary>
+        /// Process received data and respond according to the ZVT protocol and / or the current state
+        /// This method acts as the responder on the zvt protocol level. If you need to respond differently
+        /// then you can override this method and implement your own logic or catch certain cases.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <exception cref="NotImplementedException"></exception>
         protected virtual void ProcessData(byte[] data)
         {
             var dataProcessed = this.DataReceived?.Invoke(data);
@@ -225,6 +232,9 @@ namespace Portalum.Zvt
             return SendCommandResult.UnknownFailure;
         }
 
+        /// <summary>
+        /// Check if the received data indicates a positive command completion
+        /// </summary>
         protected virtual bool CheckIsPositiveCompletion()
         {
             if (this._dataBuffer.Length < 3)
@@ -252,6 +262,9 @@ namespace Portalum.Zvt
             return false;
         }
 
+        /// <summary>
+        /// Check if the received data indicates a negative command completion
+        /// </summary>
         protected virtual bool CheckIsNegativeCompletion()
         {
             if (this._dataBuffer.Length < 3)
@@ -270,6 +283,9 @@ namespace Portalum.Zvt
             return false;
         }
 
+        /// <summary>
+        /// Check if the received data indicates a "command not supported" or "unknown" command response from the PT
+        /// </summary>
         protected virtual bool CheckIsNotSupported()
         {
             if (this._dataBuffer.Length < 3)
@@ -287,12 +303,12 @@ namespace Portalum.Zvt
             return false;
         }
 
-        protected virtual void ResetDataBuffer()
+        private void ResetDataBuffer()
         {
             this._dataBuffer = null;
         }
 
-        protected virtual void ForwardUnusedBufferData()
+        private void ForwardUnusedBufferData()
         {
             if (this._dataBuffer.Length == 3)
             {

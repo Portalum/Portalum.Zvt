@@ -136,6 +136,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual("No Cardholder authentication", statusInformation.CardholderAuthentication);
             Assert.AreEqual(29, statusInformation.DateDay);
             Assert.AreEqual(10, statusInformation.DateMonth);
+            Assert.AreEqual("A0000000041010", statusInformation.ApplicationId);
         }
 
         [TestMethod]
@@ -156,6 +157,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(0, statusInformation.ErrorCode);
             Assert.AreEqual("Chip", statusInformation.CardTechnology);
             Assert.AreEqual("Offline encrypted Pin", statusInformation.CardholderAuthentication);
+            Assert.AreEqual("A0000000041010", statusInformation.ApplicationId);
         }
 
         [TestMethod]
