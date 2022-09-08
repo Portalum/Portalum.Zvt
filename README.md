@@ -214,6 +214,7 @@ Global Payments | Austria | PAX A80             |
 - Encoding is fixed to `ISO-8859-1/ISO-8859-2/ISO-8859-15` instead of default character set `CP437`. There is no way to configure this
 - `Print Line` contains TLV data at the end of the package, after `TLV-activation`. According to official documentation, there should be no TLV data here
 - The maximum number of retries for asynchronous completion is 3 when no other value is transmitted. According to the ZVT it should be infinite. 
+- Change Amount for asynchronous completion is not supported
 
 #### Hobex
 - No `Print Line` support
