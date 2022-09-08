@@ -17,7 +17,7 @@ namespace Portalum.Zvt
     public class SerialPortDeviceCommunication : IDeviceCommunication
     {
         private readonly ILogger<SerialPortDeviceCommunication> _logger;
-        private readonly string _comPort;
+        private readonly string _portName;
         private readonly SerialPort _serialPort;
         private readonly List<byte> _receiveBuffer = new List<byte>();
 
@@ -42,21 +42,21 @@ namespace Portalum.Zvt
         /// <summary>
         /// SerialPort DeviceCommunication
         /// </summary>
-        /// <param name="comPort"></param>
+        /// <param name="portName"></param>
         /// <param name="baudRate"></param>
         /// <param name="parity"></param>
         /// <param name="dataBits"></param>
         /// <param name="stopBits"></param>
         /// <param name="logger"></param>
         public SerialPortDeviceCommunication(
-            string comPort,
+            string portName,
             int baudRate = 9600,
             Parity parity = Parity.None,
             int dataBits = 8,
             StopBits stopBits = StopBits.Two,
             ILogger<SerialPortDeviceCommunication> logger = default)
         {
-            this._comPort = comPort;
+            this._portName = portName;
 
             if (logger == null)
             {
@@ -64,7 +64,7 @@ namespace Portalum.Zvt
             }
             this._logger = logger;
 
-            this._serialPort = new SerialPort(comPort, baudRate, parity, dataBits, stopBits);
+            this._serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
             this._serialPort.DataReceived += this.Receive;
         }
 
@@ -94,7 +94,7 @@ namespace Portalum.Zvt
         /// <inheritdoc />
         public string ConnectionIdentifier
         {
-            get { return this._comPort; }
+            get { return this._portName; }
         }
 
         /// <inheritdoc />
@@ -102,6 +102,8 @@ namespace Portalum.Zvt
         {
             try
             {
+                this._logger.LogInformation($"{nameof(ConnectAsync)} - PortName:{this._portName}");
+
                 this._serialPort.Open();
 
                 return Task.FromResult(this._serialPort.IsOpen);

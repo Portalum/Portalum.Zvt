@@ -17,7 +17,7 @@ namespace Portalum.Zvt.UnitTest
             var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
 
             using var communication = new SerialPortDeviceCommunication(
-                comPort: this._comPort,
+                portName: this._comPort,
                 baudRate: 115200,
                 parity: Parity.None,
                 dataBits: 8,

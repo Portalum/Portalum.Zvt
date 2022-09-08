@@ -152,7 +152,7 @@ namespace Portalum.Zvt
         {
             try
             {
-                this._logger.LogInformation($"{nameof(ConnectAsync)}");
+                this._logger.LogInformation($"{nameof(ConnectAsync)} - IpAddress:{this._ipAddress}, Port:{this._port}");
 
                 return await this._tcpClient.ConnectAsync(this._ipAddress, this._port, cancellationToken);
             }
