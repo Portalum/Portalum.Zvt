@@ -178,7 +178,7 @@ await zvtClient.PaymentAsync(10.5M);
 
 The payment terminal can be configured to stop the asynchronous completion after a certain number of queries. By default library sets
 the number of tries to 10. This can be changed by setting the `GetAsyncCompletionInfoLimit` property on the `ZvtClientConfig` object
-when constructing the `ZvtClient`, see [Set a custom configuration](#Set a custom configuration).
+when constructing the `ZvtClient`, see [Set a custom configuration](#set-a-custom-configuration).
 
 
 
