@@ -140,7 +140,7 @@ is not charged for goods that have not been dispensed or when something fails.
 
 In order to use asynchronous completion:
 * register the `CompletionStartReceived` callback in the `ZvtClient`. This callback is fired when the payment is authorized.
-* register the `CompletionDecisionRequested ` callback in the `ZvtClient`. This callback must return the status of the asynchronous completion process. 
+* register the `CompletionDecisionRequested` callback in the `ZvtClient`. This callback must return the status of the asynchronous completion process. 
 
 Please note when using asynchronous completion the `StatusInformationReceived` callback is fired multiple times as the payment terminal is 
 querying the electronic cash register for the completion status.
