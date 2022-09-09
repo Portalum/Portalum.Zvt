@@ -62,8 +62,8 @@ namespace Portalum.Zvt
         public event Func<CompletionInfo> CompletionDecisionRequested;
 
         /// <summary>
-        /// Raised when the payment was successful, but before it is stored in the PT. After this event the GetAsyncCompletionInfo
-        /// callback is queries periodically to obtain the completion status. If GetAsyncCompleteInfo is not registered the payment
+        /// Raised when the payment was successful, but before it is stored in the PT. After this event the CompletionDecisionRequested
+        /// callback is queries periodically to obtain the completion status. If CompletionDecisionRequested is not registered the payment
         /// is stored immediately in the PT and this event is never raised.
         /// </summary>
         public event Action<StatusInformation> CompletionStartReceived;
