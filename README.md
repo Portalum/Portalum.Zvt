@@ -131,7 +131,7 @@ var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger);
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", port: 20007);
 ```
 
-### Asynchronous payment completion
+### Asynchronous payment completion (vending machine)
 
 When using asynchronous completion, the payment process is split into two steps. First the payment is authorized. Then a callback is fired
 which allows the electronic cash register to dispense it's goods. After the goods have been dispensed successfully, the payment is completed. 
