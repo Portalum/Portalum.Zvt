@@ -59,14 +59,14 @@ namespace Portalum.Zvt
         /// Upon successful completion the payment is stored, otherwise an auto reversal is triggered.
         /// For possible return values see CompletionInfoStatus.
         /// </summary>
-        public event Func<CompletionInfo> GetAsyncCompletionInfo;
+        public event Func<CompletionInfo> CompletionDecisionRequested;
 
         /// <summary>
         /// Raised when the payment was successful, but before it is stored in the PT. After this event the GetAsyncCompletionInfo
         /// callback is queries periodically to obtain the completion status. If GetAsyncCompleteInfo is not registered the payment
         /// is stored immediately in the PT and this event is never raised.
         /// </summary>
-        public event Action<StatusInformation> StartAsyncCompletion;
+        public event Action<StatusInformation> CompletionStartReceived;
 
         #endregion
 
@@ -156,7 +156,7 @@ namespace Portalum.Zvt
 
         private CompletionInfo GetCompletionInfo()
         {
-            return this.GetAsyncCompletionInfo?.Invoke();
+            return this.CompletionDecisionRequested?.Invoke();
         }
 
         private Encoding GetEncoding(ZvtEncoding zvtEncoding)
@@ -323,7 +323,7 @@ namespace Portalum.Zvt
                 if (statusInformation.ErrorCode == 0 && asyncCompletion && !startAsyncCompletionFired)
                 {
                     startAsyncCompletionFired = true;
-                    this.StartAsyncCompletion?.Invoke(statusInformation);
+                    this.CompletionStartReceived?.Invoke(statusInformation);
                 }
             }
 
@@ -473,7 +473,7 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
-            if (this.GetAsyncCompletionInfo != null)
+            if (this.CompletionDecisionRequested != null)
             {
                 package.Add(0x02); // max nr. of status-informations
                 package.Add(this._clientConfig.GetAsyncCompletionInfoLimit);

@@ -139,7 +139,7 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
             zvtClient.StatusInformationReceived += statusInformationReceived;
-            zvtClient.StartAsyncCompletion += (_) => startAsyncCompletionCalled = true;
+            zvtClient.CompletionStartReceived += (_) => startAsyncCompletionCalled = true;
 
             var paymentTask = zvtClient.PaymentAsync(10);
             await Task.Delay(500, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
@@ -274,8 +274,8 @@ namespace Portalum.Zvt.UnitTest
             var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
             zvtClient.StatusInformationReceived += statusInformationReceived;
 
-            zvtClient.StartAsyncCompletion += (_) => startAsyncCompletionLaunchCount++;
-            zvtClient.GetAsyncCompletionInfo += () => completionInfo;
+            zvtClient.CompletionStartReceived += (_) => startAsyncCompletionLaunchCount++;
+            zvtClient.CompletionDecisionRequested += () => completionInfo;
 
             var paymentTask = zvtClient.PaymentAsync(33);
 
@@ -368,7 +368,7 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
             zvtClient.StatusInformationReceived += statusInformationReceived;
-            zvtClient.GetAsyncCompletionInfo += () => completionInfo;
+            zvtClient.CompletionDecisionRequested += () => completionInfo;
 
             var paymentTask = zvtClient.PaymentAsync(33);
             await Task.Delay(500, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
@@ -450,8 +450,8 @@ namespace Portalum.Zvt.UnitTest
 
             var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
 
-            zvtClient.StartAsyncCompletion += (_) => startAsyncCompletionCalled = true;
-            zvtClient.GetAsyncCompletionInfo += () =>
+            zvtClient.CompletionStartReceived += (_) => startAsyncCompletionCalled = true;
+            zvtClient.CompletionDecisionRequested += () =>
             {
                 askForCompletionCalled = true;
                 return completionInfo;

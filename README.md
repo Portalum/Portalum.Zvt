@@ -139,8 +139,8 @@ If something fails during the dispensing process, the payment is automatically r
 is not charged for goods that have not been dispensed or when something fails.
 
 In order to use asynchronous completion:
-* register the `StartAsyncCompletion` callback in the `ZvtClient`. This callback is fired when the payment is authorized.
-* register the `GetAsyncCompletionInfo` callback in the `ZvtClient`. This callback must return the status of the asynchronous completion process. 
+* register the `CompletionStartReceived` callback in the `ZvtClient`. This callback is fired when the payment is authorized.
+* register the `CompletionDecisionRequested ` callback in the `ZvtClient`. This callback must return the status of the asynchronous completion process. 
 
 Please note when using asynchronous completion the `StatusInformationReceived` callback is fired multiple times as the payment terminal is 
 querying the electronic cash register for the completion status.
@@ -155,7 +155,7 @@ if (!await deviceCommunication.ConnectAsync())
 var completionInfo = new CompletionInfo(); 
 using var zvtClient = new ZvtClient(deviceCommunication);
 
-zvtClient.StartAsyncCompletion += (statusInformation) => {
+zvtClient.CompletionStartReceived += (statusInformation) => {
    completionInfo.Status = CompletionStatus.Wait;
    // here you would start your asynchronous completion process, i.e. start dispensing a water bottle
    Console.WriteLine("Start asynchronous completion");
@@ -167,7 +167,7 @@ zvtClient.StartAsyncCompletion += (statusInformation) => {
 };
 
 // this callback is fired about every 2-4 seconds (depending on the payment terminal) to query the status of the asynchronous completion process
-zvtClient.GetAsyncCompletionInfo += () => completionInfo;
+zvtClient.CompletionDecisionRequested += () => completionInfo;
 
 await zvtClient.PaymentAsync(10.5M);
 // this task will only return when the asynchronous completion process has finished
