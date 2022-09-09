@@ -28,7 +28,7 @@ namespace Portalum.Zvt.UnitTest
                     var invokeMethod = formatter.GetType().GetMethod("Invoke");
                     var logMessage = (string)invokeMethod?.Invoke(formatter, new[] { state, exception });
 
-                    Trace.WriteLine(logMessage);
+                    Trace.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {logLevel} {logMessage}");
                 }));
 
             return logger;

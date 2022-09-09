@@ -22,6 +22,7 @@ namespace Portalum.Zvt.Models
         IResponseTraceNumberLongFormat,
         IResponseVuNumber,
         IResponseAidAuthorisationAttribute,
+        IResponseApplicationId,
         IResponseExpiryDate,
         IResponseCardSequenceNumber,
         IResponseTurnoverRecordNumber,
@@ -51,5 +52,6 @@ namespace Portalum.Zvt.Models
         public int TurnoverRecordNumber { get; set; }
         public int DateMonth { get; set; }
         public int DateDay { get; set; }
+        public string ApplicationId { get; set; }
     }
 }

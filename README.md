@@ -131,6 +131,57 @@ var zvtClient = new ZvtClient(deviceCommunication, logger: zvtClientLogger);
 var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10", port: 20007);
 ```
 
+### Asynchronous payment completion
+
+When using asynchronous completion, the payment process is split into two steps. First the payment is authorized. Then a callback is fired
+which allows the electronic cash register to dispense it's goods. After the goods have been dispensed successfully, the payment is completed. 
+If something fails during the dispensing process, the payment is automatically reversed by the payment terminal. This ensures that a customer
+is not charged for goods that have not been dispensed or when something fails.
+
+In order to use asynchronous completion:
+* register the `CompletionStartReceived` callback in the `ZvtClient`. This callback is fired when the payment is authorized.
+* register the `CompletionDecisionRequested ` callback in the `ZvtClient`. This callback must return the status of the asynchronous completion process. 
+
+Please note when using asynchronous completion the `StatusInformationReceived` callback is fired multiple times as the payment terminal is 
+querying the electronic cash register for the completion status.
+
+```cs
+var deviceCommunication = new TcpNetworkDeviceCommunication("192.168.0.10");
+if (!await deviceCommunication.ConnectAsync())
+{
+    return;
+}
+
+var completionInfo = new CompletionInfo(); 
+using var zvtClient = new ZvtClient(deviceCommunication);
+
+zvtClient.CompletionStartReceived += (statusInformation) => {
+   completionInfo.Status = CompletionStatus.Wait;
+   // here you would start your asynchronous completion process, i.e. start dispensing a water bottle
+   Console.WriteLine("Start asynchronous completion");
+   Task.Delay(5000).ContinueWith((_) => {
+      // After the goods have been dispensed successfully, set the completion status to success
+      completionInfo.Status = CompletionStatus.Success;
+      Console.WriteLine("Asynchronous completion finished");
+   });
+};
+
+// this callback is fired about every 2-4 seconds (depending on the payment terminal) to query the status of the asynchronous completion process
+zvtClient.CompletionDecisionRequested += () => completionInfo;
+
+await zvtClient.PaymentAsync(10.5M);
+// this task will only return when the asynchronous completion process has finished
+```
+
+
+#### Timeouts
+
+The payment terminal can be configured to stop the asynchronous completion after a certain number of queries. By default library sets
+the number of tries to 10. This can be changed by setting the `GetAsyncCompletionInfoLimit` property on the `ZvtClientConfig` object
+when constructing the `ZvtClient`, see [Set a custom configuration](#Set a custom configuration).
+
+
+
 ## ControlPanel
 With the Portalum.Zvt.ControlPanel you can test the different ZVT functions.
 
@@ -149,22 +200,26 @@ Then you can still look at our small tool. [Portalum.Zvt.EasyPay](https://github
 
 We have already been able to test the terminals of these payment service providers.
 
-Provider | Country | Terminal | 
---- | --- | --- |
-CardComplete | Austria | ingenico iWL250 |
-Hobex | Austria | ingenico Desk/3500 |
+Provider | Country | Terminal            | 
+--- | --- |---------------------|
+CardComplete | Austria | ingenico iWL250     |
+CardComplete | Austria | Worldline VALINA    |
+Hobex | Austria | ingenico Desk/3500  |
 Wordline/PAYONE (SIX) | Austria | yomani touch family |
-Global Payments | Austria | PAX A80 |
+Global Payments | Austria | PAX A80             |
 
 ### Known deviations from the standard ZVT protocol
 
 #### CardComplete
 - Encoding is fixed to `ISO-8859-1/ISO-8859-2/ISO-8859-15` instead of default character set `CP437`. There is no way to configure this
 - `Print Line` contains TLV data at the end of the package, after `TLV-activation`. According to official documentation, there should be no TLV data here
+- The maximum number of retries for asynchronous completion is 3 when no other value is transmitted. According to the ZVT it should be infinite. 
+- Authorization - Partial issue for Vending machine (Change Amount for asynchronous completion is not supported)
 
 #### Hobex
 - No `Print Line` support
 - Sends TLV data even without `TLV-activation`
+- Authorization - Partial issue for Vending machine (Change Amount for asynchronous completion is not supported)
 
 #### Global Payments
 - Abort from ECR not possible 

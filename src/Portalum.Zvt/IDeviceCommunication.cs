@@ -54,6 +54,6 @@ namespace Portalum.Zvt
         /// <param name="data"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task SendAsync(byte[] data, CancellationToken cancellationToken = default);
+        Task<bool> SendAsync(byte[] data, CancellationToken cancellationToken = default);
     }
 }
