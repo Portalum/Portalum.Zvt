@@ -29,7 +29,7 @@ class Program
             return;
         }
 
-        Console.WriteLine(BitConverter.ToString(e.Data));
+        Console.WriteLine(BitConverter.ToString(e.Data.ToArray()));
 
         var data = e.Data.AsSpan();
 
