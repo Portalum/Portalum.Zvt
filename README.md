@@ -156,12 +156,12 @@ var completionInfo = new CompletionInfo();
 using var zvtClient = new ZvtClient(deviceCommunication);
 
 zvtClient.CompletionStartReceived += (statusInformation) => {
-   completionInfo.Status = CompletionStatus.Wait;
+   completionInfo.State = CompletionInfoState.Wait;
    // here you would start your asynchronous completion process, i.e. start dispensing a water bottle
    Console.WriteLine("Start asynchronous completion");
    Task.Delay(5000).ContinueWith((_) => {
       // After the goods have been dispensed successfully, set the completion status to success
-      completionInfo.Status = CompletionStatus.Success;
+      completionInfo.State = CompletionInfoState.Successful;
       Console.WriteLine("Asynchronous completion finished");
    });
 };
