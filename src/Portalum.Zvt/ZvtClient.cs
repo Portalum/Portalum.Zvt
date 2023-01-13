@@ -107,7 +107,7 @@ namespace Portalum.Zvt
 
             if (receiveHandler == default)
             {
-                this.InitializeReceiveHandler(clientConfig.Language, this.GetEncoding(clientConfig.Encoding));
+                this.InitializeReceiveHandler(clientConfig.Language, this.GetEncoding(clientConfig.Encoding),clientConfig.IntermediateSateExtension);
             }
             else
             {
@@ -179,10 +179,11 @@ namespace Portalum.Zvt
 
         private void InitializeReceiveHandler(
             Language language,
-            Encoding encoding)
+            Encoding encoding,
+            ZvtIntermediateSateExtension intermediateSateExtension)
         {
             IErrorMessageRepository errorMessageRepository = this.GetErrorMessageRepository(language);
-            IIntermediateStatusRepository intermediateStatusRepository = this.GetIntermediateStatusRepository(language);
+            IIntermediateStatusRepository intermediateStatusRepository = this.GetIntermediateStatusRepository(language,intermediateSateExtension);
 
             this._receiveHandler = new ReceiveHandler(this._logger, encoding, errorMessageRepository, intermediateStatusRepository);
             this.RegisterReceiveHandlerEvents();
@@ -220,14 +221,28 @@ namespace Portalum.Zvt
             return new EnglishErrorMessageRepository();
         }
 
-        private IIntermediateStatusRepository GetIntermediateStatusRepository(Language language)
+        private IIntermediateStatusRepository GetIntermediateStatusRepository(Language language, ZvtIntermediateSateExtension intermediateSateExtension)
         {
             if (language == Language.German)
             {
-                return new GermanIntermediateStatusRepository();
+                if (intermediateSateExtension == ZvtIntermediateSateExtension.Ingenico)
+                {
+                    return new IngenicoGermanIntermediateStatusRepository();
+                }
+                else
+                {
+                    return new GermanIntermediateStatusRepository();
+                }
             }
 
-            return new EnglishIntermediateStatusRepository();
+            if (intermediateSateExtension == ZvtIntermediateSateExtension.Ingenico)
+            {
+                return new IngenicoEnglishIntermediateStatusRepository();
+            }
+            else
+            {
+                return new EnglishIntermediateStatusRepository();
+            }
         }
 
         private void ProcessIntermediateStatusInformationReceived(string message)

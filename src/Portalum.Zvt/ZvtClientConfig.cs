@@ -34,5 +34,10 @@ namespace Portalum.Zvt
         /// every 2 (ZVT standard) to 4 (observed in practice) seconds for the completion status.
         /// </summary>
         public byte GetAsyncCompletionInfoLimit = 10;
+
+        /// <summary>
+        /// Manufacturer specific IntermediateState statustext repositories.
+        /// </summary>
+        public ZvtIntermediateSateExtension IntermediateSateExtension = ZvtIntermediateSateExtension.generic;
     }
 }
