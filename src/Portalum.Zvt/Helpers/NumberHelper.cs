@@ -88,6 +88,11 @@ namespace Portalum.Zvt.Helpers
             return 0;
         }
 
+        /// <summary>
+        /// Get Int16 from bytes
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static short ToInt16LittleEndian(Span<byte> data)
         {
             var tempData = data.ToArray();
@@ -95,6 +100,12 @@ namespace Portalum.Zvt.Helpers
             return BitConverter.ToInt16(tempData, 0);
         }
 
+        /// <summary>
+        /// Convert Bit array to Int
+        /// </summary>
+        /// <param name="boolArray"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static int BoolArrayToInt(params bool[] boolArray)
         {
             if (boolArray.Length > 31)
