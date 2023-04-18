@@ -641,6 +641,51 @@ namespace Portalum.Zvt
         }
 
         /// <summary>
+        /// Print System Configuration (06 1A)
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<CommandResponse> PrintSystemConfigurationAsync(CancellationToken cancellationToken = default)
+        {
+            this._logger.LogInformation($"{nameof(PrintSystemConfigurationAsync)} - Execute");
+
+            var package = Array.Empty<byte>();
+
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x1A }, package);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Selftest (06 79)
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<CommandResponse> SelftestAsync(CancellationToken cancellationToken = default)
+        {
+            this._logger.LogInformation($"{nameof(SelftestAsync)} - Execute");
+
+            var package = Array.Empty<byte>();
+
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x79 }, package);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Status-Enquiry (05 01)
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<CommandResponse> StatusEnquiryAsync(CancellationToken cancellationToken = default)
+        {
+            this._logger.LogInformation($"{nameof(StatusEnquiryAsync)} - Execute");
+
+            var package = Array.Empty<byte>();
+
+            var fullPackage = PackageHelper.Create(new byte[] { 0x05, 0x01 }, package);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
         /// Custom Command, allows to send unimplemented commands
         /// </summary>
         /// <param name="controlFieldData">CCRC and APRC, for example 0x08, 0x01</param>
