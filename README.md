@@ -17,6 +17,10 @@ The package is available via [NuGet](https://www.nuget.org/packages/Portalum.Zvt
 PM> install-package Portalum.Zvt
 ```
 
+## V2 -> V3 Breaking change
+In the `IReceiveHandler` interface the received data is now included in the `CompletionReceived` event. Normally, the update should not lead to any difficulties.<br>
+`event Action CompletionReceived;` change to `event Action<byte[]> CompletionReceived;`
+
 ## Supported features
 
 The following features of the ZVT protocol were implemented.
@@ -187,7 +191,7 @@ With the Portalum.Zvt.ControlPanel you can test the different ZVT functions.
 
 **To use the tool, the following steps must be performed**
 
-- Install at least [.NET Desktop Runtime 6.0.3](https://dotnet.microsoft.com/download/dotnet/6.0)
+- Install at least [.NET Desktop Runtime 6.0.16](https://dotnet.microsoft.com/download/dotnet/6.0)
 - Download and extract the ControlPanel ([download](https://github.com/Portalum/Portalum.Zvt/releases/latest/download/Portalum.Zvt.ControlPanel.zip))
 
 ![Portalum.Zvt.ControlPanel](/doc/ControlPanel.png)
