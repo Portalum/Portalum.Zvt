@@ -28,13 +28,32 @@ namespace Portalum.Zvt.Helpers
         /// Byte array to hex string
         /// </summary>
         /// <param name="data"></param>
+        /// <param name="prettify"></param>
         /// <returns></returns>
-        public static string ByteArrayToHex(Span<byte> data)
+        public static string ByteArrayToHex(
+            Span<byte> data,
+            bool prettify = false)
         {
+            if (data.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            var format = "{0:x2}";
+            if (prettify)
+            {
+                format = "{0:X2}-";
+            }
+
             var hex = new StringBuilder(data.Length * 2);
             foreach (byte b in data)
             {
-                hex.AppendFormat("{0:x2}", b);
+                hex.AppendFormat(format, b);
+            }
+
+            if (prettify)
+            {
+                hex.Length--;
             }
 
             return hex.ToString();
