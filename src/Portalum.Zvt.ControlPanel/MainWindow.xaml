@@ -66,12 +66,15 @@
                             <Label x:Name="LabelConnectionStatus" Content="ConnectionStatus" HorizontalAlignment="Left" Margin="148,0,0,0" VerticalAlignment="Center" Width="147" Height="29" BorderThickness="1,1,1,1" BorderBrush="#FF919191" FontSize="11" />
                         </Grid>
                     </GroupBox>
-                    <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Advanced" Foreground="White" Margin="0,310,0,0" HorizontalAlignment="Left" Width="307" Height="126" VerticalAlignment="Top">
+                    <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Advanced" Foreground="White" Margin="0,310,0,0" HorizontalAlignment="Left" Width="307" Height="163" VerticalAlignment="Top">
                         <Grid>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonDiagnosis" Content="Diagnosis" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="205,9,0,0" Click="ButtonDiagnosis_Click"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonRepeatReceipt" Content="Repeat Receipt" HorizontalAlignment="Center" Margin="0,9,0,0" VerticalAlignment="Top" Width="90" Height="29" Click="ButtonRepeatReceipt_Click"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonEndOfDay" Content="End of Day" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonEndOfDay_Click" Width="90" Height="29" Margin="10,9,0,0"/>
                             <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSoftwareUpdate" Content="Software Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="10,47,0,0" FontSize="11" Click="ButtonSoftwareUpdate_Click"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonPrintSystemConfiguration" Content="Print System&#xa;Configuration" HorizontalAlignment="Center" VerticalAlignment="Top" Width="90" Height="29" Margin="0,47,0,0" FontSize="11" Click="ButtonPrintSystemConfiguration_Click"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSelftest" Content="Selftest" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="205,47,0,0" FontSize="11" Click="ButtonSelftest_Click"/>
+                            <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonStatusEnquiry" Content="Status Enquiry" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="29" Margin="10,85,0,0" FontSize="11" Click="ButtonStatusEnquiry_Click"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Template="{StaticResource GroupBoxWithHeader}" Header="Payment" Foreground="White" Margin="0,162,0,0" HorizontalAlignment="Left" Width="307" Height="148" VerticalAlignment="Top">

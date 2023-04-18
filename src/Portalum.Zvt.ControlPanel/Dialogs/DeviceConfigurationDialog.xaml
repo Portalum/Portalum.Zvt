@@ -17,7 +17,7 @@
         <TextBox x:Name="TextBoxIpAddress" HorizontalAlignment="Left" Text="192.168.100.20" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="123,251,0,0" Height="24" FontSize="16" KeyDown="TextBoxIpAddress_KeyDown" GotFocus="TextBoxIpAddress_GotFocus" TabIndex="1"/>
         
         <Label Content="Port" HorizontalAlignment="Left" Margin="75,280,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
-        <TextBox x:Name="TextBoxPort" HorizontalAlignment="Left" Text="20007" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="123,284,0,0" Height="24" FontSize="16" PreviewTextInput="PortValidationTextBox" TabIndex="2"/>
+        <TextBox x:Name="TextBoxPort" HorizontalAlignment="Left" Text="20007" TextWrapping="Wrap" VerticalAlignment="Top" Width="122" Margin="123,284,0,0" Height="24" FontSize="16" PreviewTextInput="PortValidationTextBox" TabIndex="2" GotFocus="TextBoxPort_GotFocus" KeyDown="TextBoxPort_KeyDown"/>
 
         <Label Content="TCP Keepalive" HorizontalAlignment="Left" Margin="6,312,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
         <CheckBox x:Name="CheckBoxTcpKeepalive" Content="" HorizontalAlignment="Left" Margin="123,322,0,0" VerticalAlignment="Top" TabIndex="3"/>

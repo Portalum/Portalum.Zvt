@@ -675,6 +675,51 @@ namespace Portalum.Zvt.ControlPanel
             this.ButtonSoftwareUpdate.IsEnabled = true;
         }
 
+        private async Task PrintSystemConfigurationAsync()
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("PrintSystemConfiguration (06 1A)");
+
+            this.ButtonPrintSystemConfiguration.IsEnabled = false;
+            var commandResponse = await this._zvtClient.PrintSystemConfigurationAsync(this._cancellationTokenSource.Token);
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonPrintSystemConfiguration.IsEnabled = true;
+        }
+
+        private async Task SelftestAsync()
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("Selftest (06 79)");
+
+            this.ButtonSelftest.IsEnabled = false;
+            var commandResponse = await this._zvtClient.SelftestAsync(this._cancellationTokenSource.Token);
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonSelftest.IsEnabled = true;
+        }
+
+        private async Task StatusEnquiryAsync()
+        {
+            if (!this.IsZvtClientReady())
+            {
+                return;
+            }
+
+            this.AddCommandInfo("Status-Enquiry (05 01)");
+
+            this.ButtonStatusEnquiry.IsEnabled = false;
+            var commandResponse = await this._zvtClient.StatusEnquiryAsync(this._cancellationTokenSource.Token);
+            this.ProcessCommandRespone(commandResponse);
+            this.ButtonStatusEnquiry.IsEnabled = true;
+        }
+
         private async void ButtonRegistration_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new RegistrationConfigurationDialog
@@ -752,6 +797,21 @@ namespace Portalum.Zvt.ControlPanel
         private async void ButtonSoftwareUpdate_Click(object sender, RoutedEventArgs e)
         {
             await this.SoftwareUpdateAsync();
+        }
+
+        private async void ButtonPrintSystemConfiguration_Click(object sender, RoutedEventArgs e)
+        {
+            await this.PrintSystemConfigurationAsync();
+        }
+
+        private async void ButtonSelftest_Click(object sender, RoutedEventArgs e)
+        {
+            await this.SelftestAsync();
+        }
+
+        private async void ButtonStatusEnquiry_Click(object sender, RoutedEventArgs e)
+        {
+            await this.StatusEnquiryAsync();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

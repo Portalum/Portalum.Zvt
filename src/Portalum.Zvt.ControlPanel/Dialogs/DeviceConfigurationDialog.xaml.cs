@@ -65,6 +65,19 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
             (sender as TextBox).SelectAll();
         }
 
+        private void TextBoxPort_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as TextBox).SelectAll();
+        }
+
+        private void TextBoxPort_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                this.CloseDialog();
+            }
+        }
+
         private void PortValidationTextBox(object sender, TextCompositionEventArgs e)
         {
             e.Handled = this._regexPortNumber.IsMatch(e.Text);
