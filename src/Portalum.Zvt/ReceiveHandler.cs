@@ -50,7 +50,7 @@ namespace Portalum.Zvt
         public event Action<string> IntermediateStatusInformationReceived;
 
         /// <inheritdoc />
-        public event Action CompletionReceived;
+        public event Action<byte[]> CompletionReceived;
 
         /// <inheritdoc />
         public event Action<string> AbortReceived;
@@ -274,9 +274,17 @@ namespace Portalum.Zvt
             //Completion (3.2 Completion)
             if (apduInfo.CanHandle(this._completionCommandControlField))
             {
-                this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Completion' received, data:{ByteHelper.ByteArrayToHex(apduData, prettify: true)}");
+                if (apduData.Length == 0)
+                {
+                    this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Completion' received, data:{ByteHelper.ByteArrayToHex(apduData, prettify: true)}");
+                    this.CompletionReceived?.Invoke(Array.Empty<byte>());
+                }
+                else
+                {
+                    this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Completion' received");
+                    this.CompletionReceived?.Invoke(apduData.ToArray());
+                }
 
-                this.CompletionReceived?.Invoke();
                 return new ProcessData { State = ProcessDataState.Processed, Response = new Completion() };
             }
 

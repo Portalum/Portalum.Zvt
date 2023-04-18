@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
+using Portalum.Zvt.Parsers;
 using Portalum.Zvt.Repositories;
 using System;
 using System.Collections.Generic;
@@ -295,7 +296,7 @@ namespace Portalum.Zvt
                 State = CommandResponseState.Unknown
             };
 
-            void completionReceived()
+            void completionReceived(byte[] apduData)
             {
                 commandResponse.State = CommandResponseState.Successful;
 
@@ -680,6 +681,11 @@ namespace Portalum.Zvt
             this._logger.LogInformation($"{nameof(StatusEnquiryAsync)} - Execute");
 
             var package = Array.Empty<byte>();
+
+            //TODO: Parse data of CompletionReceived inside SendCommandAsync the data are available
+            //var lengthOfSoftwareVersionData = BmpParser.GetDataLengthLLL(apduData.Slice(0, 3).ToArray());
+            //var softwareVersion = Encoding.GetEncoding(437).GetString(apduData.Slice(3, lengthOfSoftwareVersionData).ToArray());
+            //var test = apduData.Slice(3 + lengthOfSoftwareVersionData);
 
             var fullPackage = PackageHelper.Create(new byte[] { 0x05, 0x01 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
