@@ -2,7 +2,7 @@
 
 <img src="https://raw.githubusercontent.com/Portalum/Portalum.Zvt/main/doc/logo.png" width="150" title="Portalum Zvt Client" alt="Portalum Zvt Client" align="left">
 
-Portalum.Zvt is a library designed to simplify communication with payment terminals via the **ZVT Protocol**. The library is based on Microsoft .NET.
+Portalum.Zvt is a library designed to simplify communication with payment terminals via the **ZVT Protocol** used in (Germany, Austria, Switzerland). The library is based on Microsoft .NET.
 
 Communication via Network (TCP) and communication via a serial connection is supported. The most important commands for processing a payment transaction with an electronic POS system are also already integrated.
 
