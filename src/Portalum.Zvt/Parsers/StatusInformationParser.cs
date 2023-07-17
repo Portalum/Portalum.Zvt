@@ -133,7 +133,7 @@ namespace Portalum.Zvt.Parsers
                 switch (cardTechnology)
                 {
                     case 0x00:
-                        typedResponse.CardTechnology = "Magentic stripe";
+                        typedResponse.CardTechnology = "Magnetic stripe";
                         break;
                     case 0x01:
                         typedResponse.CardTechnology = "Chip";
