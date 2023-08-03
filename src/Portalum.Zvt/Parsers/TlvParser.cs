@@ -90,6 +90,11 @@ namespace Portalum.Zvt.Parsers
                         break;
 
                     case TlvTagFieldDataObjectType.Constructed:
+                        if (data.Length < tlvLengthInfo.Length)
+                        {
+                            this._logger.LogError($"{nameof(ParseInternal)} - Corrupt data package for tag:{tagFieldInfo.Tag} {tagFieldInfo.DataObjectType}");
+                            return false;
+                        }
 
                         var tlvConstructedDataPart = data.Slice(0, tlvLengthInfo.Length);
                         if (!this.ProcessTlvInfoAction(tagFieldInfo.Tag, tlvConstructedDataPart, response))
