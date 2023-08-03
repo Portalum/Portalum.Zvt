@@ -6,7 +6,7 @@
     public enum SendCommandResult
     {
         /// <summary>
-        /// Acknowledge received
+        /// Positive completion received
         /// </summary>
         PositiveCompletionReceived,
 

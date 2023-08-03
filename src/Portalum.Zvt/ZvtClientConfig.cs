@@ -23,7 +23,7 @@ namespace Portalum.Zvt
         public ZvtEncoding Encoding { get; set; } = ZvtEncoding.CodePage437;
 
         /// <summary>
-        /// Timeout after Command Acknowledge and Completion
+        /// Timeout after Command Completion and Completion
         /// </summary>
         public TimeSpan CommandCompletionTimeout = TimeSpan.FromSeconds(180);
 
