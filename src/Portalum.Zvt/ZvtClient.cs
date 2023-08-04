@@ -289,8 +289,8 @@ namespace Portalum.Zvt
             bool asyncCompletion = false)
         {
             using var timeoutCancellationTokenSource = new CancellationTokenSource(this._commandCompletionTimeout);
-            using var dataReceivedCancellationTokenSource = new CancellationTokenSource();
-            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, dataReceivedCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
+            using var transactionFinishCancellationTokenSource = new CancellationTokenSource();
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, transactionFinishCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
             
             var commandResponse = new CommandResponse
             {
@@ -301,7 +301,7 @@ namespace Portalum.Zvt
             {
                 commandResponse.State = CommandResponseState.Successful;
 
-                dataReceivedCancellationTokenSource.Cancel();
+                transactionFinishCancellationTokenSource.Cancel();
             }
 
             void abortReceived(string errorMessage)
@@ -309,17 +309,19 @@ namespace Portalum.Zvt
                 commandResponse.State = CommandResponseState.Abort;
                 commandResponse.ErrorMessage = errorMessage;
 
-                dataReceivedCancellationTokenSource.Cancel();
+                transactionFinishCancellationTokenSource.Cancel();
             }
 
             void intermediateStatusInformationReceived(string status)
             {
+                // Increase cancellation timeout
                 timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
             }
 
             bool startAsyncCompletionFired = false;
             void statusInformationReceived(StatusInformation statusInformation)
             {
+                // Increase cancellation timeout
                 timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
 
                 if (statusInformation.ErrorCode == 0 && asyncCompletion && !startAsyncCompletionFired)
@@ -339,6 +341,8 @@ namespace Portalum.Zvt
                 {
                     this._zvtCommunication.GetCompletionInfo += this.GetCompletionInfo;
                 }
+
+                this._zvtCommunication.TransactionActive();
 
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
@@ -373,6 +377,7 @@ namespace Portalum.Zvt
                 }
 
                 // There is no infinite timeout here, the timeout comes via the `timeoutCancellationTokenSource`
+                // Wait for TransactionFinish or Timeout
                 await Task.Delay(Timeout.InfiniteTimeSpan, linkedCancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (timeoutCancellationTokenSource.IsCancellationRequested)
@@ -384,6 +389,8 @@ namespace Portalum.Zvt
             }
             finally
             {
+                this._zvtCommunication.TransactionInactive();
+
                 this._receiveHandler.AbortReceived -= abortReceived;
                 this._receiveHandler.CompletionReceived -= completionReceived;
                 this._receiveHandler.IntermediateStatusInformationReceived -= intermediateStatusInformationReceived;

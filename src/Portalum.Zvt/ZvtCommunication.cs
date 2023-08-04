@@ -22,7 +22,7 @@ namespace Portalum.Zvt
         private CancellationTokenSource _commandCompletionCancellationTokenSource;
         private byte[] _dataBuffer;
         private bool _waitForCommandCompletion = false;
-        private bool _allowCompletion = false;
+        private bool _transactionActive = false;
 
         /// <summary>
         /// New data received from the pt device
@@ -72,6 +72,16 @@ namespace Portalum.Zvt
             {
                 this._deviceCommunication.DataReceived -= this.DataReceiveSwitch;
             }
+        }
+
+        public void TransactionActive()
+        {
+            this._transactionActive = true;
+        }
+
+        public void TransactionInactive()
+        {
+            this._transactionActive = false;
         }
 
         /// <summary>
@@ -142,6 +152,13 @@ namespace Portalum.Zvt
                     return;
             }
 
+            if (!this._transactionActive)
+            {
+                this._logger.LogInformation($"{nameof(ProcessData)} - Receive data in transaction inactive state");
+                this._deviceCommunication.SendAsync(this._negativeIssueGoodsData);
+                return;
+            }
+
             // Is StatusInformation and ErrorCode is 0
             if (dataProcessed.Response is StatusInformation { ErrorCode: 0 })
             {
@@ -185,13 +202,7 @@ namespace Portalum.Zvt
             }
             else if (dataProcessed.Response is Completion completion)
             {
-                if (this._allowCompletion)
-                {
-                    this._deviceCommunication.SendAsync(this._positiveCompletionData1);
-                    return;
-                }
-
-                this._deviceCommunication.SendAsync(this._negativeIssueGoodsData);
+                this._deviceCommunication.SendAsync(this._positiveCompletionData1);
                 return;
             }
             else if (dataProcessed.Response is Abort abort)
@@ -233,7 +244,6 @@ namespace Portalum.Zvt
             int commandCompletionReceiveTimeoutMilliseconds = 5000,
             CancellationToken cancellationToken = default)
         {
-            this._allowCompletion = true;
             this.ResetDataBuffer();
 
             this._commandCompletionCancellationTokenSource?.Dispose();
@@ -277,18 +287,15 @@ namespace Portalum.Zvt
 
             if (this.CheckIsNotSupported())
             {
-                this._allowCompletion = false;
                 return SendCommandResult.NotSupported;
             }
 
             if (this.CheckIsNegativeCompletion())
             {
-                this._allowCompletion = false;
                 this._logger.LogError($"{nameof(SendCommandAsync)} - 'Negative completion' received");
                 return SendCommandResult.NegativeCompletionReceived;
             }
 
-            this._allowCompletion = false;
             this._logger.LogError($"{nameof(SendCommandAsync)} - Unknown Failure, DataBuffer {BitConverter.ToString(this._dataBuffer)}");
             return SendCommandResult.UnknownFailure;
         }
