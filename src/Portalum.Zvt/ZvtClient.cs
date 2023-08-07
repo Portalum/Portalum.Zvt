@@ -128,6 +128,7 @@ namespace Portalum.Zvt
             {
                 this._zvtCommunication = zvtCommunication;
             }
+
             this.RegisterZvtCommunicationHandlerEvents();
 
             #endregion
@@ -277,19 +278,19 @@ namespace Portalum.Zvt
         /// SendCommandAsync
         /// </summary>
         /// <param name="commandData">The data of the command</param>
-        /// <param name="endAfterAcknowledge">After receive an acknowledge the command is successful</param>
+        /// <param name="endAfterCommandCompletion">After receive an CommandCompletion the command is successful</param>
         /// <param name="cancellationToken"></param>
         /// <param name="asyncCompletion">set to true to use asynchronous completion and it's callbacks.</param>
         /// <returns></returns>
         private async Task<CommandResponse> SendCommandAsync(
             byte[] commandData,
-            bool endAfterAcknowledge = false,
+            bool endAfterCommandCompletion = false,
             CancellationToken cancellationToken = default,
             bool asyncCompletion = false)
         {
             using var timeoutCancellationTokenSource = new CancellationTokenSource(this._commandCompletionTimeout);
-            using var dataReceivedCancellationTokenSource = new CancellationTokenSource();
-            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, dataReceivedCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
+            using var transactionFinishCancellationTokenSource = new CancellationTokenSource();
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, transactionFinishCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
             
             var commandResponse = new CommandResponse
             {
@@ -300,7 +301,7 @@ namespace Portalum.Zvt
             {
                 commandResponse.State = CommandResponseState.Successful;
 
-                dataReceivedCancellationTokenSource.Cancel();
+                transactionFinishCancellationTokenSource.Cancel();
             }
 
             void abortReceived(string errorMessage)
@@ -308,17 +309,19 @@ namespace Portalum.Zvt
                 commandResponse.State = CommandResponseState.Abort;
                 commandResponse.ErrorMessage = errorMessage;
 
-                dataReceivedCancellationTokenSource.Cancel();
+                transactionFinishCancellationTokenSource.Cancel();
             }
 
             void intermediateStatusInformationReceived(string status)
             {
+                // Increase cancellation timeout
                 timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
             }
 
             bool startAsyncCompletionFired = false;
             void statusInformationReceived(StatusInformation statusInformation)
             {
+                // Increase cancellation timeout
                 timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
 
                 if (statusInformation.ErrorCode == 0 && asyncCompletion && !startAsyncCompletionFired)
@@ -339,30 +342,42 @@ namespace Portalum.Zvt
                     this._zvtCommunication.GetCompletionInfo += this.GetCompletionInfo;
                 }
 
+                this._zvtCommunication.TransactionActive();
+
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
                 var sendCommandResult = await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken);
-                if (sendCommandResult == SendCommandResult.NotSupported)
+                switch (sendCommandResult)
                 {
-                    this._logger.LogError($"{nameof(SendCommandAsync)} - NotSupported");
-                    commandResponse.State = CommandResponseState.NotSupported;
-                    return commandResponse;
-                }
-                if (sendCommandResult != SendCommandResult.PositiveCompletionReceived)
-                {
-                    this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command: {sendCommandResult}");
-                    commandResponse.State = CommandResponseState.Error;
-                    commandResponse.ErrorMessage = sendCommandResult.ToString();
-                    return commandResponse;
+                    case SendCommandResult.PositiveCompletionReceived:
+                        break;
+                    case SendCommandResult.NotSupported:
+                        this._logger.LogError($"{nameof(SendCommandAsync)} - NotSupported");
+                        commandResponse.State = CommandResponseState.NotSupported;
+                        return commandResponse;
+                    case SendCommandResult.NegativeCompletionReceived:
+                    case SendCommandResult.NoDataReceived:
+                    case SendCommandResult.SendFailure:
+                    case SendCommandResult.UnknownFailure:
+                        this._logger.LogError($"{nameof(SendCommandAsync)} - Failure on send command: {sendCommandResult}");
+                        commandResponse.State = CommandResponseState.Error;
+                        commandResponse.ErrorMessage = sendCommandResult.ToString();
+                        return commandResponse;
+                    default:
+                        this._logger.LogError($"{nameof(SendCommandAsync)} - Unknown SendCommandResult {sendCommandResult}");
+                        commandResponse.State = CommandResponseState.Error;
+                        commandResponse.ErrorMessage = sendCommandResult.ToString();
+                        return commandResponse;
                 }
 
-                if (endAfterAcknowledge)
+                if (endAfterCommandCompletion)
                 {
                     commandResponse.State = CommandResponseState.Successful;
                     return commandResponse;
                 }
 
                 // There is no infinite timeout here, the timeout comes via the `timeoutCancellationTokenSource`
+                // Wait for TransactionFinish or Timeout
                 await Task.Delay(Timeout.InfiniteTimeSpan, linkedCancellationTokenSource.Token).ContinueWith(task =>
                 {
                     if (timeoutCancellationTokenSource.IsCancellationRequested)
@@ -374,6 +389,8 @@ namespace Portalum.Zvt
             }
             finally
             {
+                this._zvtCommunication.TransactionInactive();
+
                 this._receiveHandler.AbortReceived -= abortReceived;
                 this._receiveHandler.CompletionReceived -= completionReceived;
                 this._receiveHandler.IntermediateStatusInformationReceived -= intermediateStatusInformationReceived;
@@ -593,7 +610,7 @@ namespace Portalum.Zvt
             var package = Array.Empty<byte>();
 
             var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x02 }, package);
-            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true, cancellationToken: cancellationToken);
+            return await this.SendCommandAsync(fullPackage, endAfterCommandCompletion: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -608,7 +625,7 @@ namespace Portalum.Zvt
             var package = Array.Empty<byte>();
 
             var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0xB0 }, package);
-            return await this.SendCommandAsync(fullPackage, endAfterAcknowledge: true, cancellationToken: cancellationToken);
+            return await this.SendCommandAsync(fullPackage, endAfterCommandCompletion: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>

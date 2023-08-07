@@ -2,7 +2,7 @@
 
 class Program
 {
-    private static readonly byte[] _acknowledgePackage = new byte[] { 0x80, 0x00, 0x00 };
+    private static readonly byte[] _commandCompletionPackage = new byte[] { 0x80, 0x00, 0x00 };
     private static readonly byte[] _completionPackage = new byte[] { 0x06, 0x0F, 0x00 };
 
     private static SimpleTcpServer? _tcpServer;
@@ -38,8 +38,8 @@ class Program
         {
             Thread.Sleep(500);
 
-            Console.WriteLine("Send Acknowledge");
-            _tcpServer.Send(e.IpPort, _acknowledgePackage);
+            Console.WriteLine("Send Command Completion");
+            _tcpServer.Send(e.IpPort, _commandCompletionPackage);
 
             Thread.Sleep(1000);
 
