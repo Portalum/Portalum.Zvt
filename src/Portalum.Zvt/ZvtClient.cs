@@ -108,7 +108,7 @@ namespace Portalum.Zvt
 
             if (receiveHandler == default)
             {
-                this.InitializeReceiveHandler(clientConfig.Language, this.GetEncoding(clientConfig.Encoding));
+                this.InitializeReceiveHandler(clientConfig.Language, EncodingHelper.GetEncoding(clientConfig.Encoding));
             }
             else
             {
@@ -161,24 +161,6 @@ namespace Portalum.Zvt
             return this.CompletionDecisionRequested?.Invoke();
         }
 
-        private Encoding GetEncoding(ZvtEncoding zvtEncoding)
-        {
-            switch (zvtEncoding)
-            {
-                case ZvtEncoding.UTF8:
-                    return Encoding.UTF8;
-                case ZvtEncoding.ISO_8859_1:
-                    return Encoding.GetEncoding("iso-8859-1");
-                case ZvtEncoding.ISO_8859_2:
-                    return Encoding.GetEncoding("iso-8859-2");
-                case ZvtEncoding.ISO_8859_15:
-                    return Encoding.GetEncoding("iso-8859-15");
-                case ZvtEncoding.CodePage437:
-                default:
-                    return Encoding.GetEncoding(437);
-            }
-        }
-
         private void InitializeReceiveHandler(
             Language language,
             Encoding encoding)
@@ -218,7 +200,8 @@ namespace Portalum.Zvt
 
         private IErrorMessageRepository GetErrorMessageRepository(Language language)
         {
-            //No German translation available
+            //TODO: No German translation available
+
             return new EnglishErrorMessageRepository();
         }
 

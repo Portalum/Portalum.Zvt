@@ -1,18 +1,20 @@
 ﻿using Microsoft.Extensions.Logging;
-using Portalum.Zvt.Models;
 using Portalum.Zvt.ControlPanel.Dialogs;
 using Portalum.Zvt.ControlPanel.Models;
+using Portalum.Zvt.Helpers;
+using Portalum.Zvt.Models;
+using Portalum.Zvt.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
-using System.Threading;
 
 namespace Portalum.Zvt.ControlPanel
 {
@@ -44,7 +46,16 @@ namespace Portalum.Zvt.ControlPanel
 
             this.TextBoxAmount.Text = $"{this.CreateRandomAmount()}";
 
-            _ = Task.Run(async () => await this.ConnectAsync());
+            CodePagesEncodingProvider.Instance.GetEncoding(437);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            _ = Task.Run(async () => await this.ConnectAsync()).ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    throw task.Exception;
+                }
+            });
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -126,13 +137,38 @@ namespace Portalum.Zvt.ControlPanel
                 this.ButtonDisconnect.IsEnabled = true;
             });
 
+            #region Default ZVT
+
             var zvtClientConfig = new ZvtClientConfig
             {
                 Encoding = this._deviceConfiguration.Encoding,
                 Language = this._deviceConfiguration.Language
             };
 
-            this._zvtClient = new ZvtClient(this._deviceCommunication, logger: loggerZvtClient, zvtClientConfig);
+            this._zvtClient = new ZvtClient(
+                deviceCommunication: this._deviceCommunication,
+                logger: loggerZvtClient,
+                clientConfig: zvtClientConfig);
+
+            #endregion
+
+            #region Ingenico ZVT
+
+            //var receiveHandler = new ReceiveHandler(
+            //    logger: loggerZvtClient,
+            //    encoding: EncodingHelper.GetEncoding(this._deviceConfiguration.Encoding),
+            //    errorMessageRepository: new EnglishErrorMessageRepository(),
+            //    intermediateStatusRepository: new IngenicoEnglishIntermediateStatusRepository()
+            //    );
+
+            //this._zvtClient = new ZvtClient(
+            //    deviceCommunication: this._deviceCommunication,
+            //    logger: loggerZvtClient,
+            //    receiveHandler: receiveHandler);
+
+            #endregion
+
+
             this._zvtClient.LineReceived += this.LineReceived;
             this._zvtClient.ReceiptReceived += this.ReceiptReceived;
             this._zvtClient.StatusInformationReceived += this.StatusInformationReceived;
@@ -162,10 +198,13 @@ namespace Portalum.Zvt.ControlPanel
                 disposable.Dispose();
             }
 
-            this._zvtClient.LineReceived -= this.LineReceived;
-            this._zvtClient.ReceiptReceived -= this.ReceiptReceived;
-            this._zvtClient.StatusInformationReceived -= this.StatusInformationReceived;
-            this._zvtClient.IntermediateStatusInformationReceived -= this.IntermediateStatusInformationReceived;
+            if (this._zvtClient != null)
+            {
+                this._zvtClient.LineReceived -= this.LineReceived;
+                this._zvtClient.ReceiptReceived -= this.ReceiptReceived;
+                this._zvtClient.StatusInformationReceived -= this.StatusInformationReceived;
+                this._zvtClient.IntermediateStatusInformationReceived -= this.IntermediateStatusInformationReceived;
+            }
             this._zvtClient?.Dispose();
 
             this.ButtonDisconnect.Dispatcher.Invoke(() =>

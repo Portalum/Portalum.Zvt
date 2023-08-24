@@ -12,7 +12,8 @@ namespace Portalum.Zvt.Repositories
         /// <summary>
         /// German IntermediateStatusRepository
         /// </summary>
-        public GermanIntermediateStatusRepository()
+        /// <param name="additionalStatusCodes"></param>
+        public GermanIntermediateStatusRepository(Dictionary<byte, string> additionalStatusCodes = null)
         {
             this._statusCodes = new Dictionary<byte, string>
             {
@@ -102,6 +103,14 @@ namespace Portalum.Zvt.Repositories
                 { 0xF3, "Offline-Transaktion" },
                 { 0xFF, "kein geeigneter ZVT-Statuscode zu demdem Status. Siehe TLV-Tags 24 und 07" }
             };
+
+            if (additionalStatusCodes != null)
+            {
+                foreach (var additionalStatusCode in additionalStatusCodes)
+                {
+                    this._statusCodes.Add(additionalStatusCode.Key, additionalStatusCode.Value);
+                }
+            }
         }
 
         /// <inheritdoc />
