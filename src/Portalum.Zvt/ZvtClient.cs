@@ -372,6 +372,9 @@ namespace Portalum.Zvt
             }
             finally
             {
+                // Minimal wait timeout to send a Completion back to PT
+                await Task.Delay(100);
+
                 this._zvtCommunication.TransactionInactive();
 
                 this._receiveHandler.AbortReceived -= abortReceived;
