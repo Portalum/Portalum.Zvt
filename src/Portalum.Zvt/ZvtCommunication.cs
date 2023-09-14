@@ -198,7 +198,7 @@ namespace Portalum.Zvt
             else if (dataProcessed.Response is StatusInformation statusInformation)
             {
                 this._logger.LogInformation($"{nameof(ProcessData)} - StatusInformation with ErrorCode:{statusInformation.ErrorCode:X2} {statusInformation.ErrorMessage} received");
-                this._deviceCommunication.SendAsync(this._negativeIssueGoodsData);
+                this._deviceCommunication.SendAsync(this._positiveCompletionData1);
             }
             else if (dataProcessed.Response is Completion completion)
             {
