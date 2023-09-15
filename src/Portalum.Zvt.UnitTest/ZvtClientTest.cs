@@ -561,7 +561,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.IsFalse(startAsyncCompletionCalled);
 
             // ensure we answer with an ack in this case
-            CollectionAssert.AreEqual(new byte[] { 0x84, 0x66, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+            CollectionAssert.AreEqual(new byte[] { 0x80, 0x00, 0x00 }, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
             dataSent = Array.Empty<byte>();
 
             mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x1E, 0x01, 0x05 });
