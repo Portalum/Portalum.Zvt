@@ -16,7 +16,7 @@ namespace Portalum.Zvt
         /// <summary>
         /// Command Abort received
         /// </summary>
-        event Action<string> AbortReceived;
+        event Action<byte, string> AbortReceived;
 
         /// <summary>
         /// StatusInformation received

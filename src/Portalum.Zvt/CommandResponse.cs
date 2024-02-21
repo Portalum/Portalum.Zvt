@@ -11,6 +11,11 @@
         public CommandResponseState State { get; set; }
 
         /// <summary>
+        /// Error Code
+        /// </summary>
+        public byte ErrorCode { get; set; }
+
+        /// <summary>
         /// Error Message
         /// </summary>
         public string ErrorMessage { get; set; }

@@ -118,8 +118,8 @@ namespace Portalum.Zvt
 
             #endregion
 
-            # region ZvtCommunication
-            
+            #region ZvtCommunication
+
             if (zvtCommunication == default)
             {
                 this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
@@ -151,7 +151,7 @@ namespace Portalum.Zvt
             {
                 this.UnregisterZvtCommunicationHandlerEvents();
                 this._zvtCommunication.Dispose();
-                
+
                 this.UnregisterReceiveHandlerEvents();
             }
         }
@@ -176,7 +176,7 @@ namespace Portalum.Zvt
         {
             this._zvtCommunication.DataReceived += this.DataReceived;
         }
-        
+
         private void UnregisterZvtCommunicationHandlerEvents()
         {
             this._zvtCommunication.DataReceived -= this.DataReceived;
@@ -274,7 +274,7 @@ namespace Portalum.Zvt
             using var timeoutCancellationTokenSource = new CancellationTokenSource(this._commandCompletionTimeout);
             using var transactionFinishCancellationTokenSource = new CancellationTokenSource();
             using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, transactionFinishCancellationTokenSource.Token, timeoutCancellationTokenSource.Token);
-            
+
             var commandResponse = new CommandResponse
             {
                 State = CommandResponseState.Unknown
@@ -287,9 +287,10 @@ namespace Portalum.Zvt
                 transactionFinishCancellationTokenSource.Cancel();
             }
 
-            void abortReceived(string errorMessage)
+            void abortReceived(byte errorCode, string errorMessage)
             {
                 commandResponse.State = CommandResponseState.Abort;
+                commandResponse.ErrorCode = errorCode;
                 commandResponse.ErrorMessage = errorMessage;
 
                 transactionFinishCancellationTokenSource.Cancel();
@@ -330,6 +331,7 @@ namespace Portalum.Zvt
                 this._logger.LogDebug($"{nameof(SendCommandAsync)} - Send command to PT");
 
                 var sendCommandResult = await this._zvtCommunication.SendCommandAsync(commandData, cancellationToken: cancellationToken);
+
                 switch (sendCommandResult)
                 {
                     case SendCommandResult.PositiveCompletionReceived:

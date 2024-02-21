@@ -50,7 +50,7 @@ namespace Portalum.Zvt.Parsers
         }
 
         /// <inheritdoc />
-        public (byte StatusCode, string Message) GetMessage(Span<byte> data)
+        public (byte StatusCode, string StatusInformation) GetMessage(Span<byte> data)
         {
             if (data.Length == 0)
             {
@@ -75,12 +75,12 @@ namespace Portalum.Zvt.Parsers
             }
 
             var message = this._intermediateStatusRepository.GetMessage(id);
-            if (string.IsNullOrEmpty(message))
+            if (string.IsNullOrEmpty(message.StatusInformation))
             {
                 this._logger.LogError($"{nameof(GetMessage)} - No message available for {id:X2}");
             }
 
-            return (id, message);
+            return message;
         }
 
         private bool CleanupTextBuffer(byte[] data, IResponse response)

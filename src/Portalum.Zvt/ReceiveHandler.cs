@@ -53,7 +53,7 @@ namespace Portalum.Zvt
         public event Action<byte[]> CompletionReceived;
 
         /// <inheritdoc />
-        public event Action<string> AbortReceived;
+        public event Action<byte, string> AbortReceived;
 
         /// <summary>
         /// ReceiveHandler
@@ -236,16 +236,16 @@ namespace Portalum.Zvt
             if (apduInfo.CanHandle(this._intermediateStatusInformationControlField))
             {
                 var intermediateStatusInformation = this._intermediateStatusInformationParser.GetMessage(apduData);
-                if (intermediateStatusInformation.Message == null)
+                if (intermediateStatusInformation.StatusInformation == null)
                 {
                     return new ProcessData { State = ProcessDataState.ParseFailure };
                 }
 
-                this.IntermediateStatusInformationReceived?.Invoke(intermediateStatusInformation.StatusCode, intermediateStatusInformation.Message);
+                this.IntermediateStatusInformationReceived?.Invoke(intermediateStatusInformation.StatusCode, intermediateStatusInformation.StatusInformation);
                 return new ProcessData
                 {
                     State = ProcessDataState.Processed,
-                    Response = new IntermediateStatusInformation { ErrorMessage = intermediateStatusInformation.Message }
+                    Response = new IntermediateStatusInformation { ErrorMessage = intermediateStatusInformation.StatusInformation }
                 };
             }
 
@@ -291,7 +291,7 @@ namespace Portalum.Zvt
             //Abort (3.3 Abort)
             if (apduInfo.CanHandle(this._abortCommandControlField))
             {
-                var errorMessage = string.Empty;
+                (byte StatusCode, string StatusInformation) errorMessage = (0, string.Empty);
                 byte errorCode = 0x60;
 
                 if (apduData.Length > 0)
@@ -301,16 +301,16 @@ namespace Portalum.Zvt
                 }
                 else
                 {
-                    errorMessage = "Cannot detect error code";
+                    errorMessage.StatusInformation = "Cannot detect error code";
                 }
 
                 this._logger.LogDebug($"{nameof(ProcessApdu)} - 'Abort' received with message:{errorMessage}");
-                this.AbortReceived?.Invoke(errorMessage);
+                this.AbortReceived?.Invoke(errorMessage.StatusCode, errorMessage.StatusInformation);
 
                 return new ProcessData
                 {
                     State = ProcessDataState.Processed,
-                    Response = new Abort { ErrorCode = errorCode, ErrorMessage = errorMessage }
+                    Response = new Abort { ErrorCode = errorCode, ErrorMessage = errorMessage.StatusInformation }
                 };
             }
 
