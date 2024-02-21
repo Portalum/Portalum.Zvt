@@ -50,11 +50,11 @@ namespace Portalum.Zvt.Parsers
         }
 
         /// <inheritdoc />
-        public string GetMessage(Span<byte> data)
+        public (byte StatusCode, string Message) GetMessage(Span<byte> data)
         {
             if (data.Length == 0)
             {
-                return null;
+                return (0, null);
             }
 
             var id = data[0];
@@ -66,12 +66,12 @@ namespace Portalum.Zvt.Parsers
                 if (data.Length <= 3)
                 {
                     this._logger.LogError($"{nameof(GetMessage)} - Invalid tlv data length");
-                    return null;
+                    return (0, null);
                 }
 
                 var data1 = data.Slice(2);
                 this._bmpParser.Parse(data1, null);
-                return this._tlvTextContent.ToString();
+                return (id, this._tlvTextContent.ToString());
             }
 
             var message = this._intermediateStatusRepository.GetMessage(id);
@@ -80,7 +80,7 @@ namespace Portalum.Zvt.Parsers
                 this._logger.LogError($"{nameof(GetMessage)} - No message available for {id:X2}");
             }
 
-            return message;
+            return (id, message);
         }
 
         private bool CleanupTextBuffer(byte[] data, IResponse response)

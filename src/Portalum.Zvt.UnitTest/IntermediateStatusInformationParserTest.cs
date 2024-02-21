@@ -25,7 +25,7 @@ namespace Portalum.Zvt.UnitTest
             var parser = this.GetIntermediateStatusInformationParser();
             var statusMessage = parser.GetMessage(new byte[] { 0x0A });
 
-            Assert.AreEqual("Insert card", statusMessage);
+            Assert.AreEqual("Insert card", statusMessage.Message);
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace Portalum.Zvt.UnitTest
             expectedMessage.AppendLine("EUR 1.23");
             expectedMessage.AppendLine("Bitte warten");
             
-            Assert.AreEqual(expectedMessage.ToString(), statusMessage);
+            Assert.AreEqual(expectedMessage.ToString(), statusMessage.Message);
         }
     }
 }

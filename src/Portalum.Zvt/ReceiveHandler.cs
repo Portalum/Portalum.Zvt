@@ -47,7 +47,7 @@ namespace Portalum.Zvt
         public event Action<StatusInformation> StatusInformationReceived;
 
         /// <inheritdoc />
-        public event Action<string> IntermediateStatusInformationReceived;
+        public event Action<byte, string> IntermediateStatusInformationReceived;
 
         /// <inheritdoc />
         public event Action<byte[]> CompletionReceived;
@@ -236,16 +236,16 @@ namespace Portalum.Zvt
             if (apduInfo.CanHandle(this._intermediateStatusInformationControlField))
             {
                 var intermediateStatusInformation = this._intermediateStatusInformationParser.GetMessage(apduData);
-                if (intermediateStatusInformation == null)
+                if (intermediateStatusInformation.Message == null)
                 {
                     return new ProcessData { State = ProcessDataState.ParseFailure };
                 }
 
-                this.IntermediateStatusInformationReceived?.Invoke(intermediateStatusInformation);
+                this.IntermediateStatusInformationReceived?.Invoke(intermediateStatusInformation.StatusCode, intermediateStatusInformation.Message);
                 return new ProcessData
                 {
                     State = ProcessDataState.Processed,
-                    Response = new IntermediateStatusInformation { ErrorMessage = intermediateStatusInformation }
+                    Response = new IntermediateStatusInformation { ErrorMessage = intermediateStatusInformation.Message }
                 };
             }
 

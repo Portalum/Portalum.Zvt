@@ -12,6 +12,6 @@ namespace Portalum.Zvt.Parsers
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        string GetMessage(Span<byte> data);
+        (byte StatusCode, string Message) GetMessage(Span<byte> data);
     }
 }

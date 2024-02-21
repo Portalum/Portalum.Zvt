@@ -26,7 +26,7 @@ namespace Portalum.Zvt
         /// <summary>
         /// IntermediateStatusInformation received
         /// </summary>
-        event Action<string> IntermediateStatusInformationReceived;
+        event Action<byte, string> IntermediateStatusInformationReceived;
 
         /// <summary>
         /// Line received

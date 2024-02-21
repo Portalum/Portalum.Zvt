@@ -43,7 +43,7 @@ namespace Portalum.Zvt
         /// <summary>
         /// Receive the current transaction status for example 'waiting for card'
         /// </summary>
-        public event Action<string> IntermediateStatusInformationReceived;
+        public event Action<byte, string> IntermediateStatusInformationReceived;
 
         /// <summary>
         /// Receive single lines of a receipt
@@ -215,9 +215,9 @@ namespace Portalum.Zvt
             return new EnglishIntermediateStatusRepository();
         }
 
-        private void ProcessIntermediateStatusInformationReceived(string message)
+        private void ProcessIntermediateStatusInformationReceived(byte statusCode, string message)
         {
-            this.IntermediateStatusInformationReceived?.Invoke(message);
+            this.IntermediateStatusInformationReceived?.Invoke(statusCode, message);
         }
 
         private void ProcessStatusInformationReceived(StatusInformation statusInformation)
@@ -295,7 +295,7 @@ namespace Portalum.Zvt
                 transactionFinishCancellationTokenSource.Cancel();
             }
 
-            void intermediateStatusInformationReceived(string status)
+            void intermediateStatusInformationReceived(byte statusCode, string status)
             {
                 // Increase cancellation timeout
                 timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
