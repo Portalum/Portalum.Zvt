@@ -586,6 +586,26 @@ namespace Portalum.Zvt
         }
 
         /// <summary>
+        /// Display Text (06 E0)
+        /// ECR induces the PT to display a text.
+        /// </summary>
+        /// <param name="duration">The time in seconds the PT displays the text.</param>
+        /// <param name="textLines"></param>
+        /// <param name="beepTones"></param>
+        /// <param name="displayDevice"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<CommandResponse> DisplayTextAsync(int duration, string[] textLines, byte beepTones, byte displayDevice, CancellationToken cancellationToken = default)
+        {
+            this._logger.LogInformation($"{nameof(DisplayTextAsync)} - Execute");
+
+            var package = DisplayTextHelper.CreateAPDU(duration, textLines, beepTones, displayDevice);
+
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0xE0 }, package);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
         /// Send Turnover Totals (06 10)
         /// With this command the ECR causes the PT to send an overview about the stored transactions.
         /// </summary>

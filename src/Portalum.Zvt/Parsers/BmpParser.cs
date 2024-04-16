@@ -437,6 +437,29 @@ namespace Portalum.Zvt.Parsers
         }
 
         /// <summary>
+        /// Parse Length LLVAR
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static byte[] ParseLength(int length)
+        {
+            if (length < 0 || length > 99)
+            {
+                throw new System.Exception("Length must be between 0 and 99");
+            }
+
+            int n1 = length / 10; // Zehnerstelle
+            int n2 = length % 10; // Einerstelle
+
+            // Die Ziffern n1 und n2 in das niedrigstwertige Nibble des jeweiligen Bytes einfügen
+            byte b1 = (byte)(n1 | 0xF0); // 0xF0 Hexadezimal
+            byte b2 = (byte)(n2 | 0xF0); // Stellt sicher, dass die oberen 4 Bits als ASCII-Zeichen für Ziffern gesetzt sind
+
+            byte[] data = { b1, b2 };
+            return data;
+        }
+
+        /// <summary>
         /// Parse LLVAR Length
         /// </summary>
         /// <param name="data"></param>
@@ -507,13 +530,13 @@ namespace Portalum.Zvt.Parsers
         {
             var errorMessage = this._errorMessageRepository.GetMessage(data[0]);
             var parsed = false;
-            
+
             if (response is IResponseErrorMessage typedErrorMessageResponse)
             {
                 typedErrorMessageResponse.ErrorMessage = errorMessage.StatusInformation;
                 parsed = true;
             }
-            
+
             if (response is IResponseErrorCode typedErrorCodeResponse)
             {
                 typedErrorCodeResponse.ErrorCode = data[0];
@@ -556,7 +579,7 @@ namespace Portalum.Zvt.Parsers
 
                 var expiryDate = ByteHelper.ByteArrayToHex(data);
 
-                if (!int.TryParse(expiryDate.Substring(0,2), out var year))
+                if (!int.TryParse(expiryDate.Substring(0, 2), out var year))
                 {
                     return false;
                 }
@@ -586,7 +609,7 @@ namespace Portalum.Zvt.Parsers
 
                 var dateString = ByteHelper.ByteArrayToHex(data);
 
-                if (!int.TryParse(dateString.Substring(0,2), out var month))
+                if (!int.TryParse(dateString.Substring(0, 2), out var month))
                 {
                     return false;
                 }
@@ -699,7 +722,7 @@ namespace Portalum.Zvt.Parsers
 
             return false;
         }
-        
+
         private bool ParseVuNumber(byte[] data, IResponse response)
         {
             if (response is IResponseVuNumber typedResponse)
@@ -779,7 +802,7 @@ namespace Portalum.Zvt.Parsers
             }
             return false;
         }
-        
+
         private bool ParseCardName(byte[] data, IResponse response)
         {
             if (response is IResponseCardName typedResponse)
