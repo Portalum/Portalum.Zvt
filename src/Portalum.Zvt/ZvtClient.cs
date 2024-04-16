@@ -553,6 +553,39 @@ namespace Portalum.Zvt
         }
 
         /// <summary>
+        /// Read Card (06 C0)
+        /// ECR induces the PT to read a card.
+        /// </summary>
+        /// <param name="timeout">The time in seconds the PT waits for the card. ‘00’ means infinite.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<CommandResponse> ReadCardAsync(int timeout, CancellationToken cancellationToken = default)
+        {
+            this._logger.LogInformation($"{nameof(ReadCardAsync)} - Execute");
+
+            var package = new List<byte>();
+            package.Add(Convert.ToByte(timeout)); // timeout - 1 byte - 0x03 = 3 seconds
+            package.Add(0x19); // prefix payment type
+            package.Add(0x10);
+            package.Add(0xFC); // Dialog control
+            package.Add(0x01);
+
+            package.Add(0x06); // TLV Container
+            package.Add(0x08);
+            package.Add(0x1F); // Tags
+            package.Add(0x15);
+            package.Add(0x01);
+            package.Add(0xC0);
+            package.Add(0x1F); // Tags
+            package.Add(0x60);
+            package.Add(0x01);
+            package.Add(0x07);
+
+            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0xC0 }, package);
+            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
         /// Send Turnover Totals (06 10)
         /// With this command the ECR causes the PT to send an overview about the stored transactions.
         /// </summary>

@@ -26,7 +26,14 @@ namespace Portalum.Zvt.Models
         IResponseExpiryDate,
         IResponseCardSequenceNumber,
         IResponseTurnoverRecordNumber,
-        IResponseCardType
+        IResponseCardType,
+        IResponseCardTechnologyType,
+        IResponseCardSubtype,
+        IResponseCardUid,
+        IResponseATS,
+        IResponseCardIdentificationItem,
+        IResponseZvtCardTypeId,
+        IResponseMaximumPreAuthorisationAmount
     {
         public string ErrorMessage { get; set; }
         public byte ErrorCode { get; set; }
@@ -53,5 +60,12 @@ namespace Portalum.Zvt.Models
         public int DateMonth { get; set; }
         public int DateDay { get; set; }
         public string ApplicationId { get; set; }
+        public string CardTechnologyType { get; set; }
+        public int CardSubtype { get; set; }
+        public string CardUid { get; set; }
+        public byte[] ATS { get; set; }
+        public byte[] CardIdentificationItem { get; set; }
+        public int ZvtCardTypeId { get; set; }
+        public int MaximumPreAuthorisationAmount { get; set; }
     }
 }
