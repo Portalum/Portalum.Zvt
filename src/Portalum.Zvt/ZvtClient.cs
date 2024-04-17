@@ -268,6 +268,7 @@ namespace Portalum.Zvt
         private async Task<CommandResponse> SendCommandAsync(
             byte[] commandData,
             bool endAfterCommandCompletion = false,
+            bool endAfterStatusInformationReceived = false,
             CancellationToken cancellationToken = default,
             bool asyncCompletion = false)
         {
@@ -305,6 +306,12 @@ namespace Portalum.Zvt
             bool startAsyncCompletionFired = false;
             void statusInformationReceived(StatusInformation statusInformation)
             {
+                if (endAfterStatusInformationReceived)
+                {
+                    commandResponse.State = CommandResponseState.Successful;
+
+                    transactionFinishCancellationTokenSource.Cancel();
+                }
                 // Increase cancellation timeout
                 timeoutCancellationTokenSource.CancelAfter(this._commandCompletionTimeout);
 
@@ -582,7 +589,7 @@ namespace Portalum.Zvt
             package.Add(0x07);
 
             var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0xC0 }, package);
-            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+            return await this.SendCommandAsync(fullPackage, endAfterCommandCompletion: false, endAfterStatusInformationReceived: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>
