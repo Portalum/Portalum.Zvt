@@ -564,9 +564,10 @@ namespace Portalum.Zvt
         /// ECR induces the PT to read a card.
         /// </summary>
         /// <param name="timeout">The time in seconds the PT waits for the card. ‘00’ means infinite.</param>
+        /// <param name="dialogControl">If true the PT will display a dialog to the customer.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> ReadCardAsync(int timeout, CancellationToken cancellationToken = default)
+        public async Task<CommandResponse> ReadCardAsync(int timeout, bool dialogControl = true, CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(ReadCardAsync)} - Execute");
 
@@ -575,7 +576,7 @@ namespace Portalum.Zvt
             package.Add(0x19); // prefix payment type
             package.Add(0x10);
             package.Add(0xFC); // Dialog control
-            package.Add(0x01);
+            package.Add(Convert.ToByte(dialogControl));
 
             package.Add(0x06); // TLV Container
             package.Add(0x08);
@@ -609,7 +610,7 @@ namespace Portalum.Zvt
             var package = DisplayTextHelper.CreateAPDU(duration, textLines, beepTones, displayDevice);
 
             var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0xE0 }, package);
-            return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
+            return await this.SendCommandAsync(fullPackage, endAfterCommandCompletion: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>
