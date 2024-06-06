@@ -7,6 +7,7 @@ using Portalum.Zvt.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace Portalum.Zvt.ControlPanel
         private readonly StringBuilder _printLineCache;
         private readonly DeviceConfiguration _deviceConfiguration;
         private CancellationTokenSource _cancellationTokenSource;
+        public IEnumerable<CurrencyCodeIso4217> CurrencyCodes => Enum.GetValues<CurrencyCodeIso4217>().AsEnumerable();
 
         public MainWindow(DeviceConfiguration deviceConfiguration)
         {
@@ -45,6 +47,9 @@ namespace Portalum.Zvt.ControlPanel
             this.ButtonDisconnect.IsEnabled = false;
 
             this.TextBoxAmount.Text = $"{this.CreateRandomAmount()}";
+
+            this.Currency.ItemsSource = this.CurrencyCodes;
+            this.Currency.SelectedItem = CurrencyCodeIso4217.EUR;
 
             CodePagesEncodingProvider.Instance.GetEncoding(437);
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -589,7 +594,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("Payment/Authorization (06 01)");
 
             this.ButtonPay.IsEnabled = false;
-            var commandResponse = await this._zvtClient?.PaymentAsync(amount, this._cancellationTokenSource.Token);
+            var commandResponse = await this._zvtClient?.PaymentAsync(amount, (CurrencyCodeIso4217)this.Currency.SelectedItem, this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonPay.IsEnabled = true;
         }

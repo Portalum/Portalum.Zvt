@@ -415,7 +415,7 @@ namespace Portalum.Zvt
 
             //Currency Code (CC)
             //ISO4217 (https://en.wikipedia.org/wiki/ISO_4217)
-            var currencyNumericCodeData = NumberHelper.IntToBcd(978, 2); //978 = Euro
+            var currencyNumericCodeData = NumberHelper.IntToBcd((int)registrationConfig.Currency, 2);
             package.AddRange(currencyNumericCodeData);
 
             //Service byte
@@ -464,10 +464,12 @@ namespace Portalum.Zvt
         /// Payment process and transmits the amount from the ECR to PT.
         /// </summary>
         /// <param name="amount"></param>
+        /// <param name="currency">optional currency in ISO 4217 numeric</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<CommandResponse> PaymentAsync(
             decimal amount,
+            CurrencyCodeIso4217? currency = null,
             CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(PaymentAsync)} - Execute with amount of:{amount}");
@@ -477,12 +479,20 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
+
+            if (currency != null)
+            {
+                package.Add(0x49); //currency prefix
+                package.AddRange(NumberHelper.IntToBcd((int)currency, 2));
+            }
+
             if (this.CompletionDecisionRequested != null)
             {
                 package.Add(0x02); // max nr. of status-informations
                 package.Add(this._clientConfig.GetAsyncCompletionInfoLimit);
                 asyncCompletion = true;
             }
+
 
             var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x01 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken, asyncCompletion: asyncCompletion);

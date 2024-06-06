@@ -1,4 +1,5 @@
 ﻿using Portalum.Zvt.Helpers;
+using Portalum.Zvt.Models;
 
 namespace Portalum.Zvt
 {
@@ -42,6 +43,11 @@ namespace Portalum.Zvt
         /// It has to generate the receipt itself.
         /// </summary>
         public bool ReceiptPrintoutGeneratedViaPaymentTerminal = true;
+
+        /// <summary>
+        /// Default currency of the payment terminal
+        /// </summary>
+        public CurrencyCodeIso4217 Currency = CurrencyCodeIso4217.EUR;
 
         #endregion
 
