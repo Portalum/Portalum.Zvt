@@ -51,6 +51,32 @@ namespace Portalum.Zvt.Helpers
         }
 
         /// <summary>
+        /// Convert Binary Coded Decimal to decimal
+        /// </summary>
+        /// <param name="bcdBytes"></param>
+        /// <returns></returns>
+        public static decimal BcdToDecimal(byte[] bcdBytes)
+        {
+            long result = 0;
+
+            foreach (var bcdByte in bcdBytes)
+            {
+                var highNibble = (bcdByte >> 4) & 0xF;
+                var lowNibble = bcdByte & 0xF;
+
+                if (highNibble > 9 || lowNibble > 9)
+                {
+                    throw new ArgumentException("Invalid BCD-Format");
+                }
+
+                result = result * 10 + highNibble;
+                result = result * 10 + lowNibble;
+            }
+
+            return result / 100m;
+        }
+
+        /// <summary>
         /// Convert int to Binary Coded Decimal
         /// </summary>
         /// <param name="value"></param>

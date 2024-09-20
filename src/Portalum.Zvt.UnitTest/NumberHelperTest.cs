@@ -9,6 +9,22 @@ namespace Portalum.Zvt.UnitTest
     public class NumberHelperTest
     {
         [TestMethod]
+        public void DecimalToBcd_Convert()
+        {
+            var amount = 0M;
+
+            for (var i = 0M; i < 100; i += 0.01M)
+            {
+                amount += i;
+
+                var bcdBytes = NumberHelper.DecimalToBcd(amount);
+                var newAmount = NumberHelper.BcdToDecimal(bcdBytes);
+
+                Assert.AreEqual(amount, newAmount);
+            }
+        }
+
+        [TestMethod]
         public void DecimalToBcd_CommercialRoundOff_Successful()
         {
             var amount = 20.203M;
