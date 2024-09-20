@@ -11,4 +11,8 @@
     <PackageReference Include="SuperSimpleTcp" Version="3.0.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Portalum.Zvt\Portalum.Zvt.csproj" />
+  </ItemGroup>
+
 </Project>
