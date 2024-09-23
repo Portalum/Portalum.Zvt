@@ -11,6 +11,8 @@ class Program
     static void Main(string[] args)
     {
         _tcpServer = new SimpleTcpServer("127.0.0.1", 20007);
+        _tcpServer.Events.ClientConnected += Events_ClientConnected;
+        _tcpServer.Events.ClientDisconnected += Events_ClientDisconnected;
         _tcpServer.Events.DataReceived += Events_DataReceived;
         _tcpServer.Start();
 
@@ -18,9 +20,21 @@ class Program
         Console.WriteLine("Wait for connections, press any key for quit");
         Console.ReadLine();
 
+        _tcpServer.Events.ClientConnected -= Events_ClientConnected;
+        _tcpServer.Events.ClientDisconnected -= Events_ClientDisconnected;
         _tcpServer.Events.DataReceived -= Events_DataReceived;
         _tcpServer.Stop();
         _tcpServer.Dispose();
+    }
+
+    private static void Events_ClientConnected(object? sender, ConnectionEventArgs e)
+    {
+        Console.WriteLine($"ClientConnected - {e.IpPort}");
+    }
+
+    private static void Events_ClientDisconnected(object? sender, ConnectionEventArgs e)
+    {
+        Console.WriteLine($"ClientDisconnected - {e.IpPort}");
     }
 
     private static void Events_DataReceived(object? sender, DataReceivedEventArgs e)
@@ -89,6 +103,19 @@ class Program
 
             Console.WriteLine("Send Completion");
             _tcpServer.Send(e.IpPort, _completionPackage);
+
+            return;
+        }
+
+        // Log-Off (06 02)
+        if (data.StartsWith(new byte[] { 0x06, 0x02 }))
+        {
+            Console.WriteLine($"Receive Log-Off - [{hexData}]");
+
+            Thread.Sleep(500);
+
+            Console.WriteLine("Send Command Completion");
+            _tcpServer.Send(e.IpPort, _commandCompletionPackage);
 
             return;
         }
