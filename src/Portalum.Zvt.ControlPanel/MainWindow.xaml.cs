@@ -709,7 +709,7 @@ namespace Portalum.Zvt.ControlPanel
             this.AddCommandInfo("SoftwareUpdate (08 10)");
 
             this.ButtonSoftwareUpdate.IsEnabled = false;
-            var commandResponse = await this._zvtClient.SoftwareUpdateAsync(this._cancellationTokenSource.Token);
+            var commandResponse = await this._zvtClient.SoftwareUpdateAsync(assignmentNumber: null, this._cancellationTokenSource.Token);
             this.ProcessCommandRespone(commandResponse);
             this.ButtonSoftwareUpdate.IsEnabled = true;
         }

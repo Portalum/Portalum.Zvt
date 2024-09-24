@@ -632,14 +632,22 @@ namespace Portalum.Zvt
         /// <summary>
         /// Software-Update (08 10)
         /// </summary>
+        /// <param name="assignmentNumber">An assignment-number can be given to the PT, which enables further sequence-control
+        ///     during the call from PT to TCS</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<CommandResponse> SoftwareUpdateAsync(CancellationToken cancellationToken = default)
+        public async Task<CommandResponse> SoftwareUpdateAsync(byte[] assignmentNumber = default, CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(SoftwareUpdateAsync)} - Execute");
 
-            var package = Array.Empty<byte>();
-
+            var package = assignmentNumber == null
+                ? Array.Empty<byte>()
+                : new byte[] {
+                    0x06, //TLV Indicator
+                    (byte)(2 + assignmentNumber.Length), //TLV Length
+                    0x0F, //TLV tag for assignment-number
+                    (byte)assignmentNumber.Length //Content length
+                }.Concat(assignmentNumber).ToArray();
             var fullPackage = PackageHelper.Create(new byte[] { 0x08, 0x10 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
