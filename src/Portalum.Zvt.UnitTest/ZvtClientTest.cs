@@ -572,5 +572,82 @@ namespace Portalum.Zvt.UnitTest
 
             Assert.AreEqual(CommandResponseState.Abort, commandResponse.State);
         }
+
+        [TestMethod]
+        public async Task PaymentAsync_WithCurrency_Successful()
+        {
+            var loggerZvtClient = LoggerHelper.GetLogger<ZvtClient>();
+            var mockDeviceCommunication = new Mock<IDeviceCommunication>();
+
+            StatusInformation receivedStatusInformation = null;
+
+            void statusInformationReceived(StatusInformation statusInformation)
+            {
+                receivedStatusInformation = statusInformation;
+            }
+
+            var dataSent = Array.Empty<byte>();
+            var dataSentCancellationTokenSource = new CancellationTokenSource();
+
+            mockDeviceCommunication
+                .Setup(c => c.SendAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((byte[] data, CancellationToken cancellationToken) =>
+                {
+                    dataSent = data;
+                    dataSentCancellationTokenSource?.Cancel();
+                    return true;
+                });
+
+            var startAsyncCompletionCalled = false;
+            var clientConfig = new ZvtClientConfig
+            {
+                CommandCompletionTimeout = TimeSpan.FromSeconds(5)
+            };
+
+            var zvtClient = new ZvtClient(mockDeviceCommunication.Object, loggerZvtClient.Object, clientConfig);
+            zvtClient.StatusInformationReceived += statusInformationReceived;
+            zvtClient.CompletionStartReceived += (_) => startAsyncCompletionCalled = true;
+
+            var paymentTask = zvtClient.PaymentAsync(10, CurrencyCodeIso4217.USD);
+            await Task.Delay(500, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+
+            dataSentCancellationTokenSource.Dispose();
+            dataSentCancellationTokenSource = new CancellationTokenSource();
+
+            // ensure the timeout is not set, when nothing is passed to PaymentAsync
+            CollectionAssert.AreEqual(new byte[] { 0x06, 0x01, 0xA, 0x04, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x49, 0x08, 0x40 }, dataSent, $"Invalid Payment command");
+
+            dataSent = Array.Empty<byte>();
+
+            var paymentTerminalPositiveCompletion = new byte[] { 0x80, 0x00, 0x00 };
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalPositiveCompletion);
+
+            var paymentTerminalStatusInformation = new byte[] { 0x04, 0x0F, 0x02, 0x27, 0x00 };
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, paymentTerminalStatusInformation);
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+
+            Assert.IsNotNull(receivedStatusInformation, "No StatusInformation received");
+            receivedStatusInformation = null;
+
+            // check that the ECR answers immediately, as no issueGoodsCallback is set
+            var electronicCashRegisterCommandCompletionForStatusInformation = new byte[] { 0x80, 0x00, 0x00 };
+            CollectionAssert.AreEqual(electronicCashRegisterCommandCompletionForStatusInformation, dataSent, $"Collection is wrong {BitConverter.ToString(dataSent)}");
+
+            dataSentCancellationTokenSource.Dispose();
+            dataSentCancellationTokenSource = new CancellationTokenSource();
+
+            mockDeviceCommunication.Raise(mock => mock.DataReceived += null, new byte[] { 0x06, 0x0F, 0x00 });
+            await Task.Delay(3000, dataSentCancellationTokenSource.Token).ContinueWith(_ => { });
+
+            var commandResponse = await paymentTask;
+            Assert.IsFalse(startAsyncCompletionCalled, "CompletionStartReceived not called");
+
+            zvtClient.StatusInformationReceived -= statusInformationReceived;
+
+            zvtClient.Dispose();
+            dataSentCancellationTokenSource.Dispose();
+
+            Assert.AreEqual(CommandResponseState.Successful, commandResponse.State);
+        }
     }
 }
