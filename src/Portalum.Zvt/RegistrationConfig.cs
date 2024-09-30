@@ -1,4 +1,5 @@
 ﻿using Portalum.Zvt.Helpers;
+using Portalum.Zvt.Models;
 
 namespace Portalum.Zvt
 {
@@ -63,6 +64,11 @@ namespace Portalum.Zvt
         public bool ActivateTlvSupport = true;
 
         #endregion
+
+        /// <summary>
+        /// ISO 4217 Currency Code
+        /// </summary>
+        public CurrencyCodeIso4217 CurrencyCode = CurrencyCodeIso4217.EUR;
 
         /// <summary>
         /// Get config byte

@@ -415,7 +415,7 @@ namespace Portalum.Zvt
 
             //Currency Code (CC)
             //ISO4217 (https://en.wikipedia.org/wiki/ISO_4217)
-            var currencyNumericCodeData = NumberHelper.IntToBcd(978, 2); //978 = Euro
+            var currencyNumericCodeData = NumberHelper.IntToBcd((int)registrationConfig.CurrencyCode, 2);
             package.AddRange(currencyNumericCodeData);
 
             //Service byte
@@ -465,10 +465,12 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="amount"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="currency"></param>
         /// <returns></returns>
         public async Task<CommandResponse> PaymentAsync(
             decimal amount,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            CurrencyCodeIso4217? currency = null)
         {
             this._logger.LogInformation($"{nameof(PaymentAsync)} - Execute with amount of:{amount}");
 
@@ -477,6 +479,11 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
+            if (currency != null)
+            {
+                package.Add(0x49); //currency prefix
+                package.AddRange(NumberHelper.IntToBcd((int)currency, 2));
+            }
             if (this.CompletionDecisionRequested != null)
             {
                 package.Add(0x02); // max nr. of status-informations
@@ -517,10 +524,12 @@ namespace Portalum.Zvt
         /// </summary>
         /// <param name="amount"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="currency"></param>
         /// <returns></returns>
         public async Task<CommandResponse> RefundAsync(
             decimal amount,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            CurrencyCodeIso4217? currency = null)
         {
             this._logger.LogInformation($"{nameof(RefundAsync)} - Execute");
 
@@ -528,6 +537,11 @@ namespace Portalum.Zvt
             package.AddRange(this._passwordData);
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
+            if (currency != null)
+            {
+                package.Add(0x49); //currency prefix
+                package.AddRange(NumberHelper.IntToBcd((int)currency, 2));
+            }
 
             var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x31 }, package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
