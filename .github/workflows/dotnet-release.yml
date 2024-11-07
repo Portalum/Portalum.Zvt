@@ -11,11 +11,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v3
+    - uses: actions/checkout@v4
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
     - name: Restore dependencies
       working-directory: ./src
       run: dotnet restore
@@ -28,7 +28,7 @@ jobs:
     - name: Build project
       run: |
         dotnet publish ./src/Portalum.Zvt.ControlPanel/Portalum.Zvt.ControlPanel.csproj --configuration Release --self-contained false --runtime win-x64 -p:PublishReadyToRun=true -p:PublishSingleFile=true --output ./publish/temp
-    - uses: vimtor/action-zip@v1
+    - uses: vimtor/action-zip@v1.2
       with:
         files: ./publish/temp
         dest: ./publish/Portalum.Zvt.ControlPanel.zip
