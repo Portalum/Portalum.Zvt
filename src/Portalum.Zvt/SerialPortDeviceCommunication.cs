@@ -56,8 +56,8 @@ namespace Portalum.Zvt
             Parity parity = Parity.None,
             int dataBits = 8,
             StopBits stopBits = StopBits.Two,
-            int readTimeout = 1000,
-            int writeTimeout = 1000,
+            int readTimeout = 180000,
+            int writeTimeout = 180000,
             ILogger<SerialPortDeviceCommunication> logger = default)
         {
             this._portName = portName;
