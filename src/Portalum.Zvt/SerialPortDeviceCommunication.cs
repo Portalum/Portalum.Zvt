@@ -47,6 +47,8 @@ namespace Portalum.Zvt
         /// <param name="parity"></param>
         /// <param name="dataBits"></param>
         /// <param name="stopBits"></param>
+        /// <param name="readTimeout"></param>
+        /// <param name="writeTimeout"></param>
         /// <param name="logger"></param>
         public SerialPortDeviceCommunication(
             string portName,
@@ -54,6 +56,8 @@ namespace Portalum.Zvt
             Parity parity = Parity.None,
             int dataBits = 8,
             StopBits stopBits = StopBits.Two,
+            int readTimeout = 1000,
+            int writeTimeout = 1000,
             ILogger<SerialPortDeviceCommunication> logger = default)
         {
             this._portName = portName;
@@ -66,6 +70,8 @@ namespace Portalum.Zvt
 
             this._serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
             this._serialPort.DataReceived += this.Receive;
+            this._serialPort.ReadTimeout = readTimeout;
+            this._serialPort.WriteTimeout = writeTimeout;
         }
 
         /// <inheritdoc />
