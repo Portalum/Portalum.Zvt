@@ -26,7 +26,9 @@ namespace Portalum.Zvt.Models
         IResponseExpiryDate,
         IResponseCardSequenceNumber,
         IResponseTurnoverRecordNumber,
-        IResponseCardType
+        IResponseCardType,
+        IResponseEMV46,
+        IResponseEMV47
     {
         public string ErrorMessage { get; set; }
         public byte ErrorCode { get; set; }
@@ -53,5 +55,7 @@ namespace Portalum.Zvt.Models
         public int DateMonth { get; set; }
         public int DateDay { get; set; }
         public string ApplicationId { get; set; }
+        public string EMV46 { get; set; }
+        public string EMV47 { get; set; }
     }
 }

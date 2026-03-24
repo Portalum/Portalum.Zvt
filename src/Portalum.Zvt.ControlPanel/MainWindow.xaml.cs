@@ -460,6 +460,14 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"AidAuthorisationAttribute: {statusInformation.AidAuthorisationAttribute}");
             }
+            if (!string.IsNullOrEmpty(statusInformation.EMV46))
+            {
+                lines.Add($"EMV46: {statusInformation.EMV46}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.EMV47))
+            {
+                lines.Add($"EMV47: {statusInformation.EMV47}");
+            }
             if (statusInformation.ReceiptNumber > 0)
             {
                 lines.Add($"ReceiptNumber: {statusInformation.ReceiptNumber}");
