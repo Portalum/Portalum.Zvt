@@ -41,6 +41,7 @@ namespace Portalum.Zvt.Models
         public string CardTechnology { get; set; }
         public bool IsContactless { get; set; }
         public string CardType { get; set; }
+        public int? CardTypeId { get; set; }
         public string CardholderAuthentication { get; set; }
         public decimal Amount { get; set; }
         public bool PrintoutNeeded { get; set; }

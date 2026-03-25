@@ -428,6 +428,14 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"IsContactless");
             }
+            if (!string.IsNullOrEmpty(statusInformation.CardType))
+            {
+                lines.Add($"CardType: {statusInformation.CardType}");
+            }
+            if (statusInformation.CardTypeId.GetValueOrDefault() > 0)
+            {
+                lines.Add($"CardTypeId: {statusInformation.CardTypeId}");
+            }
             if (!string.IsNullOrEmpty(statusInformation.CardName))
             {
                 lines.Add($"CardName: {statusInformation.CardName}");
