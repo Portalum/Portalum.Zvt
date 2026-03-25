@@ -144,6 +144,7 @@ namespace Portalum.Zvt.Parsers
                         break;
                     case 0x02:
                         typedResponse.CardTechnology = "NFC";
+                        typedResponse.IsContactless = true;
                         break;
                     default:
                         return false;

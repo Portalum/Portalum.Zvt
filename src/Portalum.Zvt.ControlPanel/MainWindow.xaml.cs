@@ -424,6 +424,10 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"CardTechnology: {statusInformation.CardTechnology}");
             }
+            if (statusInformation.IsContactless)
+            {
+                lines.Add($"IsContactless");
+            }
             if (!string.IsNullOrEmpty(statusInformation.CardName))
             {
                 lines.Add($"CardName: {statusInformation.CardName}");
