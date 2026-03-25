@@ -452,6 +452,10 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"TraceNumberLongFormat: {statusInformation.TraceNumberLongFormat}");
             }
+            if (statusInformation.OriginalTraceNumber.GetValueOrDefault() > 0)
+            {
+                lines.Add($"OriginalTraceNumber: {statusInformation.OriginalTraceNumber}");
+            }
             if (!string.IsNullOrEmpty(statusInformation.VuNumber))
             {
                 lines.Add($"VU-Nr.: {statusInformation.VuNumber}");

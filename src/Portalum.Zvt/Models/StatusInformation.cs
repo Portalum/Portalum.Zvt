@@ -28,7 +28,8 @@ namespace Portalum.Zvt.Models
         IResponseTurnoverRecordNumber,
         IResponseCardType,
         IResponseEMV46,
-        IResponseEMV47
+        IResponseEMV47,
+        IResponseOriginalTraceNumber
     {
         public string ErrorMessage { get; set; }
         public byte ErrorCode { get; set; }
@@ -57,5 +58,6 @@ namespace Portalum.Zvt.Models
         public string ApplicationId { get; set; }
         public string EMV46 { get; set; }
         public string EMV47 { get; set; }
+        public int? OriginalTraceNumber { get; set; }
     }
 }
