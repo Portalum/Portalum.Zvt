@@ -40,7 +40,7 @@ namespace Portalum.Zvt.Models
         public int CardSequenceNumber { get; set; }
         public string CardTechnology { get; set; }
         public bool IsContactless { get; set; }
-        public string CardType { get; set; }
+        public string? CardType { get; set; }
         public int? CardTypeId { get; set; }
         public string CardholderAuthentication { get; set; }
         public decimal Amount { get; set; }
@@ -58,8 +58,8 @@ namespace Portalum.Zvt.Models
         public int DateMonth { get; set; }
         public int DateDay { get; set; }
         public string ApplicationId { get; set; }
-        public string EMV46 { get; set; }
-        public string EMV47 { get; set; }
+        public string? EMV46 { get; set; }
+        public string? EMV47 { get; set; }
         public int? OriginalTraceNumber { get; set; }
     }
 }

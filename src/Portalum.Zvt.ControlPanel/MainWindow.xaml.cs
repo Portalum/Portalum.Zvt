@@ -464,7 +464,7 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"TraceNumberLongFormat: {statusInformation.TraceNumberLongFormat}");
             }
-            if (statusInformation.OriginalTraceNumber.GetValueOrDefault() > 0)
+            if (statusInformation.OriginalTraceNumber is not null)
             {
                 lines.Add($"OriginalTraceNumber: {statusInformation.OriginalTraceNumber}");
             }
@@ -504,7 +504,7 @@ namespace Portalum.Zvt.ControlPanel
             var outputInfo = new OutputInfo
             {
                 Title = "StatusInformation",
-                Lines = lines.ToArray()
+                Lines = [.. lines]
             };
 
             this.AddOutputElement(outputInfo, Brushes.LightGoldenrodYellow);

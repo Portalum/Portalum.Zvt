@@ -10,6 +10,8 @@
     
     <LangVersion>latestMajor</LangVersion>
 
+    <Nullable>enable</Nullable>
+
     <PackageIcon>logo.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Portalum/Portalum.Zvt</PackageProjectUrl>

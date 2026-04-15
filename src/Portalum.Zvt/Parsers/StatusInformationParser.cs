@@ -169,7 +169,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseEMV46 typedResponse)
             {
-                typedResponse.EMV46 = _encoding.GetString(data);
+                typedResponse.EMV46 = this._encoding.GetString(data);
                 return true;
             }
             return false;
@@ -179,7 +179,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (response is IResponseEMV47 typedResponse)
             {
-                typedResponse.EMV47 = _encoding.GetString(data);
+                typedResponse.EMV47 = this._encoding.GetString(data);
                 return true;
             }
             return false;
