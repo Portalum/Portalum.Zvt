@@ -22,13 +22,13 @@ namespace Portalum.Zvt
         private readonly List<byte> _receiveBuffer = new List<byte>();
 
         /// <inheritdoc />
-        public event Action<byte[]> DataReceived;
+        public event Action<byte[]>? DataReceived;
 
         /// <inheritdoc />
-        public event Action<byte[]> DataSent;
+        public event Action<byte[]>? DataSent;
 
         /// <inheritdoc />
-        public event Action<ConnectionState> ConnectionStateChanged;
+        public event Action<ConnectionState>? ConnectionStateChanged;
 
         private const byte DLE = 0x10; //Data line escape
         private const byte STX = 0x02; //Start of text
@@ -47,6 +47,8 @@ namespace Portalum.Zvt
         /// <param name="parity"></param>
         /// <param name="dataBits"></param>
         /// <param name="stopBits"></param>
+        /// <param name="readTimeout"></param>
+        /// <param name="writeTimeout"></param>
         /// <param name="logger"></param>
         public SerialPortDeviceCommunication(
             string portName,
@@ -54,18 +56,18 @@ namespace Portalum.Zvt
             Parity parity = Parity.None,
             int dataBits = 8,
             StopBits stopBits = StopBits.Two,
-            ILogger<SerialPortDeviceCommunication> logger = default)
+            int readTimeout = 180000,
+            int writeTimeout = 180000,
+            ILogger<SerialPortDeviceCommunication>? logger = default)
         {
             this._portName = portName;
 
-            if (logger == null)
-            {
-                logger = new NullLogger<SerialPortDeviceCommunication>();
-            }
-            this._logger = logger;
+            this._logger = logger ?? new NullLogger<SerialPortDeviceCommunication>();
 
             this._serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
             this._serialPort.DataReceived += this.Receive;
+            this._serialPort.ReadTimeout = readTimeout;
+            this._serialPort.WriteTimeout = writeTimeout;
         }
 
         /// <inheritdoc />
@@ -75,6 +77,7 @@ namespace Portalum.Zvt
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             // Check to see if Dispose has already been called.
