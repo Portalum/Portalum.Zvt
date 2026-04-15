@@ -15,6 +15,7 @@ namespace Portalum.Zvt.Parsers
     {
         private readonly ILogger _logger;
         private readonly BmpParser _bmpParser;
+        private readonly Encoding _encoding;
 
         /// <summary>
         /// StatusInformationParser
@@ -28,6 +29,7 @@ namespace Portalum.Zvt.Parsers
             IErrorMessageRepository errorMessageRepository)
         {
             this._logger = logger;
+            this._encoding = encoding;
 
             //tag:24 (display-texts)
             //tag:07 (text-lines)
@@ -45,6 +47,8 @@ namespace Portalum.Zvt.Parsers
                 new TlvInfo { Tag = "1F12", Description = "Card technology", TryProcess = this.SetCardTechnology },
                 new TlvInfo { Tag = "60", Description = "Application", TryProcess = null },
                 new TlvInfo { Tag = "43", Description = "Application Id", TryProcess = this.SetApplicationId },
+                new TlvInfo { Tag = "46", Description = "EMV-print-data (customer-receipt)", TryProcess = this.SetEMV46 },
+                new TlvInfo { Tag = "47", Description = "EMV-print-data (merchant-receipt)", TryProcess = this.SetEMV47 },
                 new TlvInfo { Tag = "1F2B", Description = "Trace number (long format)", TryProcess = this.SetTraceNumberLongFormat }
             };
 
@@ -140,6 +144,7 @@ namespace Portalum.Zvt.Parsers
                         break;
                     case 0x02:
                         typedResponse.CardTechnology = "NFC";
+                        typedResponse.IsContactless = true;
                         break;
                     default:
                         return false;
@@ -158,6 +163,26 @@ namespace Portalum.Zvt.Parsers
             }
 
             return true;
+        }
+
+        private bool SetEMV46(byte[] data, IResponse response)
+        {
+            if (response is IResponseEMV46 typedResponse)
+            {
+                typedResponse.EMV46 = this._encoding.GetString(data);
+                return true;
+            }
+            return false;
+        }
+
+        private bool SetEMV47(byte[] data, IResponse response)
+        {
+            if (response is IResponseEMV47 typedResponse)
+            {
+                typedResponse.EMV47 = this._encoding.GetString(data);
+                return true;
+            }
+            return false;
         }
     }
 }

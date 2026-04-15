@@ -424,6 +424,18 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"CardTechnology: {statusInformation.CardTechnology}");
             }
+            if (statusInformation.IsContactless)
+            {
+                lines.Add($"IsContactless");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.CardType))
+            {
+                lines.Add($"CardType: {statusInformation.CardType}");
+            }
+            if (statusInformation.CardTypeId.GetValueOrDefault() > 0)
+            {
+                lines.Add($"CardTypeId: {statusInformation.CardTypeId}");
+            }
             if (!string.IsNullOrEmpty(statusInformation.CardName))
             {
                 lines.Add($"CardName: {statusInformation.CardName}");
@@ -452,6 +464,10 @@ namespace Portalum.Zvt.ControlPanel
             {
                 lines.Add($"TraceNumberLongFormat: {statusInformation.TraceNumberLongFormat}");
             }
+            if (statusInformation.OriginalTraceNumber is not null)
+            {
+                lines.Add($"OriginalTraceNumber: {statusInformation.OriginalTraceNumber}");
+            }
             if (!string.IsNullOrEmpty(statusInformation.VuNumber))
             {
                 lines.Add($"VU-Nr.: {statusInformation.VuNumber}");
@@ -459,6 +475,14 @@ namespace Portalum.Zvt.ControlPanel
             if (!string.IsNullOrEmpty(statusInformation.AidAuthorisationAttribute))
             {
                 lines.Add($"AidAuthorisationAttribute: {statusInformation.AidAuthorisationAttribute}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.EMV46))
+            {
+                lines.Add($"EMV46: {statusInformation.EMV46}");
+            }
+            if (!string.IsNullOrEmpty(statusInformation.EMV47))
+            {
+                lines.Add($"EMV47: {statusInformation.EMV47}");
             }
             if (statusInformation.ReceiptNumber > 0)
             {
@@ -480,7 +504,7 @@ namespace Portalum.Zvt.ControlPanel
             var outputInfo = new OutputInfo
             {
                 Title = "StatusInformation",
-                Lines = lines.ToArray()
+                Lines = [.. lines]
             };
 
             this.AddOutputElement(outputInfo, Brushes.LightGoldenrodYellow);
