@@ -1,5 +1,8 @@
 ﻿namespace Portalum.Zvt.Models
 {
+    /// <summary>
+    /// Completion Info
+    /// </summary>
     public class CompletionInfo
     {
         /// <summary>
