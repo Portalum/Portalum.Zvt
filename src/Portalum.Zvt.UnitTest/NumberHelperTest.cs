@@ -125,10 +125,9 @@ namespace Portalum.Zvt.UnitTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void BoolArrayToInt_ToManyElements_Failure()
         {
-            var result = NumberHelper.BoolArrayToInt(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
+            Assert.ThrowsExactly<ArgumentException>(() => NumberHelper.BoolArrayToInt(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true));
         }
     }
 }
