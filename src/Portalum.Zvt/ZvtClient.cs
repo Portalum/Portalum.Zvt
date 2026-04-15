@@ -79,10 +79,10 @@ namespace Portalum.Zvt
         /// <param name="zvtCommunication">Inject own ZVT Communication</param>
         public ZvtClient(
             IDeviceCommunication deviceCommunication,
-            ILogger<ZvtClient> logger = default,
-            ZvtClientConfig clientConfig = default,
-            IReceiveHandler receiveHandler = default,
-            ZvtCommunication zvtCommunication = default)
+            ILogger<ZvtClient>? logger = default,
+            ZvtClientConfig? clientConfig = default,
+            IReceiveHandler? receiveHandler = default,
+            ZvtCommunication? zvtCommunication = default)
         {
             if (logger == null)
             {
@@ -154,7 +154,7 @@ namespace Portalum.Zvt
             }
         }
 
-        private CompletionInfo GetCompletionInfo()
+        private CompletionInfo? GetCompletionInfo()
         {
             return this.CompletionDecisionRequested?.Invoke();
         }

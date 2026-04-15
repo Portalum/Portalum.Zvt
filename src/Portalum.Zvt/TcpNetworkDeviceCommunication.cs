@@ -18,13 +18,13 @@ namespace Portalum.Zvt
         private readonly ILogger<TcpNetworkDeviceCommunication> _logger;
 
         /// <inheritdoc />
-        public event Action<byte[]> DataReceived;
+        public event Action<byte[]>? DataReceived;
 
         /// <inheritdoc />
-        public event Action<byte[]> DataSent;
+        public event Action<byte[]>? DataSent;
 
         /// <inheritdoc />
-        public event Action<ConnectionState> ConnectionStateChanged;
+        public event Action<ConnectionState>? ConnectionStateChanged;
 
         /// <summary>
         /// TcpNetwork DeviceCommunication
@@ -37,16 +37,12 @@ namespace Portalum.Zvt
             string ipAddress,
             int port = 20007,
             bool enableKeepAlive = false,
-            ILogger<TcpNetworkDeviceCommunication> logger = default)
+            ILogger<TcpNetworkDeviceCommunication>? logger = default)
         {
             this._ipAddress = ipAddress;
             this._port = port;
 
-            if (logger == null)
-            {
-                logger = new NullLogger<TcpNetworkDeviceCommunication>();
-            }
-            this._logger = logger;
+            this._logger = logger ?? new NullLogger<TcpNetworkDeviceCommunication>();
 
             if (enableKeepAlive)
             {
@@ -78,17 +74,13 @@ namespace Portalum.Zvt
             TcpClient tcpClient,
             string ipAddress,
             int port = 20007,
-            ILogger<TcpNetworkDeviceCommunication> logger = default)
+            ILogger<TcpNetworkDeviceCommunication>? logger = default)
         {
             this._tcpClient = tcpClient;
             this._ipAddress = ipAddress;
             this._port = port;
 
-            if (logger == null)
-            {
-                logger = new NullLogger<TcpNetworkDeviceCommunication>();
-            }
-            this._logger = logger;
+            this._logger = logger ?? new NullLogger<TcpNetworkDeviceCommunication>();
 
             this.RegisterEvents();
         }
@@ -100,6 +92,7 @@ namespace Portalum.Zvt
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             // Check to see if Dispose has already been called.

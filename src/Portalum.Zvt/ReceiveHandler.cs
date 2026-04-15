@@ -70,10 +70,10 @@ namespace Portalum.Zvt
             Encoding encoding,
             IErrorMessageRepository errorMessageRepository,
             IIntermediateStatusRepository intermediateStatusRepository,
-            IPrintLineParser printLineParser = default,
-            IPrintTextBlockParser printTextBlockParser = default,
-            IStatusInformationParser statusInformationParser = default,
-            IIntermediateStatusInformationParser intermediateStatusInformationParser = default)
+            IPrintLineParser? printLineParser = default,
+            IPrintTextBlockParser? printTextBlockParser = default,
+            IStatusInformationParser? statusInformationParser = default,
+            IIntermediateStatusInformationParser? intermediateStatusInformationParser = default)
         {
             this._logger = logger;
             this._errorMessageRepository = errorMessageRepository;

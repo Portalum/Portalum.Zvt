@@ -22,7 +22,7 @@ namespace Portalum.Zvt.Parsers
         /// <param name="tlvInfos"></param>
         public TlvParser(
             ILogger logger,
-            TlvInfo[] tlvInfos = default)
+            TlvInfo[]? tlvInfos = default)
         {
             this._logger = logger;
 
@@ -123,7 +123,7 @@ namespace Portalum.Zvt.Parsers
         {
             if (this._tlvInfos.TryGetValue(tag, out var tlvInfo))
             {
-                if (tlvInfo.TryProcess == null)
+                if (tlvInfo.TryProcess is null)
                 {
                     this._logger.LogDebug($"{nameof(ProcessTlvInfoAction)} - No action defined for Tag:{tag}");
                     return true;
@@ -141,9 +141,9 @@ namespace Portalum.Zvt.Parsers
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public TlvTagFieldInfo GetTagFieldInfo(Span<byte> data)
+        public TlvTagFieldInfo? GetTagFieldInfo(Span<byte> data)
         {
-            if (data == null || data.Length == 0)
+            if (data.Length == 0)
             {
                 return null;
             }
@@ -217,7 +217,7 @@ namespace Portalum.Zvt.Parsers
         /// <returns></returns>
         public TlvLengthInfo GetLength(Span<byte> data)
         {
-            if (data == null || data.Length == 0)
+            if (data.Length == 0)
             {
                 return new TlvLengthInfo { Successful = false };
             }

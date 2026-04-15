@@ -100,7 +100,7 @@ namespace Portalum.Zvt.Repositories
         }
 
         /// <inheritdoc />
-        public string GetMessage(byte errorCode)
+        public string? GetMessage(byte errorCode)
         {
             if (this._errorCodes.TryGetValue(errorCode, out var errorMessage))
             {

@@ -12,7 +12,7 @@ namespace Portalum.Zvt.Models
 
         public string Description { get; set; }
 
-        public Func<byte[], IResponse, bool> TryParse;
+        public Func<byte[], IResponse?, bool>? TryParse;
 
         public override string ToString()
         {

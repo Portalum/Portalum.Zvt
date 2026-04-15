@@ -2,6 +2,6 @@
 {
     public interface IErrorMessageRepository
     {
-        string GetMessage(byte key);
+        string? GetMessage(byte key);
     }
 }

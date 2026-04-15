@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        string GetMessage(byte key);
+        string? GetMessage(byte key);
     }
 }

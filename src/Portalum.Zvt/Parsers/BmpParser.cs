@@ -369,7 +369,7 @@ namespace Portalum.Zvt.Parsers
             #endregion
         }
 
-        private BmpInfo GetBmpInfo(byte command)
+        private BmpInfo? GetBmpInfo(byte command)
         {
             if (!this._bmpInfos.TryGetValue(command, out var bmpInfo))
             {
@@ -380,7 +380,7 @@ namespace Portalum.Zvt.Parsers
             return bmpInfo;
         }
 
-        public bool Parse(Span<byte> data, IResponse response)
+        public bool Parse(Span<byte> data, IResponse? response)
         {
             var currentPosition = 0;
 
@@ -398,7 +398,7 @@ namespace Portalum.Zvt.Parsers
                 var dataLength = bmpInfo.DataLength;
 
                 //Variable data length
-                if (bmpInfo.CalculateDataLength != null)
+                if (bmpInfo.CalculateDataLength is not null)
                 {
                     var dataLengthData = data.Slice(currentPosition, dataLength).ToArray();
                     currentPosition += dataLength;
@@ -418,7 +418,7 @@ namespace Portalum.Zvt.Parsers
 
                 var bmpData = data.Slice(currentPosition, dataLength).ToArray();
 
-                if (bmpInfo.TryParse != null)
+                if (bmpInfo.TryParse is not null)
                 {
                     if (!bmpInfo.TryParse(bmpData, response))
                     {
@@ -556,7 +556,7 @@ namespace Portalum.Zvt.Parsers
 
                 var expiryDate = ByteHelper.ByteArrayToHex(data);
 
-                if (!int.TryParse(expiryDate.Substring(0,2), out var year))
+                if (!int.TryParse(expiryDate.Substring(0, 2), out var year))
                 {
                     return false;
                 }
@@ -586,7 +586,7 @@ namespace Portalum.Zvt.Parsers
 
                 var dateString = ByteHelper.ByteArrayToHex(data);
 
-                if (!int.TryParse(dateString.Substring(0,2), out var month))
+                if (!int.TryParse(dateString.Substring(0, 2), out var month))
                 {
                     return false;
                 }

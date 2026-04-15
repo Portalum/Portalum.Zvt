@@ -50,7 +50,7 @@ namespace Portalum.Zvt.Parsers
         }
 
         /// <inheritdoc />
-        public string GetMessage(Span<byte> data)
+        public string? GetMessage(Span<byte> data)
         {
             if (data.Length == 0)
             {

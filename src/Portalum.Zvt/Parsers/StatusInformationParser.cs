@@ -58,7 +58,7 @@ namespace Portalum.Zvt.Parsers
         }
 
         /// <inheritdoc />
-        public StatusInformation Parse(Span<byte> data)
+        public StatusInformation? Parse(Span<byte> data)
         {
             var statusInformation = new StatusInformation();
 

@@ -22,17 +22,17 @@ namespace Portalum.Zvt
         /// <summary>
         /// On connection state changed
         /// </summary>
-        event Action<ConnectionState> ConnectionStateChanged;
+        event Action<ConnectionState>? ConnectionStateChanged;
 
         /// <summary>
         /// On data received
         /// </summary>
-        event Action<byte[]> DataReceived;
+        event Action<byte[]>? DataReceived;
 
         /// <summary>
         /// On data sent
         /// </summary>
-        event Action<byte[]> DataSent;
+        event Action<byte[]>? DataSent;
 
         /// <summary>
         /// Connect to the device

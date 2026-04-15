@@ -51,7 +51,7 @@ namespace Portalum.Zvt.Parsers
         }
 
         /// <inheritdoc />
-        public ReceiptInfo Parse(Span<byte> data)
+        public ReceiptInfo? Parse(Span<byte> data)
         {
             this._completelyProcessed = false;
 
