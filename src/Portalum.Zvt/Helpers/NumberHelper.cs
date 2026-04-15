@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Linq;
 
 namespace Portalum.Zvt.Helpers
 {
     /// <summary>
-    /// NumberHelper
+    /// Number Helper
     /// </summary>
     public static class NumberHelper
     {
@@ -33,7 +32,7 @@ namespace Portalum.Zvt.Helpers
 
             if (GetNumberOfDigits(value) > 10)
             {
-                return new byte[0];
+                return [];
             }
 
             var data = new byte[length];
@@ -47,7 +46,9 @@ namespace Portalum.Zvt.Helpers
                 x1 /= 10;
             }
 
-            return data.Reverse().ToArray();
+            Array.Reverse(data);
+
+            return data;
         }
 
         /// <summary>
@@ -95,7 +96,9 @@ namespace Portalum.Zvt.Helpers
                 value /= 10;
             }
 
-            return data.Reverse().ToArray();
+            Array.Reverse(data);
+
+            return data;
         }
 
         /// <summary>

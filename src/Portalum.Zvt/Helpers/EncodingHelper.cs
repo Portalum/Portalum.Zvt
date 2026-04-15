@@ -3,7 +3,7 @@
 namespace Portalum.Zvt.Helpers
 {
     /// <summary>
-    /// EncodingHelper
+    /// Encoding Helper
     /// </summary>
     public static class EncodingHelper
     {

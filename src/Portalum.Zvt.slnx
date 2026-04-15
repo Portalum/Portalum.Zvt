@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Portalum.Zvt.ControlPanel/Portalum.Zvt.ControlPanel.csproj" />
+  <Project Path="Portalum.Zvt.TerminalSimulator/Portalum.Zvt.TerminalSimulator.csproj" />
+  <Project Path="Portalum.Zvt.UnitTest/Portalum.Zvt.UnitTest.csproj" />
+  <Project Path="Portalum.Zvt/Portalum.Zvt.csproj" />
+</Solution>

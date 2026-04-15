@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Portalum.Zvt.Helpers;
-using System.Collections.Generic;
 
 namespace Portalum.Zvt
 {

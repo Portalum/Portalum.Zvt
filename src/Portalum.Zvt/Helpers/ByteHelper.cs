@@ -5,7 +5,7 @@ using System.Text;
 namespace Portalum.Zvt.Helpers
 {
     /// <summary>
-    /// ByteHelper
+    /// Byte Helper
     /// </summary>
     public static class ByteHelper
     {
