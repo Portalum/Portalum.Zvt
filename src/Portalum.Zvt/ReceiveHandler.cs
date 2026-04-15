@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
 using Portalum.Zvt.Parsers;

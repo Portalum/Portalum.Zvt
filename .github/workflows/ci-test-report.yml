@@ -10,7 +10,7 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-    - uses: dorny/test-reporter@v1
+    - uses: dorny/test-reporter@v3
       with:
         artifact: test-results
         name: 'DotNET Tests'

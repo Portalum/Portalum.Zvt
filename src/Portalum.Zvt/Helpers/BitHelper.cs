@@ -4,7 +4,7 @@ using System;
 namespace Portalum.Zvt.Helpers
 {
     /// <summary>
-    /// BitHelper
+    /// Bit Helper
     /// </summary>
     public static class BitHelper
     {

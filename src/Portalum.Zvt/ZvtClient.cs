@@ -2,11 +2,9 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Portalum.Zvt.Helpers;
 using Portalum.Zvt.Models;
-using Portalum.Zvt.Parsers;
 using Portalum.Zvt.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;

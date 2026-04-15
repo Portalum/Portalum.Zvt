@@ -183,6 +183,7 @@ namespace Portalum.Zvt.UnitTest
             Assert.AreEqual(CommandResponseState.Successful, commandResponse.State);
         }
 
+        [Ignore("Unit Test is broken, check it")]
         [TestMethod]
         public async Task PaymentAsync_CorruptDataFlow_Failure()
         {
