@@ -22,13 +22,13 @@ namespace Portalum.Zvt
         private readonly List<byte> _receiveBuffer = new List<byte>();
 
         /// <inheritdoc />
-        public event Action<byte[]> DataReceived;
+        public event Action<byte[]>? DataReceived;
 
         /// <inheritdoc />
-        public event Action<byte[]> DataSent;
+        public event Action<byte[]>? DataSent;
 
         /// <inheritdoc />
-        public event Action<ConnectionState> ConnectionStateChanged;
+        public event Action<ConnectionState>? ConnectionStateChanged;
 
         private const byte DLE = 0x10; //Data line escape
         private const byte STX = 0x02; //Start of text
@@ -58,15 +58,11 @@ namespace Portalum.Zvt
             StopBits stopBits = StopBits.Two,
             int readTimeout = 180000,
             int writeTimeout = 180000,
-            ILogger<SerialPortDeviceCommunication> logger = default)
+            ILogger<SerialPortDeviceCommunication>? logger = default)
         {
             this._portName = portName;
 
-            if (logger == null)
-            {
-                logger = new NullLogger<SerialPortDeviceCommunication>();
-            }
-            this._logger = logger;
+            this._logger = logger ?? new NullLogger<SerialPortDeviceCommunication>();
 
             this._serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
             this._serialPort.DataReceived += this.Receive;
@@ -81,6 +77,7 @@ namespace Portalum.Zvt
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             // Check to see if Dispose has already been called.
