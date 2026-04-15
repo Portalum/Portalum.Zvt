@@ -1,6 +1,5 @@
 ﻿using Portalum.Zvt.Helpers;
 using SuperSimpleTcp;
-using System.Runtime.CompilerServices;
 
 class Program
 {
