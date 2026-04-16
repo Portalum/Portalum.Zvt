@@ -1,4 +1,9 @@
-﻿using System.Windows;
+﻿using Portalum.Zvt.Models;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 
 namespace Portalum.Zvt.ControlPanel.Dialogs
 {
@@ -9,10 +14,19 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
     {
         public RegistrationConfig RegistrationConfig { get; private set; }
 
+        public IEnumerable<CurrencyCodeIso4217> CurrencyCodes => Enum.GetValues<CurrencyCodeIso4217>().AsEnumerable();
+
         public RegistrationConfigurationDialog()
         {
             this.InitializeComponent();
+
+            this.Currency.ItemsSource = this.CurrencyCodes;
+            this.Currency.SelectedItem = CurrencyCodeIso4217.EUR;
+
             this.UpdateRegistrationConfig();
+
+
+            
         }
 
         private void UpdateRegistrationConfig()
@@ -42,6 +56,7 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
                 return;
             }
 
+
             this.RegistrationConfig = new RegistrationConfig
             {
                 AllowAdministrationViaPaymentTerminal = this.CheckBoxAllowAdministrationViaPaymentTerminal.IsChecked.Value,
@@ -49,7 +64,8 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
                 ReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal = this.CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal.IsChecked.Value,
                 ReceiptPrintoutForPaymentFunctionsViaPaymentTerminal = this.CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal.IsChecked.Value,
                 SendIntermediateStatusInformation = this.CheckBoxSendIntermediateStatusInformation.IsChecked.Value,
-                ActivateTlvSupport = this.CheckBoxActivateTlvSupport.IsChecked.Value
+                ActivateTlvSupport = this.CheckBoxActivateTlvSupport.IsChecked.Value,
+                Currency = (CurrencyCodeIso4217)this.Currency.SelectedItem
             };
 
             this.SetTitle();

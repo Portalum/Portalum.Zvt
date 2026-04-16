@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Portalum.Zvt.ControlPanel.Dialogs"
         mc:Ignorable="d"
         Title="change by code"
-        Height="223"
+        Height="243"
         Width="425"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
@@ -23,8 +23,8 @@
         <CheckBox x:Name="CheckBoxSendIntermediateStatusInformation" IsChecked="True"  Content="Send Intermediate Status information" HorizontalAlignment="Left" Margin="26,65,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
         <CheckBox x:Name="CheckBoxAllowStartPaymentViaPaymentTerminal" Content="Allow start payment via Payment Terminal" HorizontalAlignment="Left" Margin="26,85,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
         <CheckBox x:Name="CheckBoxAllowAdministrationViaPaymentTerminal" Content="Allow administration via Payment Terminal" HorizontalAlignment="Left" Margin="26,105,0,0" VerticalAlignment="Top" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" Foreground="White"/>
-        <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSave" Content="Save" Margin="10,155,10,0" VerticalAlignment="Top" Click="ButtonSave_Click" Height="29"/>
+        <Button Style="{StaticResource BaseButtonStyle}" x:Name="ButtonSave" Content="Save" Margin="10,174,10,0" VerticalAlignment="Top" Click="ButtonSave_Click" Height="29"/>
         <CheckBox x:Name="CheckBoxActivateTlvSupport" Content="Activate TLV Support" HorizontalAlignment="Left" Margin="26,124,0,0" VerticalAlignment="Top" IsChecked="True" Foreground="White"/>
-
+        <ComboBox x:Name="Currency" HorizontalAlignment="Stretch" Margin="26,144,26,0" VerticalAlignment="Top"></ComboBox>
     </Grid>
 </Window>
