@@ -19,26 +19,26 @@ namespace Portalum.Zvt
         private readonly IDeviceCommunication _deviceCommunication;
         private readonly SemaphoreSlim _processingSyncLock = new SemaphoreSlim(1);
 
-        private CancellationTokenSource _commandCompletionCancellationTokenSource;
-        private byte[] _dataBuffer;
+        private CancellationTokenSource? _commandCompletionCancellationTokenSource;
+        private byte[]? _dataBuffer;
         private bool _waitForCommandCompletion = false;
         private bool _transactionActive = false;
 
         /// <summary>
         /// New data received from the pt device
         /// </summary>
-        public event Func<byte[], ProcessData> DataReceived;
+        public event Func<byte[], ProcessData>? DataReceived;
 
         /// <summary>
         /// A callback which is checked 
         /// </summary>
-        public event Func<CompletionInfo> GetCompletionInfo;
+        public event Func<CompletionInfo>? GetCompletionInfo;
 
-        private readonly byte[] _positiveCompletionData1 = new byte[] { 0x80, 0x00, 0x00 }; //Default
-        private readonly byte[] _positiveCompletionData2 = new byte[] { 0x84, 0x00, 0x00 }; //Alternative
-        private readonly byte[] _positiveCompletionData3 = new byte[] { 0x84, 0x9C, 0x00 }; //Special case for request more time
-        private readonly byte[] _negativeIssueGoodsData = new byte[] { 0x84, 0x66, 0x00 };
-        private readonly byte[] _otherCommandData = new byte[] { 0x84, 0x83, 0x00 };
+        private readonly byte[] _positiveCompletionData1 = [0x80, 0x00, 0x00]; //Default
+        private readonly byte[] _positiveCompletionData2 = [0x84, 0x00, 0x00]; //Alternative
+        private readonly byte[] _positiveCompletionData3 = [0x84, 0x9C, 0x00]; //Special case for request more time
+        private readonly byte[] _negativeIssueGoodsData = [0x84, 0x66, 0x00];
+        private readonly byte[] _otherCommandData = [0x84, 0x83, 0x00];
         private readonly byte _negativeCompletionPrefix = 0x84;
 
         /// <summary>
@@ -305,6 +305,11 @@ namespace Portalum.Zvt
         /// </summary>
         protected virtual bool CheckIsPositiveCompletion()
         {
+            if (this._dataBuffer is null)
+            {
+                return false;
+            }
+
             if (this._dataBuffer.Length < 3)
             {
                 return false;
@@ -335,6 +340,11 @@ namespace Portalum.Zvt
         /// </summary>
         protected virtual bool CheckIsNegativeCompletion()
         {
+            if (this._dataBuffer is null)
+            {
+                return false;
+            }
+
             if (this._dataBuffer.Length < 3)
             {
                 return false;
@@ -356,6 +366,11 @@ namespace Portalum.Zvt
         /// </summary>
         protected virtual bool CheckIsNotSupported()
         {
+            if (this._dataBuffer is null)
+            {
+                return false;
+            }
+
             if (this._dataBuffer.Length < 3)
             {
                 return false;
@@ -378,6 +393,11 @@ namespace Portalum.Zvt
 
         private void ForwardUnusedBufferData()
         {
+            if (this._dataBuffer is null)
+            {
+                return;
+            }
+
             if (this._dataBuffer.Length == 3)
             {
                 this.ResetDataBuffer();
