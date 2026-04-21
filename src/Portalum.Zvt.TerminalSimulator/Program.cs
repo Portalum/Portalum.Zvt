@@ -3,8 +3,8 @@ using SuperSimpleTcp;
 
 class Program
 {
-    private static readonly byte[] _commandCompletionPackage = new byte[] { 0x80, 0x00, 0x00 };
-    private static readonly byte[] _completionPackage = new byte[] { 0x06, 0x0F, 0x00 }; //3.2 Completion
+    private static readonly byte[] _commandCompletionPackage = [0x80, 0x00, 0x00];
+    private static readonly byte[] _completionPackage = [0x06, 0x0F, 0x00]; //3.2 Completion
 
     private static SimpleTcpServer? _tcpServer;
 
