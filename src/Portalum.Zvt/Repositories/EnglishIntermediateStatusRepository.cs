@@ -13,7 +13,7 @@ namespace Portalum.Zvt.Repositories
         /// English IntermediateStatusRepository
         /// </summary>
         /// <param name="additionalStatusCodes"></param>
-        public EnglishIntermediateStatusRepository(Dictionary<byte, string> additionalStatusCodes = null)
+        public EnglishIntermediateStatusRepository(Dictionary<byte, string>? additionalStatusCodes = null)
         {
             this._statusCodes = new Dictionary<byte, string>
             {
@@ -104,7 +104,7 @@ namespace Portalum.Zvt.Repositories
                 { 0xFF, "no appropriate ZVT status code matches the status. See TLV tags 24 and 07" }
             };
 
-            if (additionalStatusCodes != null)
+            if (additionalStatusCodes is not null)
             {
                 foreach (var additionalStatusCode in additionalStatusCodes)
                 {

@@ -5,7 +5,7 @@ namespace Portalum.Zvt.Models
 {
     public class TlvInfo
     {
-        public string Tag { get; set; }
+        public string Tag { get; set; } = string.Empty;
 
         public string Description { get; set; }
 

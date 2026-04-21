@@ -701,7 +701,7 @@ namespace Portalum.Zvt
         /// <returns></returns>
         public async Task<CommandResponse> CustomCommandAsync(
             byte[] controlFieldData,
-            byte[] packageData = default,
+            byte[]? packageData = default,
             CancellationToken cancellationToken = default)
         {
             this._logger.LogInformation($"{nameof(CustomCommandAsync)} - Execute");
