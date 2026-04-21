@@ -29,12 +29,12 @@ namespace Portalum.Zvt
         private int _receiveBufferEndPosition = 0;
         private int _missingDataOfExpectedPackage = 0;
 
-        private readonly byte[] _statusInformationControlField = new byte[] { 0x04, 0x0F };
-        private readonly byte[] _intermediateStatusInformationControlField = new byte[] { 0x04, 0xFF };
-        private readonly byte[] _printLineControlField = new byte[] { 0x06, 0xD1 };
-        private readonly byte[] _printTextBlockControlField = new byte[] { 0x06, 0xD3 };
-        private readonly byte[] _completionCommandControlField = new byte[] { 0x06, 0x0F };
-        private readonly byte[] _abortCommandControlField = new byte[] { 0x06, 0x1E };
+        private readonly byte[] _statusInformationControlField = [0x04, 0x0F];
+        private readonly byte[] _intermediateStatusInformationControlField = [0x04, 0xFF];
+        private readonly byte[] _printLineControlField = [0x06, 0xD1];
+        private readonly byte[] _printTextBlockControlField = [0x06, 0xD3];
+        private readonly byte[] _completionCommandControlField = [0x06, 0x0F];
+        private readonly byte[] _abortCommandControlField = [0x06, 0x1E];
 
         /// <inheritdoc />
         public event Action<PrintLineInfo> LineReceived;
