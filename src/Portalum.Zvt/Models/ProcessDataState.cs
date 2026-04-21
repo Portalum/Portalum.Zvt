@@ -9,14 +9,17 @@
         /// Cannot process data
         /// </summary>
         CannotProcess,
+
         /// <summary>
         /// Failure on processing
         /// </summary>
         ParseFailure,
+
         /// <summary>
         /// Successfully processed
         /// </summary>
         Processed,
+
         /// <summary>
         /// Wait for more data
         /// </summary>
