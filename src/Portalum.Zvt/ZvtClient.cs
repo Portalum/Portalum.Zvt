@@ -116,7 +116,7 @@ namespace Portalum.Zvt
             
             if (zvtCommunication == default)
             {
-                this._zvtCommunication = new ZvtCommunication(logger, deviceCommunication);
+                this._zvtCommunication = new ZvtCommunication(this._logger, deviceCommunication);
             }
             else
             {
@@ -449,7 +449,7 @@ namespace Portalum.Zvt
                 //1F05 - Transaction parameter
             }
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x00 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x00], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -478,7 +478,7 @@ namespace Portalum.Zvt
                 asyncCompletion = true;
             }
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x01 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x01], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken, asyncCompletion: asyncCompletion);
         }
 
@@ -501,7 +501,7 @@ namespace Portalum.Zvt
             package.Add(0x87); //ReceiptNumber prefix
             package.AddRange(NumberHelper.IntToBcd(receiptNumber, 2));
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x30 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x30], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -523,7 +523,7 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x31 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x31], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -540,7 +540,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x50 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x50], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -557,7 +557,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x10 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x10], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -574,7 +574,7 @@ namespace Portalum.Zvt
             var package = new List<byte>();
             package.AddRange(this._passwordData);
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x20 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x20], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -589,7 +589,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x02 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x02], package);
             return await this.SendCommandAsync(fullPackage, endAfterCommandCompletion: true, cancellationToken: cancellationToken);
         }
 
@@ -604,7 +604,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0xB0 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0xB0], package);
             return await this.SendCommandAsync(fullPackage, endAfterCommandCompletion: true, cancellationToken: cancellationToken);
         }
 
@@ -619,7 +619,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x70 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x70], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -634,7 +634,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x08, 0x10 }, package);
+            var fullPackage = PackageHelper.Create([0x08, 0x10], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -649,7 +649,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x1A }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x1A], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -664,7 +664,7 @@ namespace Portalum.Zvt
 
             var package = Array.Empty<byte>();
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x06, 0x79 }, package);
+            var fullPackage = PackageHelper.Create([0x06, 0x79], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -684,7 +684,7 @@ namespace Portalum.Zvt
             //var softwareVersion = Encoding.GetEncoding(437).GetString(apduData.Slice(3, lengthOfSoftwareVersionData).ToArray());
             //var test = apduData.Slice(3 + lengthOfSoftwareVersionData);
 
-            var fullPackage = PackageHelper.Create(new byte[] { 0x05, 0x01 }, package);
+            var fullPackage = PackageHelper.Create([0x05, 0x01], package);
             return await this.SendCommandAsync(fullPackage, cancellationToken: cancellationToken);
         }
 
@@ -704,7 +704,7 @@ namespace Portalum.Zvt
 
             if (packageData is null)
             {
-                packageData = Array.Empty<byte>();
+                packageData = [];
             }
 
             var fullPackage = PackageHelper.Create(controlFieldData, packageData);

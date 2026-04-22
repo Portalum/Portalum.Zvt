@@ -296,7 +296,7 @@ namespace Portalum.Zvt
                 if (apduData.Length > 0)
                 {
                     errorCode = apduData[0];
-                    errorMessage = this._errorMessageRepository.GetMessage(errorCode);
+                    errorMessage = this._errorMessageRepository.GetMessage(errorCode) ?? "";
                 }
                 else
                 {

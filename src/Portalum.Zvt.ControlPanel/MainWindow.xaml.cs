@@ -354,10 +354,10 @@ namespace Portalum.Zvt.ControlPanel
             var outputInfo = new OutputInfo
             {
                 Title = $"Receipt {receiptInfo.ReceiptType}",
-                Lines = new string[]
-                {
+                Lines =
+                [
                     receiptInfo.Content
-                }
+                ]
             };
 
             try
@@ -380,10 +380,10 @@ namespace Portalum.Zvt.ControlPanel
                 var outputInfo = new OutputInfo
                 {
                     Title = "Lines",
-                    Lines = new string[]
-                    {
+                    Lines =
+                    [
                         this._printLineCache.ToString()
-                    }
+                    ]
                 };
 
                 var receiptWidth = 230;
@@ -548,7 +548,7 @@ namespace Portalum.Zvt.ControlPanel
                     this.AddOutputElement(new OutputInfo
                     {
                         Title = "Unkown Command",
-                        Lines = new[] { $"State: {commandResponse.State}" }
+                        Lines = [$"State: {commandResponse.State}"]
                     }, Brushes.Orange);
                     break;
                 case CommandResponseState.Abort:
@@ -556,7 +556,7 @@ namespace Portalum.Zvt.ControlPanel
                     this.AddOutputElement(new OutputInfo
                     {
                         Title = "Command is not successful",
-                        Lines = new[] { $"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}" }
+                        Lines = [$"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}"]
                     }, Brushes.Yellow);
                     break;
                 case CommandResponseState.NotSupported:
@@ -564,7 +564,7 @@ namespace Portalum.Zvt.ControlPanel
                     this.AddOutputElement(new OutputInfo
                     {
                         Title = "Command is not successful",
-                        Lines = new[] { $"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}" }
+                        Lines = [$"{commandResponse.State}\r\n\r\n{commandResponse.ErrorMessage}"]
                     }, Brushes.IndianRed);
                     break;
                 default:
@@ -579,7 +579,7 @@ namespace Portalum.Zvt.ControlPanel
                 this.AddOutputElement(new OutputInfo
                 {
                     Title = "ZVT Client not ready",
-                    Lines = new [] { "Check if the connection is active" }
+                    Lines = ["Check if the connection is active"]
                 }, Brushes.Red);
 
                 return false;

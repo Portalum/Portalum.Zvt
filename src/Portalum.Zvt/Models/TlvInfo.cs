@@ -7,9 +7,9 @@ namespace Portalum.Zvt.Models
     {
         public string Tag { get; set; } = string.Empty;
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public Func<byte[], IResponse, bool> TryProcess;
+        public Func<byte[], IResponse, bool>? TryProcess;
 
         public override string ToString()
         {
