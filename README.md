@@ -17,10 +17,6 @@ The package is available via [NuGet](https://www.nuget.org/packages/Portalum.Zvt
 PM> install-package Portalum.Zvt
 ```
 
-## V2 -> V3 Breaking change
-In the `IReceiveHandler` interface the received data is now included in the `CompletionReceived` event. Normally, the update should not lead to any difficulties.<br>
-`event Action CompletionReceived;` change to `event Action<byte[]> CompletionReceived;`
-
 ## Supported features
 
 The following features of the ZVT protocol were implemented.
