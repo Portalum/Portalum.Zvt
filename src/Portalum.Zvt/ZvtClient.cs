@@ -84,11 +84,7 @@ namespace Portalum.Zvt
             IReceiveHandler? receiveHandler = default,
             ZvtCommunication? zvtCommunication = default)
         {
-            if (logger == null)
-            {
-                logger = new NullLogger<ZvtClient>();
-            }
-            this._logger = logger;
+            this._logger = logger ?? new NullLogger<ZvtClient>();
 
             if (clientConfig == default)
             {
@@ -475,7 +471,7 @@ namespace Portalum.Zvt
             package.Add(0x04); //Amount prefix
             package.AddRange(NumberHelper.DecimalToBcd(amount));
 
-            if (this.CompletionDecisionRequested != null)
+            if (this.CompletionDecisionRequested is not null)
             {
                 package.Add(0x02); // max nr. of status-informations
                 package.Add(this._clientConfig.GetAsyncCompletionInfoLimit);
@@ -706,7 +702,7 @@ namespace Portalum.Zvt
         {
             this._logger.LogInformation($"{nameof(CustomCommandAsync)} - Execute");
 
-            if (packageData == null)
+            if (packageData is null)
             {
                 packageData = Array.Empty<byte>();
             }

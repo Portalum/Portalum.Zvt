@@ -98,7 +98,7 @@ namespace Portalum.Zvt
             // Check to see if Dispose has already been called.
             if (disposing)
             {
-                if (this._tcpClient == null)
+                if (this._tcpClient is null)
                 {
                     return;
                 }

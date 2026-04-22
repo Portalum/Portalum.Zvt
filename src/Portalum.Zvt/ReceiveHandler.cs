@@ -212,7 +212,7 @@ namespace Portalum.Zvt
             ApduResponseInfo apduInfo,
             Span<byte> apduData)
         {
-            if (apduInfo.ControlField == null ||
+            if (apduInfo.ControlField is null ||
                 apduInfo.ControlField.Length != 2)
             {
                 return new ProcessData { State = ProcessDataState.ParseFailure };
@@ -222,7 +222,7 @@ namespace Portalum.Zvt
             if (apduInfo.CanHandle(this._statusInformationControlField))
             {
                 var statusInformation = this._statusInformationParser.Parse(apduData);
-                if (statusInformation == null)
+                if (statusInformation is null)
                 {
                     return new ProcessData { State = ProcessDataState.ParseFailure };
                 }
@@ -235,7 +235,7 @@ namespace Portalum.Zvt
             if (apduInfo.CanHandle(this._intermediateStatusInformationControlField))
             {
                 var intermediateStatusInformation = this._intermediateStatusInformationParser.GetMessage(apduData);
-                if (intermediateStatusInformation == null)
+                if (intermediateStatusInformation is null)
                 {
                     return new ProcessData { State = ProcessDataState.ParseFailure };
                 }
@@ -261,7 +261,7 @@ namespace Portalum.Zvt
             if (apduInfo.CanHandle(this._printTextBlockControlField))
             {
                 var receipt = this._printTextBlockParser.Parse(apduData);
-                if (receipt == null)
+                if (receipt is null)
                 {
                     return new ProcessData { State = ProcessDataState.ParseFailure };
                 }

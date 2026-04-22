@@ -39,7 +39,7 @@ class Program
 
     private static bool IsClientConnected(string ipPort)
     {
-        if (_tcpServer == null)
+        if (_tcpServer is null)
         {
             return false;
         }
@@ -50,7 +50,7 @@ class Program
 
     private static void Events_DataReceived(object? sender, DataReceivedEventArgs e)
     {
-        if (_tcpServer == null)
+        if (_tcpServer is null)
         {
             return;
         }

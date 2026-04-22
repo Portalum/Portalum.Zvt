@@ -22,7 +22,7 @@ namespace Portalum.Zvt.ControlPanel
 
         public void SetDeviceCommunication(IDeviceCommunication deviceCommunication)
         {
-            if (this._deviceCommunication != null)
+            if (this._deviceCommunication is not null)
             {
                 this._deviceCommunication.DataReceived -= DataReceived;
             }

@@ -198,7 +198,7 @@ namespace Portalum.Zvt.ControlPanel
                 disposable.Dispose();
             }
 
-            if (this._zvtClient != null)
+            if (this._zvtClient is not null)
             {
                 this._zvtClient.LineReceived -= this.LineReceived;
                 this._zvtClient.ReceiptReceived -= this.ReceiptReceived;
@@ -261,7 +261,7 @@ namespace Portalum.Zvt.ControlPanel
                     new Bold(new Run(outputInfo.Title))
                 };
 
-                if (outputInfo.Lines != null && outputInfo.Lines.Length > 0)
+                if (outputInfo.Lines is not null && outputInfo.Lines.Length > 0)
                 {
                     inlines.Add(new LineBreak());
 
@@ -346,7 +346,7 @@ namespace Portalum.Zvt.ControlPanel
 
         private void ReceiptReceived(ReceiptInfo receiptInfo)
         {
-            if (receiptInfo == null)
+            if (receiptInfo is null)
             {
                 return;
             }
@@ -396,7 +396,7 @@ namespace Portalum.Zvt.ControlPanel
 
         private void StatusInformationReceived(StatusInformation statusInformation)
         {
-            if (statusInformation == null)
+            if (statusInformation is null)
             {
                 return;
             }
@@ -574,7 +574,7 @@ namespace Portalum.Zvt.ControlPanel
 
         private bool IsZvtClientReady()
         {
-            if (this._zvtClient == null || !this._deviceCommunication.IsConnected)
+            if (this._zvtClient is null || !this._deviceCommunication.IsConnected)
             {
                 this.AddOutputElement(new OutputInfo
                 {

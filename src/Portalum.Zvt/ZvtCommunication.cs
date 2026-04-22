@@ -131,7 +131,7 @@ namespace Portalum.Zvt
         protected virtual void ProcessData(byte[] data)
         {
             var dataProcessed = this.DataReceived?.Invoke(data);
-            if (dataProcessed == null)
+            if (dataProcessed is null)
             {
                 this._logger.LogError($"{nameof(ProcessData)} - dataProcessed is null");
                 return;
@@ -163,7 +163,7 @@ namespace Portalum.Zvt
             if (dataProcessed.Response is StatusInformation { ErrorCode: 0 })
             {
                 var completionInfo = this.GetCompletionInfo?.Invoke();
-                if (completionInfo == null)
+                if (completionInfo is null)
                 {
                     //Default if no one has subscribed to the event, immediately approve the transaction
                     this._deviceCommunication.SendAsync(this._positiveCompletionData1);
@@ -273,7 +273,7 @@ namespace Portalum.Zvt
 
             this._commandCompletionCancellationTokenSource.Dispose();
 
-            if (this._dataBuffer == null)
+            if (this._dataBuffer is null)
             {
                 return SendCommandResult.NoDataReceived;
             }

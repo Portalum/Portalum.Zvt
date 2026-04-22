@@ -388,7 +388,7 @@ namespace Portalum.Zvt.Parsers
             {
                 var command = data[currentPosition];
                 var bmpInfo = this.GetBmpInfo(command);
-                if (bmpInfo == null)
+                if (bmpInfo is null)
                 {
                     this._logger.LogError($"{nameof(Parse)} - No processing logic available for {command:X2}");
                     return false;

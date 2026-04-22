@@ -17,27 +17,27 @@ namespace Portalum.Zvt.ControlPanel.Dialogs
 
         private void UpdateRegistrationConfig()
         {
-            if (this.CheckBoxAllowAdministrationViaPaymentTerminal == null)
+            if (this.CheckBoxAllowAdministrationViaPaymentTerminal is null)
             {
                 return;
             }
 
-            if (this.CheckBoxAllowStartPaymentViaPaymentTerminal == null)
+            if (this.CheckBoxAllowStartPaymentViaPaymentTerminal is null)
             {
                 return;
             }
 
-            if (this.CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal == null)
+            if (this.CheckBoxReceiptPrintoutForAdministrationFunctionsViaPaymentTerminal is null)
             {
                 return;
             }
 
-            if (this.CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal == null)
+            if (this.CheckBoxReceiptPrintoutForPaymentFunctionsViaPaymentTerminal is null)
             {
                 return;
             }
 
-            if (this.CheckBoxSendIntermediateStatusInformation == null)
+            if (this.CheckBoxSendIntermediateStatusInformation is null)
             {
                 return;
             }
