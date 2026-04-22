@@ -77,7 +77,7 @@ namespace Portalum.Zvt.Parsers
             var message = this._intermediateStatusRepository.GetMessage(id);
             if (string.IsNullOrEmpty(message))
             {
-                this._logger.LogError($"{nameof(GetMessage)} - No message available for {id:X2}");
+                this._logger.LogWarning($"{nameof(GetMessage)} - No message available in IntermediateStatusRepository for {id:X2}");
             }
 
             return message;
